@@ -7,6 +7,7 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseFirestore
 
 // Your existing AppDelegate for Firebase configuration is correct.
 class AppDelegate: NSObject, UIApplicationDelegate {
@@ -31,3 +32,5 @@ struct GradevaApp: App {
         }
     }
 }
+
+let db = Firestore.firestore()
