@@ -9,30 +9,33 @@ import SwiftUI
 import AuthenticationServices
 
 struct SignInView: View {
-    // We will create the ViewModel here and pass it the success action.
-    @ObservedObject var viewModel: SignInViewModel
-
+    @EnvironmentObject var viewModel: SignInViewModel
+    @Environment(\.colorScheme) var colorScheme
+    
+    private var signInColor: SignInWithAppleButton.Style {
+        colorScheme == .dark ? .white : .black
+    }
+    
     var body: some View {
         VStack {
-            Text("Welcome to Gradeva")
+            Text("Sign In to Gradeva")
                 .font(.largeTitle)
                 .fontWeight(.bold)
-                .padding(.bottom, 40)
+                .padding(.bottom)
             
-            // The button now calls the ViewModel's handleSignIn method directly.
             SignInWithAppleButton(
                 .signIn,
-                onRequest: { request in
-                    viewModel.handleSignInWithAppleRequest(request)
-                },
-                onCompletion: { result in
-                    viewModel.handleSignInWithAppleCompletion(result)
-                }
+                onRequest: viewModel.handleSignInWithAppleRequest,
+                onCompletion: viewModel.handleSignInWithAppleCompletion
             )
-            .signInWithAppleButtonStyle(.black)
+            .signInWithAppleButtonStyle(signInColor)
             .frame(width: 280, height: 45)
             .cornerRadius(8)
         }
         .padding()
     }
+}
+
+#Preview {
+    SignInView()
 }
