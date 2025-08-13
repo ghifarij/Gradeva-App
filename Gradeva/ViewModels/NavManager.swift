@@ -8,7 +8,6 @@
 import Foundation
 
 enum NavPath: String, Hashable {
-    case home
     case settings
 }
 

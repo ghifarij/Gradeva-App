@@ -20,8 +20,6 @@ struct MainContentView: View {
                 HomeView()
                     .navigationDestination(for: NavPath.self) { path in
                         switch path {
-                        case .home:
-                            HomeView()
                         case .settings:
                             SettingsView()
                         }
