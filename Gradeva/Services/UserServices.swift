@@ -9,6 +9,8 @@ import Foundation
 import FirebaseFirestore
 
 class UserServices {
+    let db = DatabaseManager.shared.db
+    
     private func getUserAsync(uid: String, completion: @escaping (Result<User, Error>) -> Void) async {
         let userRef = db.collection("users").document(uid)
         
