@@ -19,14 +19,16 @@ class AuthManager: ObservableObject {
     init() {
         // Check if the user logged in Firebase
         if let user = Auth.auth().currentUser {
-            self.currentUser = user
+            self.currentUser = User(fromFirebaseUser: user)
             self.isSignedIn = true
         }
         
         Auth.auth().addStateDidChangeListener { _, user in
             DispatchQueue.main.async {
-                self.currentUser = user
-                self.isSignedIn = user != nil
+                if let user = user {
+                    self.currentUser = User(fromFirebaseUser: user)
+                    self.isSignedIn = true
+                }
             }
         }
     }
@@ -62,12 +64,12 @@ class AuthManager: ObservableObject {
                 Auth.auth().signIn(with: credential) { (authResult, error) in
                     DispatchQueue.main.async {
                         if let error = error {
-                            print("Sign In failed.")
+                            print("Sign In failed. Error: \(error.localizedDescription)")
                             return
                         }
                         
                         if let user = authResult?.user {
-                            self.currentUser = user
+                            self.currentUser = User(fromFirebaseUser: user)
                             self.isSignedIn = true
                         }
                     }
