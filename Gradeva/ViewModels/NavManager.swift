@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NavPath: String {
+enum NavPath: String, Hashable {
     case home
     case settings
 }
