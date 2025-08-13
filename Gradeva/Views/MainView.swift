@@ -10,13 +10,20 @@ import Firebase
 import FirebaseAuth
 
 struct MainContentView: View {
-    @StateObject private var viewModel = SignInViewModel()
+    @StateObject private var viewModel = AuthManager()
+    @StateObject private var navManager = NavManager()
     
     var body: some View {
-        NavigationView {
+        NavigationStack(path: $navManager.paths) {
             if viewModel.isSignedIn {
                 // Signed-in  --> show HomeView
                 HomeView()
+                    .navigationDestination(for: NavPath.self) { path in
+                        switch path {
+                        case .settings:
+                            SettingsView()
+                        }
+                    }
             } else {
                 // Not signed in --> show SignInView
                 SignInView()
@@ -24,6 +31,7 @@ struct MainContentView: View {
             
         }
         .environmentObject(viewModel)
+        .environmentObject(navManager)
     }
 }
 

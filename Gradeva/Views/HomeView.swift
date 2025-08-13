@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject var viewModel: SignInViewModel
+    @EnvironmentObject var auth: AuthManager
+    @EnvironmentObject var navManager: NavManager
     
     var body: some View {
-        if let user = viewModel.currentUser {
+        if let user = auth.currentUser {
             VStack(spacing: 16) {
                 Text("Hello,")
                     .font(.title3)
@@ -28,7 +29,7 @@ struct HomeView: View {
                 Spacer().frame(height: 24)
                 
                 Button(action: {
-                    viewModel.signOut()
+                    auth.signOut()
                 }) {
                     Text("Sign Out")
                         .fontWeight(.semibold)
@@ -39,6 +40,10 @@ struct HomeView: View {
                         .cornerRadius(8)
                 }
                 .padding(.horizontal)
+                
+                Button("Go to settings") {
+                    navManager.push(.settings)
+                }
                 
                 Spacer()
             }

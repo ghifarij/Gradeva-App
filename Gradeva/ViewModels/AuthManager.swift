@@ -10,7 +10,7 @@ import AuthenticationServices
 import FirebaseAuth
 import CryptoKit
 
-class SignInViewModel: ObservableObject {
+class AuthManager: ObservableObject {
     @Published var isSignedIn = false
     @Published var currentUser: User?
     
