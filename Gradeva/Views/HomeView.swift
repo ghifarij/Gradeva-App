@@ -49,9 +49,6 @@ struct HomeView: View {
             }
             .padding()
             .navigationTitle("Dashboard")
-            // TODO: REMOVE THIS
-        } else {
-            Text("Hello from HomeView!")
         }
     }
 }
