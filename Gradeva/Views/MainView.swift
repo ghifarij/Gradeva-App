@@ -10,14 +10,14 @@ import Firebase
 import FirebaseAuth
 
 struct MainContentView: View {
-    @StateObject private var viewModel = AuthManager()
+    @StateObject private var auth = AuthManager()
     @StateObject private var navManager = NavManager()
     @State private var hideStatusBar = false
     
     var body: some View {
         NavigationStack(path: $navManager.paths) {
             // Signed-in  --> show HomeView
-            if true {
+            if auth.isSignedIn {
                 TabView {
                     HomeView()
                         .tabItem {
@@ -52,7 +52,7 @@ struct MainContentView: View {
             }
             
         }
-        .environmentObject(viewModel)
+        .environmentObject(auth)
         .environmentObject(navManager)
     }
 }
