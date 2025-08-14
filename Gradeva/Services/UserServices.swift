@@ -11,13 +11,13 @@ import FirebaseFirestore
 class UserServices {
     let db = DatabaseManager.shared.db
     
-    func getUser(uid: String, completion: @escaping (Result<User, Error>) -> Void)  {
+    func getUser(uid: String, completion: @escaping (Result<AppUser, Error>) -> Void)  {
         Task {
             let userRef = db.collection("users").document(uid)
             
             do {
                 let document = try await userRef.getDocument()
-                let user = try document.data(as: User.self)
+                let user = try document.data(as: AppUser.self)
                 completion(.success(user))
             } catch {
                 completion(.failure(error))

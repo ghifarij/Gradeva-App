@@ -12,21 +12,21 @@ import CryptoKit
 
 class AuthManager: ObservableObject {
     @Published var isSignedIn = false
-    @Published var currentUser: User?
+    @Published var currentUser: AppUser?
     
     private var currentNonce: String?
     
     init() {
         // Check if the user logged in Firebase
         if let user = Auth.auth().currentUser {
-            self.currentUser = User(fromFirebaseUser: user)
+            self.currentUser = AppUser(fromFirebaseUser: user)
             self.isSignedIn = true
         }
         
         Auth.auth().addStateDidChangeListener { _, user in
             DispatchQueue.main.async {
                 if let user = user {
-                    self.currentUser = User(fromFirebaseUser: user)
+                    self.currentUser = AppUser(fromFirebaseUser: user)
                     self.isSignedIn = true
                 }
             }
@@ -69,7 +69,7 @@ class AuthManager: ObservableObject {
                         }
                         
                         if let user = authResult?.user {
-                            self.currentUser = User(fromFirebaseUser: user)
+                            self.currentUser = AppUser(fromFirebaseUser: user)
                             self.isSignedIn = true
                         }
                     }

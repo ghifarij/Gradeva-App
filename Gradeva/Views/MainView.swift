@@ -35,12 +35,10 @@ struct MainContentView: View {
                             Label("Profile", systemImage: "person")
                         }
                 }
-                .navigationDestination(for: NavPath.self) { path in
-                    switch path {
-                    case .settings:
-                        SettingsView()
-                    }
-                }
+                .navigationDestination(
+                    for: NavPath.self,
+                    destination: getNavDestination
+                )
             } else {
                 // Not signed in --> show SignInView
                 SignInView()
