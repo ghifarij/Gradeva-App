@@ -12,7 +12,6 @@ import FirebaseAuth
 struct MainContentView: View {
     @StateObject private var auth = AuthManager()
     @StateObject private var navManager = NavManager()
-    @State private var hideStatusBar = false
     
     var body: some View {
         NavigationStack(path: $navManager.paths) {
@@ -41,10 +40,6 @@ struct MainContentView: View {
                     case .settings:
                         SettingsView()
                     }
-                }
-                .statusBarHidden(hideStatusBar)
-                .onAppear {
-                    hideStatusBar = true
                 }
             } else {
                 // Not signed in --> show SignInView
