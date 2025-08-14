@@ -22,7 +22,7 @@ struct HomeView: View {
                     .fontWeight(.semibold)
                 
                 // Optional user id
-                Text("UID: \(user.uid)")
+                Text("UID: \(user.id)")
                     .font(.caption)
                     .foregroundColor(.gray)
                 
