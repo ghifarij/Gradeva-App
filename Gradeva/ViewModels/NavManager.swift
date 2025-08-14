@@ -7,8 +7,9 @@
 
 import Foundation
 
-enum NavPath: String, Hashable {
+enum NavPath: Hashable {
     case settings
+    case grading(String)
 }
 
 class NavManager: ObservableObject {

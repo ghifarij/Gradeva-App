@@ -8,10 +8,34 @@
 import SwiftUI
 
 struct GradingView: View {
+    // TODO: Use grading model instead of hardcoded strings
+    let subjects = [
+        "Digital Marketing",
+        "Spa",
+        "Web Development",
+        "Food & Beverage Services",
+        "Public Speaking"
+    ]
+    
     var body: some View {
-        Text("Hello, from GradingView!")
+        NavigationView {
+            VStack {
+                ScrollView {
+                    LazyVStack(spacing: 20) {
+                        ForEach(subjects, id: \.self) { item in
+                            GradingSubject(subjectName: item)
+                        }
+                    }
+                    .padding()
+                }
+                Spacer()
+            }
+            .navigationTitle("Grading")
+        }
     }
 }
+
+
 
 #Preview {
     GradingView()
