@@ -28,7 +28,6 @@ struct GradingView: View {
                     }
                     .padding()
                 }
-                Spacer()
             }
             .navigationTitle("Grading")
         }
