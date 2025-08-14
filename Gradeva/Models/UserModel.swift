@@ -26,7 +26,6 @@ class User: Codable {
         self.uid = user.uid
         self.displayName = user.displayName
         self.email = user.email
-        
         self.getUserData()
     }
     
