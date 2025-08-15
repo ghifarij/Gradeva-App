@@ -33,16 +33,14 @@ class AuthManager: ObservableObject {
         }
     }
     
-    func handleSignInWithAppleRequest(_ request:
-                                      ASAuthorizationAppleIDRequest) {
+    func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
         let nonce = randomNonceString()
         currentNonce = nonce
         request.requestedScopes = [.fullName, .email]
         request.nonce = sha256(nonce)
     }
     
-    func handleSignInWithAppleCompletion(_ result:
-                                         Result<ASAuthorization, any Error>) {
+    func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, any Error>) {
         switch result {
         case .success(let authorization):
             if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
@@ -62,15 +60,26 @@ class AuthManager: ObservableObject {
                 let credential = OAuthProvider.appleCredential(withIDToken: idTokenString, rawNonce: nonce, fullName: appleIDCredential.fullName)
                 
                 Auth.auth().signIn(with: credential) { (authResult, error) in
-                    DispatchQueue.main.async {
-                        if let error = error {
-                            print("Sign In failed. Error: \(error.localizedDescription)")
-                            return
-                        }
-                        
-                        if let user = authResult?.user {
-                            self.currentUser = AppUser(fromFirebaseUser: user)
-                            self.isSignedIn = true
+                    if let error = error {
+                        // TODO: Do proper error handling
+                        print("Sign In failed. Error: \(error.localizedDescription)")
+                        return
+                    }
+                    
+                    if let user = authResult?.user {
+                        // Get data from firestore
+                        UserServices().getUser(uid: user.uid) { firestoreResult in
+                            switch firestoreResult {
+                            case .success(let userData):
+                                DispatchQueue.main.async {
+                                    self.currentUser = userData
+                                    self.isSignedIn = true
+                                }
+                            case .failure(let error):
+                                // TODO: Do proper error handling
+                                print("Error fetching user data: \(error.localizedDescription)")
+                                
+                            }
                         }
                     }
                 }

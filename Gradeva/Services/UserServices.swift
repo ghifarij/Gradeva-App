@@ -24,4 +24,31 @@ class UserServices {
             }
         }
     }
+    
+    func registerToQueue(user: AppUser, completion: @escaping (Result<Void, Error>) -> Void) {
+        Task {
+            let registrationRef = db.collection("registrations")
+            guard let userId = user.id else {
+                completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Could not get user id"])))
+                return
+            }
+            let registration = Registration(
+                userId: userId,
+                userName: user.displayName,
+                userEmail: user.email,
+                status: .pending,
+            )
+            
+            do {
+                let registrationData = try Firestore.Encoder().encode(
+                    registration
+                )
+                try await registrationRef.addDocument(data: registrationData)
+                
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
 }
