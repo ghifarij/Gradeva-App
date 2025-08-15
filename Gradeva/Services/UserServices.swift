@@ -25,6 +25,27 @@ class UserServices {
         }
     }
     
+    func createUser(user: AppUser, completion: @escaping (Result<Void, Error>) -> Void) {
+        Task {
+            let usersRef = db.collection("users")
+            guard let userId = user.id else {
+                completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Could not get user id"])))
+                return
+            }
+            
+            do {
+                let userData = try Firestore.Encoder().encode(
+                    user
+                )
+                
+                try await usersRef.document(userId).setData(userData)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
     func registerToQueue(user: AppUser, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
             let registrationRef = db.collection("registrations")
@@ -48,6 +69,26 @@ class UserServices {
                 completion(.success(()))
             } catch {
                 completion(.failure(error))
+            }
+        }
+    }
+    
+    func handleFirstTimeLogin(user: AppUser, completion: @escaping (Result<Void, Error>) -> Void) {
+        Task {
+            createUser(user: user) { result in
+                switch result {
+                case .success:
+                    self.registerToQueue(user: user) { result in
+                        switch result {
+                        case .success:
+                            completion(.success(()))
+                        case .failure(let error):
+                            completion(.failure(error))
+                        }
+                    }
+                case .failure(let error):
+                    completion(.failure(error))
+                }
             }
         }
     }

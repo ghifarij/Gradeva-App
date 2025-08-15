@@ -13,6 +13,7 @@ import CryptoKit
 class AuthManager: ObservableObject {
     @Published var isSignedIn = false
     @Published var currentUser: AppUser?
+    @Published var isAuthLoading = false
     
     private var currentNonce: String?
     
@@ -38,54 +39,49 @@ class AuthManager: ObservableObject {
         currentNonce = nonce
         request.requestedScopes = [.fullName, .email]
         request.nonce = sha256(nonce)
+        
+        setLoading(true)
+    }
+    
+    // TODO: Create a better wrapper for this, right now it's duplicated everywhere
+    private func setLoading(_ loading: Bool) {
+        DispatchQueue.main.async {
+            self.isAuthLoading = loading
+        }
     }
     
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, any Error>) {
         switch result {
         case .success(let authorization):
             if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+                // TODO: Do proper error handling
                 guard let nonce = currentNonce else {
                     print("Nonce doesn't exist.")
+                    setLoading(false)
                     return
                 }
+                
+                // TODO: Do proper error handling
                 guard let appleIDToken = appleIDCredential.identityToken else {
                     print("Token is not found.")
+                    setLoading(false)
                     return
                 }
+                
+                // TODO: Do proper error handling
                 guard let idTokenString = String(data: appleIDToken, encoding: .utf8) else {
                     print("Failed to encode token.")
+                    setLoading(false)
                     return
                 }
                 
                 let credential = OAuthProvider.appleCredential(withIDToken: idTokenString, rawNonce: nonce, fullName: appleIDCredential.fullName)
                 
-                Auth.auth().signIn(with: credential) { (authResult, error) in
-                    if let error = error {
-                        // TODO: Do proper error handling
-                        print("Sign In failed. Error: \(error.localizedDescription)")
-                        return
-                    }
-                    
-                    if let user = authResult?.user {
-                        // Get data from firestore
-                        UserServices().getUser(uid: user.uid) { firestoreResult in
-                            switch firestoreResult {
-                            case .success(let userData):
-                                DispatchQueue.main.async {
-                                    self.currentUser = userData
-                                    self.isSignedIn = true
-                                }
-                            case .failure(let error):
-                                // TODO: Do proper error handling
-                                print("Error fetching user data: \(error.localizedDescription)")
-                                
-                            }
-                        }
-                    }
-                }
+                Auth.auth().signIn(with: credential, completion: signInCallback)
             }
         case .failure(let error):
             print("Error: \(error.localizedDescription)")
+            setLoading(false)
         }
     }
     
@@ -101,6 +97,59 @@ class AuthManager: ObservableObject {
         }
     }
     
+    private func signInCallback(
+        authResult: FirebaseAuth.AuthDataResult?,
+        error: Error?
+    ) {
+        if let error = error {
+            // TODO: Do proper error handling
+            print("Sign In failed. Error: \(error.localizedDescription)")
+            setLoading(false)
+            return
+        }
+        
+        if let user = authResult?.user {
+            // Get user data from firestore
+            UserServices().getUser(uid: user.uid) { firestoreResult in
+                switch firestoreResult {
+                    
+                    // Success --> user already exist in firestore, meaning not the first time
+                case .success(let userData):
+                    DispatchQueue.main.async {
+                        self.currentUser = userData
+                        self.isSignedIn = true
+                    }
+                    self.setLoading(false)
+                    
+                    // Failure --> first time login
+                case .failure(let error):
+                    // Convert  to AppUser
+                    let appUser = AppUser(fromFirebaseUser: user)
+                    
+                    UserServices()
+                        .handleFirstTimeLogin(user: appUser) { registrationResult in
+                            switch registrationResult {
+                            case .success():
+                                DispatchQueue.main.async {
+                                    self.currentUser = appUser
+                                    self.isSignedIn = true
+                                }
+                                self.setLoading(false)
+                            case .failure(let error):
+                                // TODO: Do proper error handling
+                                self.setLoading(false)
+                                print("Error registering user: \(error.localizedDescription)")
+                            }
+                        }
+                    
+                    // TODO: Do proper error handling
+                    print("Error fetching user data: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+    
+    // MARK: Helper functions
     private func randomNonceString(length: Int = 32) -> String {
         precondition(length > 0)
         let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
@@ -129,7 +178,6 @@ class AuthManager: ObservableObject {
         }
         return result
     }
-    
     private func sha256(_ input: String) -> String {
         let inputData = Data(input.utf8)
         let hashedData = SHA256.hash(data: inputData)
