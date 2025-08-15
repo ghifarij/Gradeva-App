@@ -20,16 +20,12 @@ class AuthManager: ObservableObject {
     init() {
         // Check if the user logged in Firebase
         if let user = Auth.auth().currentUser {
-            self.currentUser = AppUser(fromFirebaseUser: user)
-            self.isSignedIn = true
+            getUserDataFromFirestore(user: user)
         }
         
         Auth.auth().addStateDidChangeListener { _, user in
-            DispatchQueue.main.async {
-                if let user = user {
-                    self.currentUser = AppUser(fromFirebaseUser: user)
-                    self.isSignedIn = true
-                }
+            if let user = user {
+                self.getUserDataFromFirestore(user: user)
             }
         }
     }
@@ -110,41 +106,46 @@ class AuthManager: ObservableObject {
         
         if let user = authResult?.user {
             // Get user data from firestore
-            UserServices().getUser(uid: user.uid) { firestoreResult in
-                switch firestoreResult {
-                    
-                    // Success --> user already exist in firestore, meaning not the first time
-                case .success(let userData):
-                    DispatchQueue.main.async {
-                        self.currentUser = userData
-                        self.isSignedIn = true
-                    }
-                    self.setLoading(false)
-                    
-                    // Failure --> first time login
-                case .failure(let error):
-                    // Convert  to AppUser
-                    let appUser = AppUser(fromFirebaseUser: user)
-                    
-                    UserServices()
-                        .handleFirstTimeLogin(user: appUser) { registrationResult in
-                            switch registrationResult {
-                            case .success():
-                                DispatchQueue.main.async {
-                                    self.currentUser = appUser
-                                    self.isSignedIn = true
-                                }
-                                self.setLoading(false)
-                            case .failure(let error):
-                                // TODO: Do proper error handling
-                                self.setLoading(false)
-                                print("Error registering user: \(error.localizedDescription)")
-                            }
-                        }
-                    
-                    // TODO: Do proper error handling
-                    print("Error fetching user data: \(error.localizedDescription)")
+            getUserDataFromFirestore(user: user)
+        }
+    }
+    
+    private func getUserDataFromFirestore(user: FirebaseAuth.User) {
+        setLoading(true)
+        UserServices().getUser(uid: user.uid) { firestoreResult in
+            switch firestoreResult {
+                
+                // Success --> user already exist in firestore, meaning not the first time
+            case .success(let userData):
+                DispatchQueue.main.async {
+                    self.currentUser = userData
+                    self.isSignedIn = true
                 }
+                self.setLoading(false)
+                
+                // Failure --> first time login
+            case .failure(let error):
+                // Convert  to AppUser
+                let appUser = AppUser(fromFirebaseUser: user)
+                
+                UserServices()
+                    .handleFirstTimeLogin(user: appUser) { registrationResult in
+                        switch registrationResult {
+                        case .success():
+                            DispatchQueue.main.async {
+                                self.currentUser = appUser
+                                self.isSignedIn = true
+                            }
+                            self.setLoading(false)
+                        case .failure(let error):
+                            // TODO: Do proper error handling
+                            self.setLoading(false)
+                            print("Error registering user: \(error.localizedDescription)")
+                        }
+                    }
+                
+                // TODO: Do proper error handling
+                print("Error fetching user data: \(error.localizedDescription)")
             }
         }
     }
