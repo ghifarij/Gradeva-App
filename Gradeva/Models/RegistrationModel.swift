@@ -17,7 +17,21 @@ enum RegistrationStatus: String, Codable {
 class Registration: Codable {
     @DocumentID var id: String?
     var userId: String
-    var status: RegistrationStatus
     var userName: String?
     var userEmail: String?
+    var status: RegistrationStatus
+    
+    init(
+        id: String? = nil,
+        userId: String,
+        userName: String? = nil,
+        userEmail: String? = nil,
+        status: RegistrationStatus
+    ) {
+        self.id = id
+        self.userId = userId
+        self.userName = userName
+        self.userEmail = userEmail
+        self.status = status
+    }
 }

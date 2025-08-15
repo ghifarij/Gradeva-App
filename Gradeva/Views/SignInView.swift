@@ -23,14 +23,25 @@ struct SignInView: View {
                 .fontWeight(.bold)
                 .padding(.bottom)
             
-            SignInWithAppleButton(
-                .signIn,
-                onRequest: auth.handleSignInWithAppleRequest,
-                onCompletion: auth.handleSignInWithAppleCompletion
-            )
-            .signInWithAppleButtonStyle(signInColor)
-            .frame(width: 280, height: 45)
-            .cornerRadius(8)
+            
+            ZStack {
+                SignInWithAppleButton(
+                    .signIn,
+                    onRequest: auth.handleSignInWithAppleRequest,
+                    onCompletion: auth.handleSignInWithAppleCompletion
+                )
+                .signInWithAppleButtonStyle(signInColor)
+                .frame(width: 280, height: 45)
+                .cornerRadius(8)
+                .disabled(auth.isAuthLoading)
+                .opacity(auth.isAuthLoading ? 0.5 : 1) // dim when loading
+                
+                if auth.isAuthLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                }
+            }
+            
         }
         .padding()
     }
