@@ -107,7 +107,7 @@ xcodebuild -project Gradeva.xcodeproj -scheme Gradeva -destination 'platform=iOS
 # Package dependencies are resolved automatically by Xcode
 # Check Package.resolved for current dependency versions
 ```
-
+ 
 ## Configuration
 - **Minimum iOS Version**: 18.4
 - **Marketing Version**: 1.0
