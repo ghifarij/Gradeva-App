@@ -2,7 +2,7 @@
 //  RegistrationService.swift
 //  Gradeva
 //
-//  Created by Afga Ghifari on 18/08/25.
+//  Created by Claude Code on 18/08/25.
 //
 
 import Foundation

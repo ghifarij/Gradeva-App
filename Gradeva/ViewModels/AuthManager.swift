@@ -13,6 +13,8 @@ class AuthManager: ObservableObject {
     @Published var isSignedIn = false
     @Published var currentUser: AppUser?
     @Published var isAuthLoading = false
+    @Published var authError: AuthError?
+    @Published var showingError = false
     
     private let appleSignInService = AppleSignInService()
     private let googleSignInService = GoogleSignInService()
@@ -37,8 +39,8 @@ class AuthManager: ObservableObject {
     func handleSignInWithAppleCompletion(_ result: Result<ASAuthorization, any Error>) {
         appleSignInService.handleSignInWithAppleCompletion(result) { credential, error in
             if let error = error {
-                print("Apple Sign In Error: \(error.localizedDescription)")
-                self.setLoading(false)
+                let authError = AuthError.from(error)
+                self.handleAuthError(authError)
                 return
             }
             
@@ -52,8 +54,8 @@ class AuthManager: ObservableObject {
         setLoading(true)
         googleSignInService.signIn { credential, error in
             if let error = error {
-                print("Google Sign In Error: \(error.localizedDescription)")
-                self.setLoading(false)
+                let authError = AuthError.from(error)
+                self.handleAuthError(authError)
                 return
             }
             
@@ -69,9 +71,11 @@ class AuthManager: ObservableObject {
             DispatchQueue.main.async {
                 self.isSignedIn = false
                 self.currentUser = nil
+                self.clearError()
             }
         } catch {
-            print("Failed to sign out: \(error.localizedDescription)")
+            let authError = AuthError.firebaseSignOutFailed(error.localizedDescription)
+            handleAuthError(authError)
         }
     }
     
@@ -86,8 +90,8 @@ class AuthManager: ObservableObject {
         error: Error?
     ) {
         if let error = error {
-            print("Sign In failed. Error: \(error.localizedDescription)")
-            setLoading(false)
+            let authError = AuthError.firebaseSignInFailed(error.localizedDescription)
+            handleAuthError(authError)
             return
         }
     }
@@ -115,13 +119,32 @@ class AuthManager: ObservableObject {
                         }
                         self.setLoading(false)
                     case .failure(let error):
-                        self.setLoading(false)
-                        print("Error registering user: \(error.localizedDescription)")
+                        let authError = AuthError.userRegistrationFailed(error.localizedDescription)
+                        self.handleAuthError(authError)
                     }
                 }
-                
-                print("Error fetching user data: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    private func handleAuthError(_ error: AuthError) {
+        DispatchQueue.main.async {
+            // Don't show error UI for user cancellation
+            if error == .userCancelled {
+                self.setLoading(false)
+                return
+            }
+            
+            self.authError = error
+            self.showingError = true
+            self.setLoading(false)
+        }
+    }
+    
+    func clearError() {
+        DispatchQueue.main.async {
+            self.authError = nil
+            self.showingError = false
         }
     }
 }

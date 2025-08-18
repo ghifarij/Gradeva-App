@@ -36,9 +36,7 @@ struct SignInView: View {
                 .disabled(auth.isAuthLoading)
                 .opacity(auth.isAuthLoading ? 0.5 : 1)
           
-                Button(action: {
-                    auth.handleSignInWithGoogle()
-                }) {
+                Button(action: auth.handleSignInWithGoogle) {
                     HStack(spacing: 12) {
                         Image("g")
                             .resizable()
@@ -59,6 +57,11 @@ struct SignInView: View {
                 }
                 .disabled(auth.isAuthLoading)
                 .opacity(auth.isAuthLoading ? 0.5 : 1)
+            }
+            
+            if let error = auth.authError {
+                InlineErrorView(error: error)
+                    .padding(.top)
             }
             
         }

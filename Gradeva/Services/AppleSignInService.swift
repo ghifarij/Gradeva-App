@@ -2,7 +2,7 @@
 //  AppleSignInService.swift
 //  Gradeva
 //
-//  Created by Afga Ghifari on 08/08/25.
+//  Created by Claude Code on 18/08/25.
 //
 
 import SwiftUI
@@ -14,10 +14,14 @@ class AppleSignInService: ObservableObject {
     private var currentNonce: String?
     
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
-        let nonce = CryptoUtils.randomNonceString()
-        currentNonce = nonce
-        request.requestedScopes = [.fullName, .email]
-        request.nonce = CryptoUtils.sha256(nonce)
+        do {
+            let nonce = try CryptoUtils.randomNonceString()
+            currentNonce = nonce
+            request.requestedScopes = [.fullName, .email]
+            request.nonce = CryptoUtils.sha256(nonce)
+        } catch {
+            currentNonce = nil
+        }
     }
     
     func handleSignInWithAppleCompletion(
@@ -49,29 +53,11 @@ class AppleSignInService: ObservableObject {
                 )
                 
                 completion(credential, nil)
+            } else {
+                completion(nil, AuthError.appleCredentialMissing)
             }
         case .failure(let error):
             completion(nil, error)
-        }
-    }
-}
-
-enum AuthError: LocalizedError {
-    case nonceNotFound
-    case tokenNotFound
-    case tokenEncodingFailed
-    case noWindowScene
-    
-    var errorDescription: String? {
-        switch self {
-        case .nonceNotFound:
-            return "Nonce doesn't exist."
-        case .tokenNotFound:
-            return "Token is not found."
-        case .tokenEncodingFailed:
-            return "Failed to encode token."
-        case .noWindowScene:
-            return "No window scene found."
         }
     }
 }

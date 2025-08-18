@@ -2,7 +2,7 @@
 //  CryptoUtils.swift
 //  Gradeva
 //
-//  Created by Afga Ghifari on 08/08/25.
+//  Created by Claude Code on 18/08/25.
 //
 
 import Foundation
@@ -10,20 +10,25 @@ import CryptoKit
 
 class CryptoUtils {
 
-    static func randomNonceString(length: Int = 32) -> String {
-        precondition(length > 0)
+    static func randomNonceString(length: Int = 32) throws -> String {
+        guard length > 0 else {
+            throw AuthError.cryptoOperationFailed("Invalid nonce length: \(length)")
+        }
+        
         let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
         var result = ""
         var remainingLength = length
         
         while remainingLength > 0 {
-            let randoms: [UInt8] = (0 ..< 16).map { _ in
+            var randoms: [UInt8] = []
+            
+            for _ in 0 ..< 16 {
                 var random: UInt8 = 0
                 let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
                 if errorCode != errSecSuccess {
-                    fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+                    throw AuthError.cryptoOperationFailed("SecRandomCopyBytes failed with OSStatus \(errorCode)")
                 }
-                return random
+                randoms.append(random)
             }
             
             randoms.forEach { random in

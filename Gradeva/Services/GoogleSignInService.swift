@@ -2,7 +2,7 @@
 //  GoogleSignInService.swift
 //  Gradeva
 //
-//  Created by Afga Ghifari on 08/08/25.
+//  Created by Claude Code on 18/08/25.
 //
 
 import SwiftUI
@@ -14,7 +14,7 @@ class GoogleSignInService: ObservableObject {
 
     func signIn(completion: @escaping (AuthCredential?, Error?) -> Void) {
         guard let clientID = FirebaseApp.app()?.options.clientID else {
-            completion(nil, AuthError.noWindowScene)
+            completion(nil, AuthError.googleClientIdMissing)
             return
         }
         
@@ -37,7 +37,7 @@ class GoogleSignInService: ObservableObject {
             guard let user = result?.user,
                   let idToken = user.idToken?.tokenString
             else {
-                completion(nil, AuthError.tokenNotFound)
+                completion(nil, AuthError.googleTokenMissing)
                 return
             }
             
