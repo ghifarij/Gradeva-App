@@ -9,6 +9,8 @@ import SwiftUI
 import AuthenticationServices
 import FirebaseAuth
 import CryptoKit
+import FirebaseCore
+import GoogleSignIn
 
 class AuthManager: ObservableObject {
     @Published var isSignedIn = false
@@ -79,6 +81,38 @@ class AuthManager: ObservableObject {
             print("Error: \(error.localizedDescription)")
             setLoading(false)
         }
+    }
+    
+    func handleSignInWithGoogle() {
+        setLoading(true)
+        guard let clientID = FirebaseApp.app()?.options.clientID else { return }
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let rootViewController = windowScene.windows.first?.rootViewController
+        else {
+            print("No window scene found.")
+            setLoading(false)
+            return
+        }
+        let config = GIDConfiguration(clientID: clientID)
+        GIDSignIn.sharedInstance.configuration = config
+        
+        GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { result, error in
+            guard error == nil else {
+                self.setLoading(false)
+                return
+            }
+            
+            guard let user = result?.user,
+                  let idToken = user.idToken?.tokenString
+            else {
+                self.setLoading(false)
+                return
+            }
+            
+            let credential = GoogleAuthProvider.credential(withIDToken: idToken, accessToken: user.accessToken.tokenString)
+            Auth.auth().signIn(with: credential, completion: self.signInCallback)
+        }
+
     }
     
     func signOut() {
