@@ -90,10 +90,6 @@ class AuthManager: ObservableObject {
             setLoading(false)
             return
         }
-        
-        if let user = authResult?.user {
-            getUserDataFromFirestore(user: user)
-        }
     }
     
     private func getUserDataFromFirestore(user: FirebaseAuth.User) {
