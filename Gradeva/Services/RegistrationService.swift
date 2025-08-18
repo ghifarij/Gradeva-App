@@ -54,7 +54,12 @@ class RegistrationService {
                                 return
                             }
                             
-                            registration.userId = user.id ?? ""
+                            guard let userId = user.id else {
+                                completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not get user id"])))
+                                return
+                            }
+                            
+                            registration.userId = userId
                             registration.status = .approved
                             
                             self.updateApprovedRegistration(
