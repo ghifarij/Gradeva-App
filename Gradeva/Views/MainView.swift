@@ -44,13 +44,7 @@ struct MainContentView: View {
                     }
                 }
             } else if auth.isSignedIn {
-                // TODO: Implement a better view
-                VStack {
-                    Text("You're not belong to any school, contact your administrator to join a school")
-                    Button("Sign Out") {
-                        auth.signOut()
-                    }
-                }
+                NotRegisteredView()
             } else {
                 // Not signed in --> show SignInView
                 SignInView()
