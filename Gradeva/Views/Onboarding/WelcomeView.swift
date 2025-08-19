@@ -8,20 +8,33 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @StateObject private var subjectsManager = SubjectsManager()
-    
+    @State private var currentStep = 0
     @State private var name: String = ""
     @State private var selectedSubjects = Set<String>()
     @State private var isLoading = false
-    @FocusState private var isNameFieldFocused: Bool
     
-    private var canContinue: Bool {
-        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !selectedSubjects.isEmpty
+    private var canContinueFromName: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
     
-    private func handleContinue() {
+    private var canContinueFromSubjects: Bool {
+        !selectedSubjects.isEmpty
+    }
+    
+    private func nextStep() {
+        withAnimation {
+            currentStep += 1
+        }
+    }
+    
+    private func previousStep() {
+        withAnimation {
+            currentStep -= 1
+        }
+    }
+    
+    private func finishOnboarding() {
         isLoading = true
-        isNameFieldFocused = false
         
         // TODO: Implement onboarding completion logic
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -29,105 +42,127 @@ struct WelcomeView: View {
         }
     }
     
+    private func getNextAction() {
+        switch currentStep {
+        case 0:
+            nextStep()
+        case 1:
+            if canContinueFromName {
+                nextStep()
+            }
+        case 2:
+            if canContinueFromSubjects {
+                finishOnboarding()
+            }
+        default:
+            break
+        }
+    }
+    
     var body: some View {
-        ScrollView {
-            VStack(spacing: 32) {
-                // Header Section
-                VStack(spacing: 16) {
-                    Image(systemName: "graduationcap.fill")
-                        .font(.system(size: 60))
-                        .foregroundStyle(Color.accentColor)
-                        .padding(.top, 20)
-                    
-                    VStack(spacing: 8) {
-                        Text("Welcome to Gradeva")
-                            .font(.system(.title, design: .rounded, weight: .bold))
-                            .multilineTextAlignment(.center)
-                        
-                        Text("Let's get started by setting up your profile")
-                            .font(.system(.body, design: .rounded))
-                            .foregroundStyle(.secondary)
-                            .multilineTextAlignment(.center)
+        GeometryReader { geometry in
+            VStack {
+                // Header with step indicator
+                HStack(spacing: 8) {
+                    ForEach(0..<3, id: \.self) { index in
+                        Circle()
+                            .fill(index <= currentStep ? Color.accentColor : Color.gray.opacity(0.3))
+                            .frame(width: 8, height: 8)
+                            .scaleEffect(index == currentStep ? 1.2 : 1.0)
                     }
                 }
                 
-                // Name Input Section
-                VStack(alignment: .leading, spacing: 12) {
-                    Text("What's your name?")
-                        .font(.system(.title2, design: .rounded, weight: .semibold))
-                    
-                    TextField("Enter your full name", text: $name)
-                        .textFieldStyle(.plain)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 16)
-                        .background(Color(.systemGray6))
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(isNameFieldFocused ? Color.accentColor : Color.clear, lineWidth: 2)
-                        )
-                        .focused($isNameFieldFocused)
-                        .textInputAutocapitalization(.words)
-                        .textContentType(.name)
-                }
-                
-                // Subject Selection Section
-                VStack(alignment: .leading, spacing: 16) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Choose your subjects")
-                            .font(.system(.title2, design: .rounded, weight: .semibold))
-                        
-                        Text("Select the subjects you'll be grading")
-                            .font(.system(.subheadline, design: .rounded))
-                            .foregroundStyle(.secondary)
+                // Step content with sliding animation
+                ZStack {
+                    switch currentStep {
+                    case 0:
+                        WelcomeStepView()
+                            .transition(.blurReplace)
+                            .padding(.horizontal, 24)
+                    case 1:
+                        NameStepView(name: $name)
+                            .transition(.blurReplace)
+                            .padding(.horizontal, 24)
+                    case 2:
+                        SubjectsStepView(selectedSubjects: $selectedSubjects)
+                            .transition(.blurReplace)
+                            // padding set internally
+                    default:
+                        EmptyView()
                     }
-                    
-                    LazyVStack(spacing: 12) {
-                        ForEach(subjectsManager.subjects, id: \.id) { subject in
-                            SubjectSelection(
-                                subject: subject,
-                                selectedSubjects: $selectedSubjects
+                }
+                .frame(maxHeight: .infinity)
+                
+                // Bottom navigation
+                VStack(spacing: 12) {
+                    // Back button (outlined)
+                    if currentStep > 0 {
+                        Button(action: previousStep) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "chevron.left")
+                                Text("Back")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16)
+                                    .stroke(Color.accentColor, lineWidth: 1)
                             )
                         }
+                        .transition(.opacity)
+                        .disabled(isLoading)
                     }
-                }
-                
-                // Continue Button
-                VStack(spacing: 16) {
-                    Button(action: handleContinue) {
+                    
+                    // Main button
+                    Button(action: getNextAction) {
                         HStack {
-                            if isLoading {
+                            if isLoading && currentStep == 2 {
                                 ProgressView()
-                                    .scaleEffect(0.9)
-                                    .foregroundStyle(.white)
                             } else {
-                                Text("Continue")
-                                    .font(.system(.body, design: .rounded, weight: .semibold))
+                                Text(buttonTitle)
+                                Image(systemName: buttonIcon)
                             }
                         }
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(canContinue ? Color.accentColor : Color.gray.opacity(0.3))
+                        .padding(.vertical)
+                        .background(buttonEnabled ? Color.accentColor : Color.gray.opacity(0.3))
                         .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .transition(.opacity)
                     }
-                    .disabled(!canContinue || isLoading)
-                    .animation(.easeInOut(duration: 0.2), value: canContinue)
-                    
-                    if !selectedSubjects.isEmpty {
-                        Text("\(selectedSubjects.count) subject\(selectedSubjects.count == 1 ? "" : "s") selected")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .transition(.opacity)
-                    }
+                    .disabled(!buttonEnabled || isLoading)
                 }
-                
-                Spacer(minLength: 20)
+                .padding(.horizontal, 24)
             }
-            .padding(.horizontal, 24)
+            .padding(.bottom, max(40, geometry.safeAreaInsets.bottom + 20))
+            .padding(.top)
         }
-        .onTapGesture {
-            isNameFieldFocused = false
+        .ignoresSafeArea(.keyboard)
+    }
+    
+    private var buttonTitle: String {
+        switch currentStep {
+        case 0: return "Get Started"
+        case 1: return "Continue"
+        case 2: return "Finish Setup"
+        default: return "Continue"
+        }
+    }
+    
+    private var buttonIcon: String {
+        switch currentStep {
+        case 0, 1: return "arrow.right"
+        case 2: return "checkmark"
+        default: return "arrow.right"
+        }
+    }
+    
+    private var buttonEnabled: Bool {
+        switch currentStep {
+        case 0: return true
+        case 1: return canContinueFromName
+        case 2: return canContinueFromSubjects
+        default: return false
         }
     }
 }
