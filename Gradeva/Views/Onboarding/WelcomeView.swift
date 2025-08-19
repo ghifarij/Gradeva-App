@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct WelcomeView: View {
+    @StateObject private var subjectsManager = SubjectsManager()
     @State private var currentStep = 0
     @State private var name: String = ""
     @State private var selectedSubjects = Set<String>()
-    @State private var isLoading = false
     
     private var canContinueFromName: Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -34,11 +34,14 @@ struct WelcomeView: View {
     }
     
     private func finishOnboarding() {
-        isLoading = true
-        
-        // TODO: Implement onboarding completion logic
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            isLoading = false
+        let subjectIds = Array(selectedSubjects)
+        subjectsManager.completeOnboarding(name: name, subjectIds: subjectIds) { result in
+            switch result {
+            case .success:
+                print("Onboarding completed successfully")
+            case .failure(let error):
+                print("Onboarding failed: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -85,6 +88,7 @@ struct WelcomeView: View {
                             .padding(.horizontal, 24)
                     case 2:
                         SubjectsStepView(selectedSubjects: $selectedSubjects)
+                            .environmentObject(subjectsManager)
                             .transition(.blurReplace)
                             // padding set internally
                     default:
@@ -110,13 +114,13 @@ struct WelcomeView: View {
                             )
                         }
                         .transition(.opacity)
-                        .disabled(isLoading)
+                        .disabled(subjectsManager.isClaimingSubjects)
                     }
                     
                     // Main button
                     Button(action: getNextAction) {
                         HStack {
-                            if isLoading && currentStep == 2 {
+                            if subjectsManager.isClaimingSubjects && currentStep == 2 {
                                 ProgressView()
                             } else {
                                 Text(buttonTitle)
@@ -130,7 +134,16 @@ struct WelcomeView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .transition(.opacity)
                     }
-                    .disabled(!buttonEnabled || isLoading)
+                    .disabled(!buttonEnabled || subjectsManager.isClaimingSubjects)
+                    
+                    // Error message
+                    if let errorMessage = subjectsManager.errorMessage {
+                        Text(errorMessage)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                            .multilineTextAlignment(.center)
+                            .transition(.opacity)
+                    }
                 }
                 .padding(.horizontal, 24)
             }

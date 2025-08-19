@@ -10,7 +10,7 @@ import Firebase
 import FirebaseAuth
 
 struct MainContentView: View {
-    @StateObject private var auth = AuthManager()
+    @ObservedObject private var auth = AuthManager.shared
     @StateObject private var navManager = NavManager()
     
     var body: some View {

@@ -11,6 +11,8 @@ import Combine
 class SubjectsManager: ObservableObject {
     @Published var subjects: [Subject] = []
     @Published var isLoading: Bool = false
+    @Published var isClaimingSubjects: Bool = false
+    @Published var errorMessage: String?
     
     private var auth = AuthManager.shared
     private var cancellables = Set<AnyCancellable>()
@@ -39,6 +41,80 @@ class SubjectsManager: ObservableObject {
             
             DispatchQueue.main.async {
                 self.isLoading = false
+            }
+        }
+    }
+    
+    func completeOnboarding(name: String, subjectIds: [String], completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let currentUser = auth.currentUser else {
+            DispatchQueue.main.async {
+                self.errorMessage = "No current user found"
+            }
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No current user found"])))
+            return
+        }
+        
+        DispatchQueue.main.async {
+            self.isClaimingSubjects = true
+            self.errorMessage = nil
+        }
+        
+        // Update user profile
+        currentUser.displayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        currentUser.didCompleteOnboarding = true
+        
+        // First, claim the subjects
+        SubjectServices().claimSubjects(user: currentUser, subjectIds: subjectIds) { result in
+            switch result {
+            case .success:
+                // Then update the user with name and completion status
+                UserServices().updateUser(user: currentUser) { updateResult in
+                    DispatchQueue.main.async {
+                        self.isClaimingSubjects = false
+                        
+                        switch updateResult {
+                        case .success:
+                            // Refresh user data to trigger reactivity
+                            self.auth.refreshCurrentUser()
+                            completion(.success(()))
+                        case .failure(let error):
+                            self.errorMessage = "Failed to update profile: \(error.localizedDescription)"
+                            completion(.failure(error))
+                        }
+                    }
+                }
+            case .failure(let error):
+                DispatchQueue.main.async {
+                    self.isClaimingSubjects = false
+                    self.errorMessage = "Failed to save subjects: \(error.localizedDescription)"
+                }
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func claimSubjects(subjectIds: [String], completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let currentUser = auth.currentUser else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "No current user found"])))
+            return
+        }
+        
+        DispatchQueue.main.async {
+            self.isClaimingSubjects = true
+        }
+        
+        SubjectServices().claimSubjects(user: currentUser, subjectIds: subjectIds) { result in
+            DispatchQueue.main.async {
+                self.isClaimingSubjects = false
+                
+                switch result {
+                case .success:
+                    // Refresh user data to trigger reactivity
+                    self.auth.refreshCurrentUser()
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
             }
         }
     }

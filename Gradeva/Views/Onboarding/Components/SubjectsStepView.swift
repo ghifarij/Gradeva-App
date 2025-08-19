@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct SubjectsStepView: View {
-    @StateObject private var subjectsManager = SubjectsManager()
+    @EnvironmentObject var subjectsManager: SubjectsManager
     @Binding var selectedSubjects: Set<String>
     
     var body: some View {
@@ -54,4 +54,5 @@ struct SubjectsStepView: View {
     SubjectsStepView(
         selectedSubjects: .constant(Set<String>())
     )
+    .environmentObject(SubjectsManager())
 }

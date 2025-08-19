@@ -149,4 +149,16 @@ class AuthManager: ObservableObject {
             self.showingError = false
         }
     }
+    
+    // TODO: Replace with real-time Firestore listener for better UX
+    func refreshCurrentUser() {
+        guard let firebaseUser = Auth.auth().currentUser else { return }
+        getUserDataFromFirestore(user: firebaseUser)
+    }
+    
+    func updateCurrentUser(_ updatedUser: AppUser) {
+        DispatchQueue.main.async {
+            self.currentUser = updatedUser
+        }
+    }
 }
