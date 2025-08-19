@@ -17,19 +17,22 @@ class AppUser: Codable {
     var schoolId: String?
     var createdAt: Timestamp?
     var updatedAt: Timestamp?
+    var subjectIds: [String]?
     
     init(
         uid: String,
         displayName: String? = nil,
         email: String? = nil,
         didCompleteOnboarding: Bool? = nil,
-        schoolId: String? = nil
+        schoolId: String? = nil,
+        subjectIds: [String]? = nil
     ) {
         self.id = uid
         self.displayName = displayName
         self.email = email
         self.didCompleteOnboarding = didCompleteOnboarding
         self.schoolId = schoolId
+        self.subjectIds = subjectIds
     }
     
     init(fromFirebaseUser user: FirebaseAuth.User) {
