@@ -13,11 +13,23 @@ struct MainContentView: View {
     @ObservedObject private var auth = AuthManager.shared
     @StateObject private var navManager = NavManager()
     
+    var didCompleteOnboarding: Bool {
+        auth.currentUser?.didCompleteOnboarding ?? false
+    }
+    
+    var isAssignedToSchool: Bool {
+        auth.currentUser?.schoolId != nil
+    }
+    
+    var hasNoSchool: Bool {
+        !isAssignedToSchool && auth.isSignedIn
+    }
+    
     var body: some View {
         NavigationStack(path: $navManager.paths) {
             // Signed-in  --> show HomeView
-            if auth.isSignedIn && auth.currentUser?.schoolId != nil {
-                if auth.currentUser?.didCompleteOnboarding != true {
+            if auth.isSignedIn && isAssignedToSchool {
+                if !didCompleteOnboarding {
                     WelcomeView()
                 } else {
                     TabView {
@@ -47,7 +59,7 @@ struct MainContentView: View {
                         }
                     }
                 }
-            } else if auth.isSignedIn {
+            } else if hasNoSchool {
                 NotRegisteredView()
             } else {
                 // Not signed in --> show SignInView
