@@ -19,6 +19,8 @@ class AuthManager: ObservableObject {
     private let appleSignInService = AppleSignInService()
     private let googleSignInService = GoogleSignInService()
     
+    static let shared = AuthManager()
+    
     init() {
         if let user = Auth.auth().currentUser {
             getUserDataFromFirestore(user: user)
