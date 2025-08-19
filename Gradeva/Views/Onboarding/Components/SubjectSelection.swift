@@ -13,7 +13,7 @@ struct SubjectSelection: View {
     
     private var isSelected: Bool {
         guard let subjectId = subject.id else { return false }
-        selectedSubjects.contains(subjectId)
+        return selectedSubjects.contains(subjectId)
     }
     
     private func toggleSelection() {

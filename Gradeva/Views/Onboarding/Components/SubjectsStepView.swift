@@ -44,8 +44,9 @@ struct SubjectsStepView: View {
                     }
                 }
                 .padding(.horizontal, 24)
-                .padding(.vertical, 20)
+                .padding(.vertical, 10)
             }
+            .padding(.bottom)
         }
     }
 }

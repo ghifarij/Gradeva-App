@@ -24,8 +24,7 @@ class SubjectServices {
                         let subject = try document.data(as: Subject.self)
                         subjects.append(subject)
                     } catch {
-                        // Skip invalid subject documents and continue
-                        continue
+                        // Skip invalid subject documents and do nothing
                     }
                 }
                 
