@@ -17,30 +17,34 @@ struct MainContentView: View {
         NavigationStack(path: $navManager.paths) {
             // Signed-in  --> show HomeView
             if auth.isSignedIn && auth.currentUser?.schoolId != nil {
-                TabView {
-                    HomeView()
-                        .tabItem {
-                            Label("Home", systemImage: "house")
+                if auth.currentUser?.didCompleteOnboarding != true {
+                    WelcomeView()
+                } else {
+                    TabView {
+                        HomeView()
+                            .tabItem {
+                                Label("Home", systemImage: "house")
+                            }
+                        GradingView()
+                            .tabItem {
+                                Label("Grading", systemImage: "pencil")
+                            }
+                        AnalyticsView()
+                            .tabItem {
+                                Label("Analytics", systemImage: "chart.bar")
+                            }
+                        ProfileView()
+                            .tabItem {
+                                Label("Profile", systemImage: "person")
+                            }
+                    }
+                    .navigationDestination(for: NavPath.self) { path in
+                        switch path {
+                        case .settings:
+                            SettingsView()
+                        case .grading(let examId):
+                            GradingExamView(examId: examId)
                         }
-                    GradingView()
-                        .tabItem {
-                            Label("Grading", systemImage: "pencil")
-                        }
-                    AnalyticsView()
-                        .tabItem {
-                            Label("Analytics", systemImage: "chart.bar")
-                        }
-                    ProfileView()
-                        .tabItem {
-                            Label("Profile", systemImage: "person")
-                        }
-                }
-                .navigationDestination(for: NavPath.self) { path in
-                    switch path {
-                    case .settings:
-                        SettingsView()
-                    case .grading(let examId):
-                        GradingExamView(examId: examId)
                     }
                 }
             } else if auth.isSignedIn {
