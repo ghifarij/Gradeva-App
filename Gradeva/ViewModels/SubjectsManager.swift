@@ -61,16 +61,18 @@ class SubjectsManager: ObservableObject {
             self.errorMessage = nil
         }
         
-        // Update user profile
-        currentUser.displayName = name.trimmingCharacters(in: .whitespacesAndNewlines)
-        currentUser.didCompleteOnboarding = true
+        // Create updated user instance
+        let updatedUser = currentUser.copy(
+            displayName: name.trimmingCharacters(in: .whitespacesAndNewlines),
+            didCompleteOnboarding: true
+        )
         
         // First, claim the subjects
-        SubjectServices().claimSubjects(user: currentUser, subjectIds: subjectIds) { result in
+        SubjectServices().claimSubjects(user: updatedUser, subjectIds: subjectIds) { result in
             switch result {
             case .success:
                 // Then update the user with name and completion status
-                UserServices().updateUser(user: currentUser) { updateResult in
+                UserServices().updateUser(user: updatedUser) { updateResult in
                     DispatchQueue.main.async {
                         self.isClaimingSubjects = false
                         

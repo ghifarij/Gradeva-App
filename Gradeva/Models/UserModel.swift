@@ -40,4 +40,21 @@ class AppUser: Codable {
         self.displayName = user.displayName
         self.email = user.email
     }
+    
+    func copy(
+        displayName: String? = nil,
+        email: String? = nil,
+        didCompleteOnboarding: Bool? = nil,
+        schoolId: String? = nil,
+        subjectIds: [String]? = nil
+    ) -> AppUser {
+        return AppUser(
+            uid: self.id ?? "",
+            displayName: displayName ?? self.displayName,
+            email: email ?? self.email,
+            didCompleteOnboarding: didCompleteOnboarding ?? self.didCompleteOnboarding,
+            schoolId: schoolId ?? self.schoolId,
+            subjectIds: subjectIds ?? self.subjectIds
+        )
+    }
 }

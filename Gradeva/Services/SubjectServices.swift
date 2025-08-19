@@ -37,12 +37,14 @@ class SubjectServices {
     }
     
     func claimSubjects(user: AppUser, subjectIds: [String], completion: @escaping (Result<Void, Error>) -> Void) {
-        // Update user's subjectIds and mark onboarding as complete
-        user.subjectIds = subjectIds
-        user.didCompleteOnboarding = true
+        // Create new user instance with updated subjects and completion status
+        let updatedUser = user.copy(
+            didCompleteOnboarding: true,
+            subjectIds: subjectIds
+        )
         
         // Use UserServices to update the user document
-        UserServices().updateUser(user: user) { result in
+        UserServices().updateUser(user: updatedUser) { result in
             switch result {
             case .success:
                 completion(.success(()))

@@ -39,4 +39,21 @@ class Registration: Codable {
         self.status = status
         self.schoolId = schoolId
     }
+    
+    func copy(
+        userId: String? = nil,
+        userName: String? = nil,
+        userEmail: String? = nil,
+        status: RegistrationStatus? = nil,
+        schoolId: String? = nil
+    ) -> Registration {
+        return Registration(
+            id: self.id,
+            userId: userId ?? self.userId,
+            userName: userName ?? self.userName,
+            userEmail: userEmail ?? self.userEmail,
+            status: status ?? self.status,
+            schoolId: schoolId ?? self.schoolId
+        )
+    }
 }
