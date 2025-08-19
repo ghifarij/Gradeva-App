@@ -20,18 +20,23 @@ class Registration: Codable {
     var userName: String?
     var userEmail: String?
     var status: RegistrationStatus
+    var schoolId: String?
+    var createdAt: Timestamp?
+    var updatedAt: Timestamp?
     
     init(
         id: String? = nil,
         userId: String,
         userName: String? = nil,
         userEmail: String? = nil,
-        status: RegistrationStatus
+        status: RegistrationStatus,
+        schoolId: String? = nil
     ) {
         self.id = id
         self.userId = userId
         self.userName = userName
         self.userEmail = userEmail
         self.status = status
+        self.schoolId = schoolId
     }
 }

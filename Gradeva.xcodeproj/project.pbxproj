@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2FB429AF2E535ED400D16F92 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 2FB429AE2E535ED400D16F92 /* GoogleSignIn */; };
+		2FB429B12E535ED400D16F92 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 2FB429B02E535ED400D16F92 /* GoogleSignInSwift */; };
 		FE19B8C62E4598AA006F28DE /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = FE19B8C52E4598AA006F28DE /* FirebaseAuth */; };
 		FE19B8C82E4598AA006F28DE /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = FE19B8C72E4598AA006F28DE /* FirebaseCore */; };
 		FE19B8CA2E4598AA006F28DE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = FE19B8C92E4598AA006F28DE /* FirebaseFirestore */; };
@@ -16,9 +18,22 @@
 		FE19B8B22E4596FB006F28DE /* Gradeva.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Gradeva.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		2FB429692E535DF400D16F92 /* Exceptions for "Gradeva" folder in "Gradeva" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = FE19B8B12E4596FB006F28DE /* Gradeva */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FE19B8B42E4596FB006F28DE /* Gradeva */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				2FB429692E535DF400D16F92 /* Exceptions for "Gradeva" folder in "Gradeva" target */,
+			);
 			path = Gradeva;
 			sourceTree = "<group>";
 		};
@@ -29,7 +44,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2FB429B12E535ED400D16F92 /* GoogleSignInSwift in Frameworks */,
 				FE19B8C82E4598AA006F28DE /* FirebaseCore in Frameworks */,
+				2FB429AF2E535ED400D16F92 /* GoogleSignIn in Frameworks */,
 				FE19B8C62E4598AA006F28DE /* FirebaseAuth in Frameworks */,
 				FE19B8CA2E4598AA006F28DE /* FirebaseFirestore in Frameworks */,
 			);
@@ -77,6 +94,8 @@
 				FE19B8C52E4598AA006F28DE /* FirebaseAuth */,
 				FE19B8C72E4598AA006F28DE /* FirebaseCore */,
 				FE19B8C92E4598AA006F28DE /* FirebaseFirestore */,
+				2FB429AE2E535ED400D16F92 /* GoogleSignIn */,
+				2FB429B02E535ED400D16F92 /* GoogleSignInSwift */,
 			);
 			productName = Gradeva;
 			productReference = FE19B8B22E4596FB006F28DE /* Gradeva.app */;
@@ -108,6 +127,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				FE19B8C42E4598AA006F28DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				2FB429AD2E535ED400D16F92 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = FE19B8B32E4596FB006F28DE /* Products */;
@@ -274,6 +294,7 @@
 				DEVELOPMENT_TEAM = 2835P8Z43C;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Gradeva/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -303,6 +324,7 @@
 				DEVELOPMENT_TEAM = 2835P8Z43C;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Gradeva/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -345,6 +367,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		2FB429AD2E535ED400D16F92 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		FE19B8C42E4598AA006F28DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -356,6 +386,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		2FB429AE2E535ED400D16F92 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2FB429AD2E535ED400D16F92 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		2FB429B02E535ED400D16F92 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2FB429AD2E535ED400D16F92 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
 		FE19B8C52E4598AA006F28DE /* FirebaseAuth */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = FE19B8C42E4598AA006F28DE /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

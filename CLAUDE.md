@@ -8,7 +8,7 @@ Gradeva is an iOS application for grading and analytics management, built with S
 - **Language**: Swift 5.0
 - **Framework**: SwiftUI
 - **Backend**: Firebase (Auth, Firestore, Core)
-- **Authentication**: Sign in with Apple
+- **Authentication**: Sign in with Apple & Google
 - **Architecture**: MVVM pattern
 
 ## Project Structure
@@ -25,27 +25,37 @@ Gradeva/
 ├── Views/
 │   ├── MainView.swift         # Main content view with tab navigation
 │   ├── HomeView.swift         # Home tab view
-│   ├── SignInView.swift       # Authentication view
+│   ├── SignInView.swift       # Authentication view with Apple & Google Sign-In
 │   ├── SettingsView.swift     # Settings view
 │   ├── Analytics/
 │   │   └── AnalyticsView.swift
+│   ├── Components/
+│   │   └── ErrorAlertView.swift # Reusable error alert component
 │   ├── Grading/
-│   │   └── GradingView.swift
+│   │   ├── Components/
+│   │   │   ├── GradingCard.swift    # Individual grading card component
+│   │   │   └── GradingSubject.swift # Subject selection component
+│   │   ├── GradingView.swift        # Main grading interface
+│   │   └── GradingExamView.swift    # Exam grading view
 │   ├── Onboarding/
 │   │   └── WelcomeView.swift
 │   └── Profile/
 │       └── ProfileView.swift
 ├── Services/
-│   └── UserServices.swift     # User data operations with Firestore
+│   ├── UserServices.swift      # User data operations with Firestore
+│   ├── AppleSignInService.swift # Apple authentication service
+│   ├── GoogleSignInService.swift # Google authentication service
+│   └── RegistrationService.swift # User registration logic
 ├── Utils/
-│   └── NavUtils.swift         # Navigation destination resolver
-├── Assets.xcassets/           # App icons and color assets
+│   ├── AuthError.swift         # Authentication error handling
+│   └── CryptoUtils.swift       # Cryptographic utilities
+├── Assets.xcassets/           # App icons and color assets (includes Google 'g' icon)
 ├── GoogleService-Info.plist   # Firebase configuration
 └── Gradeva.entitlements       # App capabilities and entitlements
 ```
 
 ## Key Features
-- **Authentication**: Sign in with Apple integration
+- **Authentication**: Sign in with Apple & Google integration
 - **Tab Navigation**: Home, Grading, Analytics, Profile
 - **Firebase Integration**: Firestore database, Authentication
 - **User Management**: Registration status tracking
@@ -74,9 +84,11 @@ All dependencies are managed through Swift Package Manager:
 
 ### Authentication Flow
 1. App checks for existing Firebase auth state
-2. If not authenticated, shows SignInView with Apple Sign In
+2. If not authenticated, shows SignInView with Apple & Google Sign-In options
 3. Upon successful authentication, shows main TabView interface
 4. AuthManager handles state changes and user session management
+5. Dedicated services handle Apple and Google authentication flows
+6. Registration service manages user onboarding process
 
 ### Testing
 - No test framework currently configured
@@ -116,8 +128,11 @@ xcodebuild -project Gradeva.xcodeproj -scheme Gradeva -destination 'platform=iOS
 
 ## Security Considerations
 - Sign in with Apple provides privacy-focused authentication
+- Google Sign-In offers additional authentication options
 - Firebase handles secure user authentication and data storage
 - App entitlements configured for Sign in with Apple capability
+- CryptoUtils provides secure cryptographic operations
+- AuthError handles authentication failures gracefully
 
 ## Future Enhancements
 - Add comprehensive test suite (XCTest framework recommended)

@@ -34,9 +34,9 @@ class UserServices {
             }
             
             do {
-                let userData = try Firestore.Encoder().encode(
-                    user
-                )
+                var userData = try Firestore.Encoder().encode(user)
+                userData["createdAt"] = FieldValue.serverTimestamp()
+                userData["updatedAt"] = FieldValue.serverTimestamp()
                 
                 try await usersRef.document(userId).setData(userData)
                 completion(.success(()))
@@ -46,26 +46,19 @@ class UserServices {
         }
     }
     
-    func registerToQueue(user: AppUser, completion: @escaping (Result<Void, Error>) -> Void) {
+    func updateUser(user: AppUser, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
-            let registrationRef = db.collection("registrations")
+            let usersRef = db.collection("users")
             guard let userId = user.id else {
                 completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "Could not get user id"])))
                 return
             }
-            let registration = Registration(
-                userId: userId,
-                userName: user.displayName,
-                userEmail: user.email,
-                status: .pending,
-            )
             
             do {
-                let registrationData = try Firestore.Encoder().encode(
-                    registration
-                )
-                try await registrationRef.addDocument(data: registrationData)
+                var userData = try Firestore.Encoder().encode(user)
+                userData["updatedAt"] = FieldValue.serverTimestamp()
                 
+                try await usersRef.document(userId).updateData(userData)
                 completion(.success(()))
             } catch {
                 completion(.failure(error))
@@ -78,7 +71,7 @@ class UserServices {
             createUser(user: user) { result in
                 switch result {
                 case .success:
-                    self.registerToQueue(user: user) { result in
+                    RegistrationService().registerToQueue(user: user) { result in
                         switch result {
                         case .success:
                             completion(.success(()))
