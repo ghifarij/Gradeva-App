@@ -15,6 +15,8 @@ class AppUser: Codable {
     var email: String?
     var didCompleteOnboarding: Bool?
     var schoolId: String?
+    var createdAt: Timestamp?
+    var updatedAt: Timestamp?
     
     init(
         uid: String,
