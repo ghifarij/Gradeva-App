@@ -36,7 +36,9 @@ class SubjectsManager: ObservableObject {
                     self.subjects = subjects
                 }
             case .failure(let error):
-                print("Error: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.errorMessage = "Failed to load subjects: \(error.localizedDescription)"
+                }
             }
             
             DispatchQueue.main.async {

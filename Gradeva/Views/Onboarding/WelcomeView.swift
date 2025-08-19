@@ -38,9 +38,11 @@ struct WelcomeView: View {
         subjectsManager.completeOnboarding(name: name, subjectIds: subjectIds) { result in
             switch result {
             case .success:
-                print("Onboarding completed successfully")
-            case .failure(let error):
-                print("Onboarding failed: \(error.localizedDescription)")
+                // Onboarding completion is handled by the ViewModel
+                break
+            case .failure:
+                // Error handling is managed by SubjectsManager's errorMessage
+                break
             }
         }
     }

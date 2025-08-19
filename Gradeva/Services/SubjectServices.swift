@@ -24,14 +24,13 @@ class SubjectServices {
                         let subject = try document.data(as: Subject.self)
                         subjects.append(subject)
                     } catch {
-                        // TODO: error handling
-                        print("Error decoding subject: \(error.localizedDescription)")
+                        // Skip invalid subject documents and continue
+                        continue
                     }
                 }
                 
                 completion(.success(subjects))
             } catch {
-                print("Error: \(error.localizedDescription)")
                 completion(.failure(error))
             }
         }
