@@ -107,7 +107,7 @@ class AuthManager: ObservableObject {
                 }
                 self.setLoading(false)
                 
-            case .failure(let error):
+            case .failure(_):
                 let appUser = AppUser(fromFirebaseUser: user)
                 
                 UserServices().handleFirstTimeLogin(user: appUser) { registrationResult in
