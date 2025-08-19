@@ -24,7 +24,7 @@ struct SignInView: View {
                 .fontWeight(.bold)
                 .padding(.bottom)
             
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 SignInWithAppleButton(
                     .signIn,
                     onRequest: auth.handleSignInWithAppleRequest,
@@ -37,12 +37,13 @@ struct SignInView: View {
                 .opacity(auth.isAuthLoading ? 0.5 : 1)
           
                 Button(action: auth.handleSignInWithGoogle) {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 4) {
                         Image("g")
                             .resizable()
-                            .frame(width: 20, height: 20)
+                            .frame(width: 12, height: 12)
                         Text("Sign in with Google")
-                            .font(.system(size: 16, weight: .medium))
+                            .font(.headline)
+                            .fontWeight(.medium)
                             .foregroundColor(.primary)
                     }
                     .frame(width: 280, height: 45)
