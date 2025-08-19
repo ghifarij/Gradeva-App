@@ -14,12 +14,20 @@ class AppUser: Codable {
     var displayName: String?
     var email: String?
     var didCompleteOnboarding: Bool?
+    var schoolId: String?
     
-    init(uid: String, displayName: String? = nil, email: String? = nil, didCompleteOnboarding: Bool? = nil) {
+    init(
+        uid: String,
+        displayName: String? = nil,
+        email: String? = nil,
+        didCompleteOnboarding: Bool? = nil,
+        schoolId: String? = nil
+    ) {
         self.id = uid
         self.displayName = displayName
         self.email = email
         self.didCompleteOnboarding = didCompleteOnboarding
+        self.schoolId = schoolId
     }
     
     init(fromFirebaseUser user: FirebaseAuth.User) {

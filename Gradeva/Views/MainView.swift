@@ -16,7 +16,7 @@ struct MainContentView: View {
     var body: some View {
         NavigationStack(path: $navManager.paths) {
             // Signed-in  --> show HomeView
-            if auth.isSignedIn {
+            if auth.isSignedIn && auth.currentUser?.schoolId != nil {
                 TabView {
                     HomeView()
                         .tabItem {
@@ -41,6 +41,14 @@ struct MainContentView: View {
                         SettingsView()
                     case .grading(let examId):
                         GradingExamView(examId: examId)
+                    }
+                }
+            } else if auth.isSignedIn {
+                // TODO: Implement a better view
+                VStack {
+                    Text("You're not belong to any school, contact your administrator to join a school")
+                    Button("Sign Out") {
+                        auth.signOut()
                     }
                 }
             } else {
