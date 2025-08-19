@@ -12,15 +12,17 @@ struct SubjectSelection: View {
     @Binding var selectedSubjects: Set<String>
     
     private var isSelected: Bool {
-        selectedSubjects.contains(subject.id ?? "")
+        guard let subjectId = subject.id else { return false }
+        selectedSubjects.contains(subjectId)
     }
     
     private func toggleSelection() {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            guard let subjectId = subject.id else { return }
             if isSelected {
-                selectedSubjects.remove(subject.id ?? "")
+                selectedSubjects.remove(subjectId)
             } else {
-                selectedSubjects.insert(subject.id ?? "")
+                selectedSubjects.insert(subjectId)
             }
         }
         
