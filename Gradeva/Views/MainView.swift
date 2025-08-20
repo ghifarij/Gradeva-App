@@ -12,6 +12,7 @@ import FirebaseAuth
 struct MainContentView: View {
     @ObservedObject private var auth = AuthManager.shared
     @StateObject private var navManager = NavManager()
+    @State private var showSplashScreen = true
     
     var didCompleteOnboarding: Bool {
         auth.currentUser?.didCompleteOnboarding ?? false
@@ -25,12 +26,21 @@ struct MainContentView: View {
         !isAssignedToSchool && auth.isSignedIn
     }
     
+    private func hideSplashScreen() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                showSplashScreen = false
+            }
+        }
+    }
+    
     var body: some View {
         NavigationStack(path: $navManager.paths) {
-            // Show splash screen while authentication is loading
-            if auth.isAuthLoading {
+            // Show splash screen on first launch for 1.5 seconds
+            if showSplashScreen {
                 SplashScreenView()
                     .transition(.blurReplace)
+                    .onAppear(perform: hideSplashScreen)
             // Signed-in  --> show HomeView
             } else if auth.isSignedIn && isAssignedToSchool {
                 if !didCompleteOnboarding {
