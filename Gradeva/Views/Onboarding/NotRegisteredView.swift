@@ -12,7 +12,6 @@ struct NotRegisteredView: View {
     @StateObject private var registration = RegistrationManager()
     @EnvironmentObject private var auth: AuthManager
     
-    
     var registrationLink: String {
         if let registrationId = registration.myRegistration?.id {
             return "https://gradeva.muhammadramdan.com/register/\(registrationId)"
@@ -64,18 +63,24 @@ struct NotRegisteredView: View {
                     )
             )
             
-            Button(action: {
-                auth.signOut()
-            }) {
+            Button(action: auth.signOut) {
                 Text("Sign Out")
                     .fontWeight(.semibold)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.red)
-                    .foregroundColor(.white)
-                    .cornerRadius(8)
             }
-            .padding(.horizontal)
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.red)
+            .foregroundColor(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
+            
+            Button(action: registration.registerToDemo) {
+                Text("Try with Demo School")
+            }
+            .frame(maxWidth: .infinity)
+            .padding()
+            .background(Color.accentColor)
+            .foregroundStyle(.white)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .padding()
     }
