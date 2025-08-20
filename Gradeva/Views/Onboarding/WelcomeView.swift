@@ -65,104 +65,102 @@ struct WelcomeView: View {
     }
     
     var body: some View {
-        GeometryReader { geometry in
-            VStack {
-                // Header with step indicator
-                HStack(spacing: 8) {
-                    ForEach(0..<3, id: \.self) { index in
-                        Circle()
-                            .fill(index <= currentStep ? Color.accentColor : Color.gray.opacity(0.3))
-                            .frame(width: 8, height: 8)
-                            .scaleEffect(index == currentStep ? 1.2 : 1.0)
-                    }
+        VStack {
+            // Header with step indicator
+            HStack(spacing: 8) {
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .fill(index <= currentStep ? Color.accentColor : Color.gray.opacity(0.3))
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(index == currentStep ? 1.2 : 1.0)
                 }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("Onboarding progress")
-                .accessibilityValue("Step \(currentStep + 1) of 3")
-                
-                // Step content with sliding animation
-                ZStack {
-                    switch currentStep {
-                    case 0:
-                        WelcomeStepView()
-                            .transition(.blurReplace)
-                            .padding(.horizontal, 24)
-                    case 1:
-                        NameStepView(name: $name)
-                            .transition(.blurReplace)
-                            .padding(.horizontal, 24)
-                    case 2:
-                        SubjectsStepView(selectedSubjects: $selectedSubjects)
-                            .environmentObject(subjectsManager)
-                            .transition(.blurReplace)
-                            // padding set internally
-                    default:
-                        EmptyView()
-                    }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Onboarding progress")
+            .accessibilityValue("Step \(currentStep + 1) of 3")
+            .padding(.top)
+            
+            // Step content with sliding animation
+            ZStack {
+                switch currentStep {
+                case 0:
+                    WelcomeStepView()
+                        .transition(.blurReplace)
+                        .padding(.horizontal, 24)
+                case 1:
+                    NameStepView(name: $name)
+                        .transition(.blurReplace)
+                        .padding(.horizontal, 24)
+                case 2:
+                    SubjectsStepView(selectedSubjects: $selectedSubjects)
+                        .environmentObject(subjectsManager)
+                        .transition(.blurReplace)
+                        // padding set internally
+                default:
+                    EmptyView()
                 }
-                .frame(maxHeight: .infinity)
-                
-                // Bottom navigation
-                VStack(spacing: 12) {
-                    // Back button (outlined)
-                    if currentStep > 0 {
-                        Button(action: previousStep) {
-                            HStack(spacing: 8) {
-                                Image(systemName: "chevron.left")
-                                    .accessibilityHidden(true)
-                                Text("Back")
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16)
-                                    .stroke(Color.accentColor, lineWidth: 1)
-                            )
-                        }
-                        .transition(.opacity)
-                        .disabled(subjectsManager.isClaimingSubjects)
-                        .accessibilityLabel("Back")
-                        .accessibilityHint("Double tap to go to previous onboarding step")
-                        .accessibilityAddTraits(.isButton)
-                    }
-                    
-                    // Main button
-                    Button(action: getNextAction) {
-                        HStack {
-                            if subjectsManager.isClaimingSubjects && currentStep == 2 {
-                                ProgressView()
-                                    .accessibilityLabel("Setting up your account")
-                            } else {
-                                Text(buttonTitle)
-                                Image(systemName: buttonIcon)
-                                    .accessibilityHidden(true)
-                            }
+            }
+            .frame(maxHeight: .infinity)
+            
+            // Bottom navigation
+            VStack(spacing: 12) {
+                // Back button (outlined)
+                if currentStep > 0 {
+                    Button(action: previousStep) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                                .accessibilityHidden(true)
+                            Text("Back")
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical)
-                        .background(buttonEnabled ? Color.accentColor : Color.gray.opacity(0.3))
-                        .foregroundStyle(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .transition(.opacity)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.accentColor, lineWidth: 1)
+                        )
                     }
-                    .disabled(!buttonEnabled || subjectsManager.isClaimingSubjects)
-                    .accessibilityLabel(buttonTitle)
-                    .accessibilityHint(buttonHint)
+                    .transition(.opacity)
+                    .disabled(subjectsManager.isClaimingSubjects)
+                    .accessibilityLabel("Back")
+                    .accessibilityHint("Double tap to go to previous onboarding step")
                     .accessibilityAddTraits(.isButton)
-                    .accessibilityValue(buttonEnabled ? "" : "Disabled")
-                    
-                    // Error message
-                    if let errorMessage = subjectsManager.errorMessage {
-                        InlineErrorView(message: errorMessage)
-                            .transition(.opacity)
-                    }
                 }
-                .accessibilityElement(children: .contain)
-                .accessibilityLabel("Onboarding navigation")
-                .padding(.horizontal, 24)
+                
+                // Main button
+                Button(action: getNextAction) {
+                    HStack {
+                        if subjectsManager.isClaimingSubjects && currentStep == 2 {
+                            ProgressView()
+                                .accessibilityLabel("Setting up your account")
+                        } else {
+                            Text(buttonTitle)
+                            Image(systemName: buttonIcon)
+                                .accessibilityHidden(true)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical)
+                    .background(buttonEnabled ? Color.accentColor : Color.gray.opacity(0.3))
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+                    .transition(.opacity)
+                }
+                .disabled(!buttonEnabled || subjectsManager.isClaimingSubjects)
+                .accessibilityLabel(buttonTitle)
+                .accessibilityHint(buttonHint)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityValue(buttonEnabled ? "" : "Disabled")
+                
+                // Error message
+                if let errorMessage = subjectsManager.errorMessage {
+                    InlineErrorView(message: errorMessage)
+                        .transition(.opacity)
+                }
             }
-            .padding(.bottom, max(40, geometry.safeAreaInsets.bottom + 20))
-            .padding(.top)
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Onboarding navigation")
+            .padding(.horizontal, 24)
+            .padding(.bottom, 40)
         }
         .ignoresSafeArea(.keyboard)
     }
