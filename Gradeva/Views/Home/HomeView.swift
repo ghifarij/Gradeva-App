@@ -8,9 +8,6 @@
 import SwiftUI
 
 struct HomeView: View {
-    //    @EnvironmentObject var auth: AuthManager
-    //    @EnvironmentObject var navManager: NavManager
-    
     // State for the selected batch in the picker.
     @State private var selectedBatch = "Batch 1"
     private let batches = ["Batch 1", "Batch 2", "Batch 3"]
