@@ -1,14 +1,14 @@
 //
-//  GradingCard.swift
+//  ExamCard.swift
 //  Gradeva
 //
-//  Created by Ramdan on 14/08/25.
+//  Created by Afga Ghifari on 20/08/25.
 //
 
 import SwiftUI
 
 
-struct GradingCard: View {
+struct ExamCard: View {
     @EnvironmentObject var navManager: NavManager
     let title: String
     
@@ -61,12 +61,12 @@ struct GradingCard: View {
                 }
             )
             .onTapGesture {
-                navManager.push(.grading(title))
+                navManager.push(.exam(title))
             }
     }
 }
 
 #Preview {
-    GradingCard(title: "Digital Marketing")
+    GradingCard(title: "Theory")
         .environmentObject(NavManager())
 }
