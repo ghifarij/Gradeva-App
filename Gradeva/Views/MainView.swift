@@ -41,20 +41,20 @@ struct MainContentView: View {
     
     var body: some View {
         NavigationStack(path: $navManager.paths) {
-            // Show splash screen on first launch for 1.5 seconds
-            if showSplashScreen {
-                SplashScreenView()
+            ZStack {
+                // Show splash screen on first launch for 1.5 seconds
+                if showSplashScreen {
+                    SplashScreenView()
+                        .transition(.opacity) 
+                        .onAppear(perform: hideSplashScreen)
+                    // First launch - show welcome screen with login button
+                } else if launchManager.isFirstLaunch {
+                    FirstLaunchWelcomeView(onLoginTapped: {
+                        launchManager.markAppAsLaunched()
+                    })
                     .transition(.blurReplace)
-                    .onAppear(perform: hideSplashScreen)
-                // First launch - show welcome screen with login button
-            } else if launchManager.isFirstLaunch {
-                FirstLaunchWelcomeView(onLoginTapped: {
-                    launchManager.markAppAsLaunched()
-                })
-                .transition(.blurReplace)
-                // Signed-in and has school --> show main content
-            } else if auth.isSignedIn && isAssignedToSchool {
-                ZStack {
+                    // Signed-in and has school --> show main content
+                } else if auth.isSignedIn && isAssignedToSchool {
                     if !didCompleteOnboarding {
                         WelcomeView()
                             .transition(.blurReplace)
@@ -62,14 +62,14 @@ struct MainContentView: View {
                         MainTabView()
                             .transition(.blurReplace)
                     }
+                } else if hasNoSchool {
+                    NotRegisteredView()
+                        .transition(.blurReplace)
+                } else if !auth.isSignedIn {
+                    // Not signed in --> show SignInView
+                    SignInView()
+                        .transition(.blurReplace)
                 }
-            } else if hasNoSchool {
-                NotRegisteredView()
-                    .transition(.blurReplace)
-            } else {
-                // Not signed in --> show SignInView
-                SignInView()
-                    .transition(.blurReplace)
             }
             
         }

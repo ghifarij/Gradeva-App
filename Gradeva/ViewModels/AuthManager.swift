@@ -56,6 +56,14 @@ class AuthManager: ObservableObject {
         }
     }
     
+    private func setIsSignedIn(_ isSignedIn: Bool) {
+        DispatchQueue.main.async {
+            withAnimation {
+                self.isSignedIn = isSignedIn
+            }
+        }
+    }
+    
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
         setLoading(true)
         appleSignInService.handleSignInWithAppleRequest(request)
@@ -94,8 +102,8 @@ class AuthManager: ObservableObject {
         do {
             stopUserListener()
             try Auth.auth().signOut()
+            self.setIsSignedIn(false)
             DispatchQueue.main.async {
-                self.isSignedIn = false
                 self.currentUser = nil
                 self.clearError()
             }
@@ -132,9 +140,7 @@ class AuthManager: ObservableObject {
             switch firestoreResult {
             case .success(let userData):
                 self.setUser(user: userData)
-                DispatchQueue.main.async {
-                    self.isSignedIn = true
-                }
+                self.setIsSignedIn(true)
                 self.setLoading(false)
                 
             case .failure(_):
@@ -144,9 +150,7 @@ class AuthManager: ObservableObject {
                     switch registrationResult {
                     case .success():
                         self.setUser(user: appUser)
-                        DispatchQueue.main.async {
-                            self.isSignedIn = true
-                        }
+                        self.setIsSignedIn(true)
                         self.setLoading(false)
                     case .failure(let error):
                         let authError = AuthError.userRegistrationFailed(error.localizedDescription)
