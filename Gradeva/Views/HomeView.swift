@@ -18,15 +18,13 @@ struct HomeView: View {
                     Text("Hello,")
                         .font(.title3)
                         .foregroundColor(.secondary)
-                        .accessibilityHidden(true)
                     Text(user.email ?? "User")
                         .font(.title2)
                         .fontWeight(.semibold)
-                        .accessibilityLabel("Welcome, \(user.email ?? "User")")
-                        .accessibilityAddTraits(.isHeader)
                 }
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Welcome message for \(user.email ?? "User")")
+                .accessibilityAddTraits(.isHeader)
                 
                 Text("UID: \(String(describing: user.id))")
                     .font(.caption)
@@ -37,9 +35,7 @@ struct HomeView: View {
                 Spacer().frame(height: 24)
                 
                 VStack(spacing: 12) {
-                    Button(action: {
-                        auth.signOut()
-                    }) {
+                    Button(action: auth.signOut) {
                         Text("Sign Out")
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity)

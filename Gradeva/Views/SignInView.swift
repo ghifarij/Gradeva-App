@@ -40,7 +40,7 @@ struct SignInView: View {
                 .accessibilityLabel("Sign in with Apple")
                 .accessibilityHint("Double tap to sign in using your Apple ID")
                 .accessibilityAddTraits(.isButton)
-                .accessibilityRemoveTraits(auth.isAuthLoading ? [] : .isButton)
+                .accessibilityRemoveTraits(auth.isAuthLoading ? .isButton : [])
                 .accessibilityValue(auth.isAuthLoading ? "Loading" : "")
           
                 Button(action: auth.handleSignInWithGoogle) {
@@ -78,9 +78,6 @@ struct SignInView: View {
             if let error = auth.authError {
                 InlineErrorView(error: error)
                     .padding(.top)
-                    .accessibilityLabel("Sign in error")
-                    .accessibilityValue(error.localizedDescription)
-                    .accessibilityAddTraits(.isStaticText)
             }
             
         }
