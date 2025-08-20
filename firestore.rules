@@ -1,0 +1,82 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions for authentication and authorization
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Check if the user is an admin
+    function isAdmin() {
+      return isAuthenticated() && 
+             request.auth.token.admin == true;
+    }
+    
+    // Get the user's school ID
+    function getUserSchoolId() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.schoolId;
+    }
+    
+    // Check if the user belongs to a specific school
+    function belongsToSchool(schoolId) {
+      return isAuthenticated() && getUserSchoolId() == schoolId;
+    }
+
+    // Check if the user is a school admin using claims
+    function isSchoolAdmin(schoolId) {
+      return isAuthenticated() && 
+             request.auth.token.schoolId == schoolId && 
+             request.auth.token.admin == true;
+    }
+
+    // Check if the user is the owner of a document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection - users can read/write their own data, admins can read and write all
+    match /users/{userId} {
+      allow read, write: if isOwner(userId) || isAdmin();
+    }
+
+    // Registrations collection - authenticated users can read/write registrations
+    match /registrations/{registrationId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Schools collection - users can read schools they belong to, school admins can write
+    match /schools/{schoolId} {
+      allow read: if belongsToSchool(schoolId) || isSchoolAdmin(schoolId);
+      allow write: if isSchoolAdmin(schoolId);
+
+      // Students subcollection - school members can read, school admins can write
+      match /students/{studentId} {
+        allow write: if isSchoolAdmin(schoolId);
+        allow read: if belongsToSchool(schoolId) || isSchoolAdmin(schoolId);
+      }
+
+      // Default exams subcollection - only school admins can read/write
+      match /defaultExams/{examId} {
+        allow read, write: if isSchoolAdmin(schoolId);
+      }
+
+      // Subjects subcollection - school members can read, school admins can write
+      match /subjects/{subjectId} {
+        allow write: if isSchoolAdmin(schoolId);
+        allow read: if belongsToSchool(schoolId) || isSchoolAdmin(schoolId);
+
+        // Exams subcollection - school members can read, school admins can write
+        match /exams/{examId} {
+          allow write: if isSchoolAdmin(schoolId);
+          allow read: if belongsToSchool(schoolId) || isSchoolAdmin(schoolId);
+
+          // Exam results subcollection - school members and school admins can read/write
+          match /examResults/{resultId} {
+            allow read, write: if belongsToSchool(schoolId) || isSchoolAdmin(schoolId);
+          }
+        }
+      }
+    }
+  }
+}

@@ -45,8 +45,8 @@ class RegistrationService {
                     if let registration = existingRegistration {
                         // Registration exists, check if approved
                         if let schoolId = registration.schoolId {
-                            // Update user with schoolId from approved registration
-                            user.schoolId = schoolId
+                            // Create updated user with schoolId from approved registration
+                            let updatedUser = user.copy(schoolId: schoolId)
                             
                             // Update registration with current userId
                             guard let registrationId = registration.id else {
@@ -59,13 +59,16 @@ class RegistrationService {
                                 return
                             }
                             
-                            registration.userId = userId
-                            registration.status = .approved
+                            // Create updated registration
+                            let updatedRegistration = registration.copy(
+                                userId: userId,
+                                status: .approved
+                            )
                             
                             self.updateApprovedRegistration(
-                                registration: registration,
+                                registration: updatedRegistration,
                                 registrationId: registrationId,
-                                user: user,
+                                user: updatedUser,
                                 completion: completion
                             )
                         } else {

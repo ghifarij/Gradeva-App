@@ -33,10 +33,15 @@ struct GradingView: View {
                     ForEach(subjects, id: \.self) { subject in
                         GradingCard(title: subject)
                     }
+                    .padding()
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel("Subjects list")
                 }
-                .padding()
+                .accessibilityLabel("Grading subjects scroll view")
             }
             .navigationTitle("Grading")
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Grading screen")
         }
     }
 }

@@ -19,6 +19,8 @@ class AuthManager: ObservableObject {
     private let appleSignInService = AppleSignInService()
     private let googleSignInService = GoogleSignInService()
     
+    static let shared = AuthManager()
+    
     init() {
         if let user = Auth.auth().currentUser {
             getUserDataFromFirestore(user: user)
@@ -145,6 +147,18 @@ class AuthManager: ObservableObject {
         DispatchQueue.main.async {
             self.authError = nil
             self.showingError = false
+        }
+    }
+    
+    // TODO: Replace with real-time Firestore listener for better UX
+    func refreshCurrentUser() {
+        guard let firebaseUser = Auth.auth().currentUser else { return }
+        getUserDataFromFirestore(user: firebaseUser)
+    }
+    
+    func updateCurrentUser(_ updatedUser: AppUser) {
+        DispatchQueue.main.async {
+            self.currentUser = updatedUser
         }
     }
 }
