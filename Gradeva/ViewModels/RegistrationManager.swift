@@ -11,6 +11,7 @@ import Combine
 class RegistrationManager: ObservableObject {
     @Published var myRegistration: Registration?
     @Published var isLoading: Bool = false
+    @Published var errorMessage: String?
     
     private var auth = AuthManager.shared
     private var cancellables = Set<AnyCancellable>()
@@ -36,7 +37,7 @@ class RegistrationManager: ObservableObject {
                     case .success(let registration):
                         self.myRegistration = registration
                     case .failure(let error):
-                        print("Error: \(error)")
+                        self.errorMessage = "Failed to load registration: \(error.localizedDescription)"
                     }
                 }
             }

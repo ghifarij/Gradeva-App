@@ -1,7 +1,7 @@
 # Gradeva iOS App
 
 ## Project Overview
-Gradeva is an iOS application for grading and analytics management, built with SwiftUI and Firebase. It features user authentication, tabbed navigation, and cloud data storage.
+Gradeva is an iOS application for grading and analytics management, built with SwiftUI and Firebase. It features user authentication, comprehensive onboarding with teacher registration, tabbed navigation, and cloud data storage.
 
 ## Technology Stack
 - **Platform**: iOS 18.4+
@@ -16,12 +16,18 @@ Gradeva is an iOS application for grading and analytics management, built with S
 Gradeva/
 ├── GradevaApp.swift           # Main app entry point with Firebase configuration
 ├── Models/
-│   ├── UserModel.swift        # AppUser model with Firebase integration
+│   ├── UserModel.swift        # AppUser model with Firebase integration & copy function
 │   ├── DatabaseModel.swift    # Firebase database manager singleton
-│   └── RegistrationModel.swift # Registration status and model
+│   ├── RegistrationModel.swift # Registration status and model
+│   ├── ExamModel.swift        # Exam and ExamResult models
+│   ├── SchoolModel.swift      # School model
+│   ├── StudentModel.swift     # Student model
+│   └── SubjectModel.swift     # Subject model
 ├── ViewModels/
 │   ├── AuthManager.swift      # Authentication state management
-│   └── NavManager.swift       # Navigation path management
+│   ├── NavManager.swift       # Navigation path management
+│   ├── RegistrationManager.swift # Teacher registration management
+│   └── SubjectsManager.swift  # Subjects and onboarding management
 ├── Views/
 │   ├── MainView.swift         # Main content view with tab navigation
 │   ├── HomeView.swift         # Home tab view
@@ -38,14 +44,21 @@ Gradeva/
 │   │   ├── GradingView.swift        # Main grading interface
 │   │   └── GradingExamView.swift    # Exam grading view
 │   ├── Onboarding/
-│   │   └── WelcomeView.swift
+│   │   ├── Components/
+│   │   │   ├── NameStepView.swift      # Name input step
+│   │   │   ├── WelcomeStepView.swift   # Welcome step
+│   │   │   ├── SubjectsStepView.swift  # Subject selection step
+│   │   │   └── SubjectSelection.swift  # Subject selection component
+│   │   ├── WelcomeView.swift      # Multi-step onboarding flow
+│   │   └── NotRegisteredView.swift # View for unregistered teachers
 │   └── Profile/
 │       └── ProfileView.swift
 ├── Services/
 │   ├── UserServices.swift      # User data operations with Firestore
 │   ├── AppleSignInService.swift # Apple authentication service
 │   ├── GoogleSignInService.swift # Google authentication service
-│   └── RegistrationService.swift # User registration logic
+│   ├── RegistrationService.swift # User registration logic
+│   └── SubjectServices.swift   # Subject data operations
 ├── Utils/
 │   ├── AuthError.swift         # Authentication error handling
 │   └── CryptoUtils.swift       # Cryptographic utilities
@@ -56,9 +69,12 @@ Gradeva/
 
 ## Key Features
 - **Authentication**: Sign in with Apple & Google integration
+- **Teacher Registration**: Registration link system for school administrators
+- **Comprehensive Onboarding**: Multi-step process (welcome, name, subject selection)
 - **Tab Navigation**: Home, Grading, Analytics, Profile
+- **Subject Management**: Teachers can claim and manage subjects within schools
 - **Firebase Integration**: Firestore database, Authentication
-- **User Management**: Registration status tracking
+- **User Management**: Registration status tracking with reactive state management
 - **Navigation**: Programmatic navigation with NavManager
 
 ## Development Workflow
@@ -82,13 +98,17 @@ All dependencies are managed through Swift Package Manager:
 - GoogleService-Info.plist contains Firebase configuration
 - Database manager is implemented as a singleton in DatabaseModel.swift
 
-### Authentication Flow
+### Authentication & Onboarding Flow
 1. App checks for existing Firebase auth state
 2. If not authenticated, shows SignInView with Apple & Google Sign-In options
-3. Upon successful authentication, shows main TabView interface
+3. Upon successful authentication:
+   - If user has no school registration: shows NotRegisteredView with registration link
+   - If user needs onboarding: shows multi-step WelcomeView (welcome → name → subjects)
+   - If user is fully set up: shows main TabView interface
 4. AuthManager handles state changes and user session management
-5. Dedicated services handle Apple and Google authentication flows
-6. Registration service manages user onboarding process
+5. RegistrationManager handles teacher registration status
+6. SubjectsManager manages subject selection and onboarding completion
+7. Dedicated services handle Apple and Google authentication flows
 
 ### Testing
 - No test framework currently configured
@@ -99,6 +119,10 @@ All dependencies are managed through Swift Package Manager:
 - MVVM architecture pattern
 - ObservableObject for state management
 - Async/await for asynchronous operations
+- **Immutable Data Patterns**: Never mutate class instances directly - use copy functions instead
+  - Example: `let updatedUser = currentUser.copy(displayName: newName)` instead of `currentUser.displayName = newName`
+  - All model classes implement copy functions for creating modified instances
+  - This ensures data integrity and prevents unintended side effects
 
 ## Development Commands
 
@@ -133,6 +157,8 @@ xcodebuild -project Gradeva.xcodeproj -scheme Gradeva -destination 'platform=iOS
 - App entitlements configured for Sign in with Apple capability
 - CryptoUtils provides secure cryptographic operations
 - AuthError handles authentication failures gracefully
+- Registration link system ensures only authorized teachers can access schools
+- Immutable data patterns prevent accidental state mutations and improve security
 
 ## Future Enhancements
 - Add comprehensive test suite (XCTest framework recommended)
