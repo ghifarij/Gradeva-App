@@ -76,6 +76,7 @@ Gradeva/
 - **Firebase Integration**: Firestore database, Authentication
 - **User Management**: Registration status tracking with reactive state management
 - **Navigation**: Programmatic navigation with NavManager
+- **Accessibility**: Full VoiceOver support and comprehensive accessibility features
 
 ## Development Workflow
 
@@ -123,6 +124,15 @@ All dependencies are managed through Swift Package Manager:
   - Example: `let updatedUser = currentUser.copy(displayName: newName)` instead of `currentUser.displayName = newName`
   - All model classes implement copy functions for creating modified instances
   - This ensures data integrity and prevents unintended side effects
+- **Accessibility Requirements**: All UI components must include comprehensive accessibility features
+  - Use proper `accessibilityLabel` for element identification
+  - Use `accessibilityValue` for dynamic states/content (e.g., "Step 2 of 3", "Selected")
+  - Use `accessibilityHint` with "Double tap to..." for actionable elements
+  - Use `accessibilityAddTraits` to identify element types (.isButton, .isHeader, .isStaticText)
+  - Use `accessibilityElement(children: .combine)` with label-value pattern for grouped content
+  - Hide decorative elements with `accessibilityHidden(true)`
+  - Provide loading state feedback for VoiceOver users
+  - Use `InlineErrorView` component for consistent error accessibility
 
 ## Development Commands
 
@@ -159,6 +169,17 @@ xcodebuild -project Gradeva.xcodeproj -scheme Gradeva -destination 'platform=iOS
 - AuthError handles authentication failures gracefully
 - Registration link system ensures only authorized teachers can access schools
 - Immutable data patterns prevent accidental state mutations and improve security
+
+## Accessibility Standards
+The app fully complies with iOS accessibility guidelines and WCAG standards:
+- **VoiceOver Support**: Complete screen reader navigation with descriptive labels and hints
+- **Dynamic Type**: All text scales appropriately with user font size preferences
+- **Touch Targets**: All interactive elements meet 44pt minimum touch target size
+- **Keyboard Navigation**: Full keyboard accessibility for external keyboards
+- **Reduced Motion**: Respects user's reduced motion preferences
+- **High Contrast**: Compatible with high contrast display settings
+- **Motor Accessibility**: Accommodates users with motor impairments through proper button sizing and clear interaction patterns
+- **Cognitive Accessibility**: Clear navigation flows, consistent patterns, and helpful error messages
 
 ## Future Enhancements
 - Add comprehensive test suite (XCTest framework recommended)
