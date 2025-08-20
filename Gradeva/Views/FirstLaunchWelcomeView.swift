@@ -25,14 +25,15 @@ struct FirstLaunchWelcomeView: View {
                 Text("Welcome to Gradeva")
                     .font(.largeTitle)
                     .fontWeight(.bold)
-                    .accessibilityAddTraits(.isHeader)
                 
                 Text("Your comprehensive grading and analytics management solution")
                     .font(.body)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.secondary)
-                    .accessibilityAddTraits(.isStaticText)
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Welcome to Gradeva. Your comprehensive grading and analytics management solution.")
+            .accessibilityAddTraits(.isHeader)
             .padding(.horizontal, 24)
             
             Spacer()
@@ -53,9 +54,12 @@ struct FirstLaunchWelcomeView: View {
             .accessibilityLabel("Login")
             .accessibilityHint("Double tap to proceed to login screen")
             .accessibilityAddTraits(.isButton)
+            .frame(minHeight: 44) // Ensure minimum touch target size
             .padding(.horizontal, 24)
             .padding(.bottom, 40)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Welcome screen")
     }
 }
 
