@@ -17,6 +17,7 @@ struct WelcomeStepView: View {
                 Image(systemName: "graduationcap.fill")
                     .font(.system(size: 80))
                     .foregroundStyle(Color.accentColor)
+                    .accessibilityHidden(true)
                 
                 VStack(spacing: 12) {
                     Text("Welcome to Gradeva")
@@ -28,6 +29,8 @@ struct WelcomeStepView: View {
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.center)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Welcome to Gradeva, your all-in-one grading and analytics companion")
             }
             
             Spacer()
