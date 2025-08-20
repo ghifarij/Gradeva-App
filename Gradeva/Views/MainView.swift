@@ -27,8 +27,12 @@ struct MainContentView: View {
     
     var body: some View {
         NavigationStack(path: $navManager.paths) {
+            // Show splash screen while authentication is loading
+            if auth.isAuthLoading {
+                SplashScreenView()
+                    .transition(.blurReplace)
             // Signed-in  --> show HomeView
-            if auth.isSignedIn && isAssignedToSchool {
+            } else if auth.isSignedIn && isAssignedToSchool {
                 if !didCompleteOnboarding {
                     WelcomeView()
                 } else {

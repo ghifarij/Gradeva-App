@@ -83,7 +83,9 @@ class AuthManager: ObservableObject {
     
     private func setLoading(_ loading: Bool) {
         DispatchQueue.main.async {
-            self.isAuthLoading = loading
+            withAnimation(.easeOut(duration: 0.5)) {
+                self.isAuthLoading = loading
+            }
         }
     }
     
