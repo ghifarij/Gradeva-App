@@ -48,7 +48,26 @@ extension View {
 }
 
 struct InlineErrorView: View {
-    let error: AuthError
+    private let errorMessage: String
+    private let recoveryMessage: String?
+    
+    init(error: AuthError) {
+        self.errorMessage = error.localizedDescription
+        self.recoveryMessage = error.recoveryMessage
+    }
+    
+    init(message: String, recoveryMessage: String? = nil) {
+        self.errorMessage = message
+        self.recoveryMessage = recoveryMessage
+    }
+    
+    private var accessibilityValue: String {
+        var value = errorMessage
+        if let recoveryMessage = recoveryMessage {
+            value += ". \(recoveryMessage)"
+        }
+        return value
+    }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -63,11 +82,11 @@ struct InlineErrorView: View {
                         .foregroundColor(.red)
                 }
                 
-                Text(error.localizedDescription)
+                Text(errorMessage)
                     .font(.body)
                     .fixedSize(horizontal: false, vertical: true)
                 
-                if let recoveryMessage = error.recoveryMessage {
+                if let recoveryMessage = recoveryMessage {
                     Text(recoveryMessage)
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -82,5 +101,9 @@ struct InlineErrorView: View {
             RoundedRectangle(cornerRadius: 8)
                 .stroke(Color.red.opacity(0.3), lineWidth: 1)
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Error")
+        .accessibilityValue(accessibilityValue)
+        .accessibilityAddTraits(.isStaticText)
     }
 }

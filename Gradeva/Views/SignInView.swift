@@ -23,6 +23,8 @@ struct SignInView: View {
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.bottom)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityLabel("Sign In to Gradeva")
             
             VStack(spacing: 12) {
                 SignInWithAppleButton(
@@ -31,22 +33,29 @@ struct SignInView: View {
                     onCompletion: auth.handleSignInWithAppleCompletion
                 )
                 .signInWithAppleButtonStyle(signInColor)
-                .frame(width: 280, height: 45)
+                .frame(height: 44)
                 .cornerRadius(8)
                 .disabled(auth.isAuthLoading)
                 .opacity(auth.isAuthLoading ? 0.5 : 1)
+                .accessibilityLabel("Sign in with Apple")
+                .accessibilityHint("Double tap to sign in using your Apple ID")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityRemoveTraits(auth.isAuthLoading ? [] : .isButton)
+                .accessibilityValue(auth.isAuthLoading ? "Loading" : "")
           
                 Button(action: auth.handleSignInWithGoogle) {
                     HStack(spacing: 4) {
                         Image("g")
                             .resizable()
                             .frame(width: 12, height: 12)
+                            .accessibilityHidden(true)
                         Text("Sign in with Google")
                             .font(.headline)
                             .fontWeight(.medium)
                             .foregroundColor(.primary)
                     }
-                    .frame(width: 280, height: 45)
+                    .frame(height: 44)
+                    .frame(maxWidth: .infinity)
                     .background(
                         RoundedRectangle(cornerRadius: 8)
                             .fill(Color(.systemBackground))
@@ -58,15 +67,26 @@ struct SignInView: View {
                 }
                 .disabled(auth.isAuthLoading)
                 .opacity(auth.isAuthLoading ? 0.5 : 1)
+                .accessibilityLabel("Sign in with Google")
+                .accessibilityHint("Double tap to sign in using your Google account")
+                .accessibilityAddTraits(.isButton)
+                .accessibilityValue(auth.isAuthLoading ? "Loading" : "")
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Sign in options")
             
             if let error = auth.authError {
                 InlineErrorView(error: error)
                     .padding(.top)
+                    .accessibilityLabel("Sign in error")
+                    .accessibilityValue(error.localizedDescription)
+                    .accessibilityAddTraits(.isStaticText)
             }
             
         }
-        .padding()
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Sign in screen")
+        .padding(.horizontal, 40)
     }
 }
 

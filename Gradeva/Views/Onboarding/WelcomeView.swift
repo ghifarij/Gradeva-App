@@ -76,6 +76,9 @@ struct WelcomeView: View {
                             .scaleEffect(index == currentStep ? 1.2 : 1.0)
                     }
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Onboarding progress")
+                .accessibilityValue("Step \(currentStep + 1) of 3")
                 
                 // Step content with sliding animation
                 ZStack {
@@ -106,6 +109,7 @@ struct WelcomeView: View {
                         Button(action: previousStep) {
                             HStack(spacing: 8) {
                                 Image(systemName: "chevron.left")
+                                    .accessibilityHidden(true)
                                 Text("Back")
                             }
                             .frame(maxWidth: .infinity)
@@ -117,6 +121,9 @@ struct WelcomeView: View {
                         }
                         .transition(.opacity)
                         .disabled(subjectsManager.isClaimingSubjects)
+                        .accessibilityLabel("Back")
+                        .accessibilityHint("Double tap to go to previous onboarding step")
+                        .accessibilityAddTraits(.isButton)
                     }
                     
                     // Main button
@@ -124,9 +131,11 @@ struct WelcomeView: View {
                         HStack {
                             if subjectsManager.isClaimingSubjects && currentStep == 2 {
                                 ProgressView()
+                                    .accessibilityLabel("Setting up your account")
                             } else {
                                 Text(buttonTitle)
                                 Image(systemName: buttonIcon)
+                                    .accessibilityHidden(true)
                             }
                         }
                         .frame(maxWidth: .infinity)
@@ -137,16 +146,19 @@ struct WelcomeView: View {
                         .transition(.opacity)
                     }
                     .disabled(!buttonEnabled || subjectsManager.isClaimingSubjects)
+                    .accessibilityLabel(buttonTitle)
+                    .accessibilityHint(buttonHint)
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityValue(buttonEnabled ? "" : "Disabled")
                     
                     // Error message
                     if let errorMessage = subjectsManager.errorMessage {
-                        Text(errorMessage)
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                            .multilineTextAlignment(.center)
+                        InlineErrorView(message: errorMessage)
                             .transition(.opacity)
                     }
                 }
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Onboarding navigation")
                 .padding(.horizontal, 24)
             }
             .padding(.bottom, max(40, geometry.safeAreaInsets.bottom + 20))
@@ -178,6 +190,15 @@ struct WelcomeView: View {
         case 1: return canContinueFromName
         case 2: return canContinueFromSubjects
         default: return false
+        }
+    }
+    
+    private var buttonHint: String {
+        switch currentStep {
+        case 0: return "Double tap to start the onboarding process"
+        case 1: return canContinueFromName ? "Double tap to continue to subject selection" : "Enter your name to continue"
+        case 2: return canContinueFromSubjects ? "Double tap to complete onboarding and start using the app" : "Select at least one subject to continue"
+        default: return "Double tap to continue to next step"
         }
     }
 }

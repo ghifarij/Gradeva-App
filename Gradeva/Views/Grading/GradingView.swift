@@ -27,9 +27,14 @@ struct GradingView: View {
                         }
                     }
                     .padding()
+                    .accessibilityElement(children: .contain)
+                    .accessibilityLabel("Subjects list")
                 }
+                .accessibilityLabel("Grading subjects scroll view")
             }
             .navigationTitle("Grading")
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Grading screen")
         }
     }
 }
