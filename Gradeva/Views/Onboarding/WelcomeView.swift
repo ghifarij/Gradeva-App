@@ -9,6 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     @StateObject private var subjectsManager = SubjectsManager()
+    @EnvironmentObject private var auth: AuthManager
     @State private var currentStep = 0
     @State private var name: String = ""
     @State private var selectedSubjects = Set<String>()
@@ -95,7 +96,7 @@ struct WelcomeView: View {
                     SubjectsStepView(selectedSubjects: $selectedSubjects)
                         .environmentObject(subjectsManager)
                         .transition(.blurReplace)
-                        // padding set internally
+                    // padding set internally
                 default:
                     EmptyView()
                 }
@@ -105,26 +106,28 @@ struct WelcomeView: View {
             // Bottom navigation
             VStack(spacing: 12) {
                 // Back button (outlined)
-                if currentStep > 0 {
-                    Button(action: previousStep) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "chevron.left")
-                                .accessibilityHidden(true)
-                            Text("Back")
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.accentColor, lineWidth: 1)
-                        )
+                
+                Button(action: previousStep) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "chevron.left")
+                            .accessibilityHidden(true)
+                        Text("Back")
                     }
-                    .transition(.opacity)
-                    .disabled(subjectsManager.isClaimingSubjects)
-                    .accessibilityLabel("Back")
-                    .accessibilityHint("Double tap to go to previous onboarding step")
-                    .accessibilityAddTraits(.isButton)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color.accentColor, lineWidth: 1)
+                    )
                 }
+                .transition(.blurReplace)
+                .opacity(currentStep == 0 ? 0 : 1)
+                .disabled(subjectsManager.isClaimingSubjects || currentStep == 0)
+                .accessibilityHidden(currentStep == 0)
+                .accessibilityLabel("Back")
+                .accessibilityHint("Double tap to go to previous onboarding step")
+                .accessibilityAddTraits(.isButton)
+                
                 
                 // Main button
                 Button(action: getNextAction) {
@@ -150,12 +153,6 @@ struct WelcomeView: View {
                 .accessibilityHint(buttonHint)
                 .accessibilityAddTraits(.isButton)
                 .accessibilityValue(buttonEnabled ? "" : "Disabled")
-                
-                // Error message
-                if let errorMessage = subjectsManager.errorMessage {
-                    InlineErrorView(message: errorMessage)
-                        .transition(.opacity)
-                }
             }
             .accessibilityElement(children: .contain)
             .accessibilityLabel("Onboarding navigation")
@@ -163,6 +160,17 @@ struct WelcomeView: View {
             .padding(.bottom, 40)
         }
         .ignoresSafeArea(.keyboard)
+        .onAppear {
+            // Prefill name field with user's current display name
+            if name.isEmpty, let displayName = auth.currentUser?.displayName, !displayName.isEmpty {
+                name = displayName
+            }
+            
+            // Skip to step 2 if user already completed demo onboarding
+            if auth.currentUser?.didCompleteDemoOnboarding == true {
+                currentStep = 2
+            }
+        }
     }
     
     private var buttonTitle: String {
@@ -203,4 +211,5 @@ struct WelcomeView: View {
 
 #Preview {
     WelcomeView()
+        .environmentObject(AuthManager.shared)
 }

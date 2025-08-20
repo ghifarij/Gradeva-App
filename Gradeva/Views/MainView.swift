@@ -19,6 +19,10 @@ struct MainContentView: View {
         auth.currentUser?.didCompleteOnboarding ?? false
     }
     
+    var didCompleteDemoOnboarding: Bool {
+        auth.currentUser?.didCompleteDemoOnboarding ?? false
+    }
+    
     var isAssignedToSchool: Bool {
         auth.currentUser?.schoolId != nil
     }
@@ -42,13 +46,13 @@ struct MainContentView: View {
                 SplashScreenView()
                     .transition(.blurReplace)
                     .onAppear(perform: hideSplashScreen)
-            // First launch - show welcome screen with login button
+                // First launch - show welcome screen with login button
             } else if launchManager.isFirstLaunch {
                 FirstLaunchWelcomeView(onLoginTapped: {
                     launchManager.markAppAsLaunched()
                 })
                 .transition(.blurReplace)
-            // Signed-in and has school --> show main content
+                // Signed-in and has school --> show main content
             } else if auth.isSignedIn && isAssignedToSchool {
                 ZStack {
                     if !didCompleteOnboarding {
@@ -61,9 +65,11 @@ struct MainContentView: View {
                 }
             } else if hasNoSchool {
                 NotRegisteredView()
+                    .transition(.blurReplace)
             } else {
                 // Not signed in --> show SignInView
                 SignInView()
+                    .transition(.blurReplace)
             }
             
         }

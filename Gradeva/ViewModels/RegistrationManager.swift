@@ -49,7 +49,7 @@ class RegistrationManager: ObservableObject {
         isLoading = true
         errorMessage = nil
         
-        let updatedUser = user.copy(schoolId: "demo-school")
+        let updatedUser = user.copy(didCompleteDemoOnboarding: true, schoolId: "demo-school")
         
         UserServices().updateUser(user: updatedUser) { [weak self] result in
             DispatchQueue.main.async {
