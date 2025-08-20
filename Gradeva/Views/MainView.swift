@@ -12,6 +12,7 @@ import FirebaseAuth
 struct MainContentView: View {
     @ObservedObject private var auth = AuthManager.shared
     @StateObject private var navManager = NavManager()
+    @StateObject private var launchManager = AppLaunchManager.shared
     @State private var showSplashScreen = true
     
     var didCompleteOnboarding: Bool {
@@ -41,7 +42,13 @@ struct MainContentView: View {
                 SplashScreenView()
                     .transition(.blurReplace)
                     .onAppear(perform: hideSplashScreen)
-            // Signed-in  --> show HomeView
+            // First launch - show welcome screen with login button
+            } else if launchManager.isFirstLaunch {
+                FirstLaunchWelcomeView(onLoginTapped: {
+                    launchManager.markAppAsLaunched()
+                })
+                .transition(.blurReplace)
+            // Signed-in and has school --> show main content
             } else if auth.isSignedIn && isAssignedToSchool {
                 ZStack {
                     if !didCompleteOnboarding {
