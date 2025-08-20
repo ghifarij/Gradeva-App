@@ -35,7 +35,7 @@ class AuthManager: ObservableObject {
             if let user = user {
                 self.getUserDataFromFirestore(user: user)
             } else {
-                // User signed out - clean up listener
+                    // User signed out - clean up listener
                 self.stopUserListener()
             }
         }
@@ -46,6 +46,14 @@ class AuthManager: ObservableObject {
     deinit {
         stopUserListener()
         cancellables.removeAll()
+    }
+    
+    private func setUser(user: AppUser) {
+        DispatchQueue.main.async {
+            withAnimation {
+                self.currentUser = user
+            }
+        }
     }
     
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
@@ -123,8 +131,8 @@ class AuthManager: ObservableObject {
         userServices.getUser(uid: user.uid) { firestoreResult in
             switch firestoreResult {
             case .success(let userData):
+                self.setUser(user: userData)
                 DispatchQueue.main.async {
-                    self.currentUser = userData
                     self.isSignedIn = true
                 }
                 self.setLoading(false)
@@ -135,8 +143,8 @@ class AuthManager: ObservableObject {
                 self.userServices.handleFirstTimeLogin(user: appUser) { registrationResult in
                     switch registrationResult {
                     case .success():
+                        self.setUser(user: appUser)
                         DispatchQueue.main.async {
-                            self.currentUser = appUser
                             self.isSignedIn = true
                         }
                         self.setLoading(false)
@@ -180,9 +188,7 @@ class AuthManager: ObservableObject {
         userListener = userServices.startUserListener(uid: uid) { [weak self] result in
             switch result {
             case .success(let updatedUser):
-                DispatchQueue.main.async {
-                    self?.currentUser = updatedUser
-                }
+                self?.setUser(user: updatedUser)
             case .failure(let error):
                 print("User listener error: \(error.localizedDescription)")
             }
@@ -213,8 +219,6 @@ class AuthManager: ObservableObject {
     }
     
     func updateCurrentUser(_ updatedUser: AppUser) {
-        DispatchQueue.main.async {
-            self.currentUser = updatedUser
-        }
+        setUser(user: updatedUser)
     }
 }
