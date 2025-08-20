@@ -22,12 +22,18 @@ struct GradingSubject: View {
         VStack(alignment: .leading) {
             Text(subjectName)
                 .font(.title3.bold())
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityLabel("Subject: \(subjectName)")
             VStack(spacing: 12) {
                 ForEach(gradingItems, id: \.self) { item in
                     GradingCard(title: item)
                 }
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("\(subjectName) exams and assessments")
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("\(subjectName) subject section")
     }
 }
 

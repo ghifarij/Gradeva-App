@@ -10,6 +10,9 @@ import SwiftUI
 struct ProfileView: View {
     var body: some View {
         Text("Hello, from ProfileView!")
+            .accessibilityLabel("Profile view placeholder")
+            .accessibilityHint("This is a placeholder for the profile screen")
+            .accessibilityAddTraits(.isStaticText)
     }
 }
 

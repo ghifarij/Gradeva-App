@@ -28,6 +28,8 @@ struct GradingCard: View {
                         Text(title)
                             .font(.title2.weight(.semibold))
                             .foregroundStyle(.secondary)
+                            .accessibilityLabel(title)
+                            .accessibilityAddTraits(.isHeader)
                         Spacer()
                     }
                     .frame(maxWidth: .infinity)
@@ -46,10 +48,12 @@ struct GradingCard: View {
                             Text("Grading here")
                                 .foregroundColor(.secondary)
                                 .font(.callout)
+                                .accessibilityHidden(true)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(.secondary)
                                 .font(.headline)
+                                .accessibilityHidden(true)
                         }
                         .padding(.horizontal)
                         .padding(.top, 4)
@@ -60,6 +64,10 @@ struct GradingCard: View {
             .onTapGesture {
                 navManager.push(.grading("some_ID"))
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(title) grading card")
+            .accessibilityHint("Double tap to open grading for \(title)")
+            .accessibilityAddTraits(.isButton)
     }
 }
 

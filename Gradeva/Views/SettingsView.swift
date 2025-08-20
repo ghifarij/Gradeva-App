@@ -11,10 +11,19 @@ struct SettingsView: View {
     @EnvironmentObject var navManager: NavManager
     
     var body: some View {
-        Text("Hello from Settings")
-        Button("Go Back") {
-            navManager.back()
+        VStack(spacing: 16) {
+            Text("Hello from Settings")
+                .accessibilityLabel("Settings view placeholder")
+                .accessibilityAddTraits(.isHeader)
+            Button("Go Back") {
+                navManager.back()
+            }
+            .accessibilityLabel("Go Back")
+            .accessibilityHint("Return to previous screen")
+            .accessibilityAddTraits(.isButton)
         }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Settings screen")
     }
 }
 

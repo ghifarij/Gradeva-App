@@ -21,6 +21,7 @@ struct NameStepView: View {
                 Image(systemName: "person.circle.fill")
                     .font(.system(size: 60))
                     .foregroundStyle(Color.accentColor)
+                    .accessibilityHidden(true)
                 
                 VStack(spacing: 8) {
                     Text("What's your name?")
@@ -33,6 +34,9 @@ struct NameStepView: View {
                         .multilineTextAlignment(.center)
                 }
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("What's your name? This helps us personalize your experience")
+            .accessibilityAddTraits(.isHeader)
             
             // Name Input
             TextField("Enter your full name", text: $name)
@@ -48,6 +52,9 @@ struct NameStepView: View {
                 .textInputAutocapitalization(.words)
                 .textContentType(.name)
                 .font(.system(.body, design: .rounded))
+                .accessibilityLabel("Full name")
+                .accessibilityHint("Enter your full name to personalize the app experience")
+                .accessibilityValue(name.isEmpty ? "Empty" : name)
             
             Spacer()
         }
