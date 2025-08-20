@@ -18,12 +18,12 @@ struct HomeView: View {
                     Text("Hello,")
                         .font(.title3)
                         .foregroundColor(.secondary)
-                    Text(user.email ?? "User")
+                    Text(user.displayName ?? user.email ?? "User")
                         .font(.title2)
                         .fontWeight(.semibold)
                 }
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("Welcome message for \(user.email ?? "User")")
+                .accessibilityLabel("Welcome message for \(user.displayName ?? user.email ?? "User")")
                 .accessibilityAddTraits(.isHeader)
                 
                 Text("UID: \(String(describing: user.id))")

@@ -8,6 +8,8 @@
 import SwiftUI
 import AuthenticationServices
 import FirebaseAuth
+import FirebaseFirestore
+import Combine
 
 class AuthManager: ObservableObject {
     @Published var isSignedIn = false
@@ -18,6 +20,9 @@ class AuthManager: ObservableObject {
     
     private let appleSignInService = AppleSignInService()
     private let googleSignInService = GoogleSignInService()
+    private let userServices = UserServices()
+    private var userListener: ListenerRegistration?
+    private var cancellables = Set<AnyCancellable>()
     
     static let shared = AuthManager()
     
@@ -29,8 +34,18 @@ class AuthManager: ObservableObject {
         Auth.auth().addStateDidChangeListener { _, user in
             if let user = user {
                 self.getUserDataFromFirestore(user: user)
+            } else {
+                // User signed out - clean up listener
+                self.stopUserListener()
             }
         }
+        
+        setupAppLifecycleObservers()
+    }
+    
+    deinit {
+        stopUserListener()
+        cancellables.removeAll()
     }
     
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {
@@ -69,6 +84,7 @@ class AuthManager: ObservableObject {
     
     func signOut() {
         do {
+            stopUserListener()
             try Auth.auth().signOut()
             DispatchQueue.main.async {
                 self.isSignedIn = false
@@ -102,7 +118,9 @@ class AuthManager: ObservableObject {
     
     private func getUserDataFromFirestore(user: FirebaseAuth.User) {
         setLoading(true)
-        UserServices().getUser(uid: user.uid) { firestoreResult in
+        startUserListener(uid: user.uid)
+        
+        userServices.getUser(uid: user.uid) { firestoreResult in
             switch firestoreResult {
             case .success(let userData):
                 DispatchQueue.main.async {
@@ -114,7 +132,7 @@ class AuthManager: ObservableObject {
             case .failure(_):
                 let appUser = AppUser(fromFirebaseUser: user)
                 
-                UserServices().handleFirstTimeLogin(user: appUser) { registrationResult in
+                self.userServices.handleFirstTimeLogin(user: appUser) { registrationResult in
                     switch registrationResult {
                     case .success():
                         DispatchQueue.main.async {
@@ -152,10 +170,46 @@ class AuthManager: ObservableObject {
         }
     }
     
-    // TODO: Replace with real-time Firestore listener for better UX
-    func refreshCurrentUser() {
-        guard let firebaseUser = Auth.auth().currentUser else { return }
-        getUserDataFromFirestore(user: firebaseUser)
+    private func startUserListener(uid: String) {
+        // Prevent multiple listeners - always stop existing one first
+        stopUserListener()
+        
+        // Only start listener if user is still signed in
+        guard Auth.auth().currentUser?.uid == uid else { return }
+        
+        userListener = userServices.startUserListener(uid: uid) { [weak self] result in
+            switch result {
+            case .success(let updatedUser):
+                DispatchQueue.main.async {
+                    self?.currentUser = updatedUser
+                }
+            case .failure(let error):
+                print("User listener error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    private func stopUserListener() {
+        userListener?.remove()
+        userListener = nil
+    }
+    
+    private func setupAppLifecycleObservers() {
+        // Stop listeners when app goes to background to save resources
+        NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)
+            .sink { [weak self] _ in
+                self?.stopUserListener()
+            }
+            .store(in: &cancellables)
+        
+        // Restart listeners when app becomes active
+        NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)
+            .sink { [weak self] _ in
+                if let uid = Auth.auth().currentUser?.uid {
+                    self?.startUserListener(uid: uid)
+                }
+            }
+            .store(in: &cancellables)
     }
     
     func updateCurrentUser(_ updatedUser: AppUser) {
