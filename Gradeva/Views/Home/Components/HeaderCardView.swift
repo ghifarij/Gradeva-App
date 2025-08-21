@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HeaderCardView: View {
     @EnvironmentObject var auth: AuthManager
+    @ObservedObject private var schoolManager = SchoolManager.shared
+    @ObservedObject private var batchManager = BatchManager.shared
     
     var body: some View {
         ZStack(alignment: .top) {
@@ -40,12 +42,12 @@ struct HeaderCardView: View {
                             .foregroundStyle(.white.opacity(0.7))
                             .fontWeight(.medium)
                         
-                        Text("12")
+                        Text(batchManager.currentBatch?.name ?? "-")
                             .fontWeight(.bold)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel("Current active batch")
-                    .accessibilityValue("Batch 12")
+                    .accessibilityValue("Batch \(batchManager.currentBatch?.name ?? "unknown")")
                     .accessibilityAddTraits(.isStaticText)
                     
                     Spacer()
@@ -66,12 +68,12 @@ struct HeaderCardView: View {
                             .foregroundStyle(.white.opacity(0.7))
                             .fontWeight(.medium)
                         
-                        Text("28")
+                        Text("\(batchManager.studentCount)")
                             .fontWeight(.bold)
                     }
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Total students in batch 12")
-                    .accessibilityValue("28 students")
+                    .accessibilityLabel("Total students in active batch")
+                    .accessibilityValue("\(batchManager.studentCount) students")
                     .accessibilityAddTraits(.isStaticText)
                     
                     Spacer()

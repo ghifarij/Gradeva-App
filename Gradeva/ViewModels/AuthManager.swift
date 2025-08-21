@@ -54,6 +54,11 @@ class AuthManager: ObservableObject {
                 self.currentUser = user
             }
         }
+        
+        // Start school listener when user is set
+        if let schoolId = user.schoolId {
+            SchoolManager.shared.startSchoolListener(schoolId: schoolId)
+        }
     }
     
     private func setIsSignedIn(_ isSignedIn: Bool) {
@@ -101,6 +106,7 @@ class AuthManager: ObservableObject {
     func signOut() {
         do {
             stopUserListener()
+            SchoolManager.shared.stopSchoolListener()
             try Auth.auth().signOut()
             self.setIsSignedIn(false)
             DispatchQueue.main.async {
