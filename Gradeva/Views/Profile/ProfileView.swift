@@ -181,7 +181,7 @@ struct ProfileView: View {
                     .accessibilityAddTraits(.isHeader)
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 20) {
-                    ForEach(1...8, id: \.self) { avatarNumber in
+                    ForEach(1...9, id: \.self) { avatarNumber in
                         let avatarName = "avatar-\(avatarNumber)"
                         Button(action: {
                             viewModel.updateAvatar(avatarName)
