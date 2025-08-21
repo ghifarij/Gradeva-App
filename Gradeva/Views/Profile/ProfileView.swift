@@ -12,8 +12,7 @@ struct ProfileView: View {
     @State private var showingAvatarSelection = false
     
     var body: some View {
-        NavigationView {
-            List {
+        List {
                 Section {
                     profileHeader
                 }
@@ -89,15 +88,14 @@ struct ProfileView: View {
                         .accessibilityHint("Double tap to sign out of your account")
                     }
                 }
-            }
-            .navigationTitle("Profile")
-            .navigationBarTitleDisplayMode(.large)
-            .refreshable {
-                await viewModel.refreshData()
-            }
-            .task {
-                await viewModel.refreshData()
-            }
+        }
+        .navigationTitle("Profile")
+        .navigationBarTitleDisplayMode(.large)
+        .refreshable {
+            await viewModel.refreshData()
+        }
+        .task {
+            await viewModel.refreshData()
         }
         .alert("Sign Out", isPresented: $viewModel.showingSignOutAlert) {
             Button("Cancel", role: .cancel) {
@@ -141,7 +139,6 @@ struct ProfileView: View {
                         .background(Color.blue)
                         .clipShape(Circle())
                         .offset(x: -4, y: -4)
-                        .accessibilityHidden(true)
                 }
             }
             .accessibilityLabel("Change avatar")

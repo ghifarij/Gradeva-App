@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HeaderCardView: View {
     @EnvironmentObject var auth: AuthManager
+    @EnvironmentObject var navManager: NavManager
     @ObservedObject private var schoolManager = SchoolManager.shared
     @ObservedObject private var batchManager = BatchManager.shared
     
@@ -91,14 +92,30 @@ struct HeaderCardView: View {
             .background(.white)
             .clipShape(RoundedRectangle(cornerRadius: 32))
             
-            Image(auth.currentUser?.avatar ?? "avatar-1")
-                .resizable()
-                .scaledToFill()
-            .frame(width: 100, height: 100)
-            .clipped()
-            .clipShape(Circle())
+            Button(action: {
+                navManager.push(.profile)
+            }) {
+                ZStack(alignment: .bottomTrailing) {
+                    Image(auth.currentUser?.avatar ?? "avatar-1")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .clipped()
+                        .clipShape(Circle())
+                    
+                    Image(systemName: "pencil")
+                        .foregroundColor(.white)
+                        .font(.system(size: 12, weight: .medium))
+                        .frame(width: 24, height: 24)
+                        .background(Color.blue)
+                        .clipShape(Circle())
+                        .offset(x: -4, y: -4)
+                }
+            }
             .offset(y: -50)
-            .accessibilityHidden(true)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Profile picture")
+            .accessibilityHint("Double tap to view profile")
         }
     }
 }
@@ -106,4 +123,5 @@ struct HeaderCardView: View {
 #Preview {
     HeaderCardView()
         .environmentObject(AuthManager())
+        .environmentObject(NavManager())
 }
