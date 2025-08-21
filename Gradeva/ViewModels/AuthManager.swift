@@ -31,7 +31,7 @@ class AuthManager: ObservableObject {
             getUserDataFromFirestore(user: user)
         }
         
-        Auth.auth().addStateDidChangeListener { _, user in
+        let _ = Auth.auth().addStateDidChangeListener { _, user in
             if let user = user {
                 self.getUserDataFromFirestore(user: user)
             } else {
