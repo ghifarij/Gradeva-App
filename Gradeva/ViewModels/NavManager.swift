@@ -17,6 +17,8 @@ enum NavPath: Hashable {
 class NavManager: ObservableObject {
     @Published var paths: [NavPath] = []
     
+    static let shared = NavManager()
+    
     // Push
     func push(_ path: NavPath) {
         paths.append(path)

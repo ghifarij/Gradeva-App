@@ -53,5 +53,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .environmentObject(NavManager())
+        .environmentObject(NavManager.shared)
 }

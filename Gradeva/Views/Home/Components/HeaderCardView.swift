@@ -123,5 +123,5 @@ struct HeaderCardView: View {
 #Preview {
     HeaderCardView()
         .environmentObject(AuthManager())
-        .environmentObject(NavManager())
+        .environmentObject(NavManager.shared)
 }

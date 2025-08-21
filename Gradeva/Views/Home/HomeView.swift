@@ -52,6 +52,6 @@ struct HomeView: View {
 #Preview {
     HomeView()
         .environmentObject(AuthManager())
-        .environmentObject(NavManager())
+        .environmentObject(NavManager.shared)
 }
 

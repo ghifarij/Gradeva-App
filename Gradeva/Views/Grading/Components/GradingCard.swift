@@ -76,5 +76,5 @@ struct GradingCard: View {
 
 #Preview {
     GradingCard(title: "Digital Marketing")
-        .environmentObject(NavManager())
+        .environmentObject(NavManager.shared)
 }

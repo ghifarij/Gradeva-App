@@ -37,6 +37,9 @@ class AuthManager: ObservableObject {
             } else {
                     // User signed out - clean up listener
                 self.stopUserListener()
+                DispatchQueue.main.async {
+                    NavManager.shared.reset()
+                }
             }
         }
         
@@ -112,6 +115,7 @@ class AuthManager: ObservableObject {
             DispatchQueue.main.async {
                 self.currentUser = nil
                 self.clearError()
+                NavManager.shared.reset()
             }
         } catch {
             let authError = AuthError.firebaseSignOutFailed(error.localizedDescription)

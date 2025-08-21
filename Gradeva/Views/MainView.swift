@@ -11,7 +11,7 @@ import FirebaseAuth
 
 struct MainContentView: View {
     @ObservedObject private var auth = AuthManager.shared
-    @StateObject private var navManager = NavManager()
+    @ObservedObject private var navManager = NavManager.shared
     @StateObject private var launchManager = AppLaunchManager.shared
     @State private var showSplashScreen = true
     
