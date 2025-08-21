@@ -10,7 +10,7 @@ import AuthenticationServices
 import FirebaseAuth
 import CryptoKit
 
-class AppleSignInService: ObservableObject {
+class AppleSignInService {
     private var currentNonce: String?
     
     func handleSignInWithAppleRequest(_ request: ASAuthorizationAppleIDRequest) {

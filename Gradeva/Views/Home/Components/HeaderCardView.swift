@@ -16,12 +16,12 @@ struct HeaderCardView: View {
                 Spacer()
                 Text(auth.currentUser?.displayName ?? "User")
                     .font(.callout)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.appPrimary)
                 
                 Text("Digital Marketing")
                     .font(.title2)
                     .fontWeight(.semibold)
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.appPrimary)
                 
                 HStack {
                     Spacer()
@@ -63,7 +63,7 @@ struct HeaderCardView: View {
                 }
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
-                .background(Color.accentColor)
+                .background(Color.appPrimary)
                 .frame(height: 100)
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .padding(.horizontal)

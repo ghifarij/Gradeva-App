@@ -10,7 +10,7 @@ import FirebaseAuth
 import FirebaseCore
 import GoogleSignIn
 
-class GoogleSignInService: ObservableObject {
+class GoogleSignInService {
 
     func signIn(completion: @escaping (AuthCredential?, Error?) -> Void) {
         guard let clientID = FirebaseApp.app()?.options.clientID else {

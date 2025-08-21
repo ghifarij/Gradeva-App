@@ -25,7 +25,7 @@ struct SummaryView: View {
                     Circle()
                         .trim(from: 0.0, to: CGFloat(0.4))
                         .stroke(
-                            Color.accentColor,
+                            Color.appPrimaryDarker,
                             style: StrokeStyle(lineWidth: 12, lineCap: .round, lineJoin: .round)
                         )
                         .rotationEffect(.degrees(-90))
@@ -65,7 +65,7 @@ struct SummaryView: View {
                     .padding()
                     .frame(maxWidth: .infinity)
                     .frame(height: 80)
-                    .background(.green)
+                    .background(.appSuccess)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     
                     VStack(alignment: .leading) {
@@ -83,7 +83,7 @@ struct SummaryView: View {
                     .padding()
                     .frame(maxWidth: .infinity)
                     .frame(height: 80)
-                    .background(.red)
+                    .background(.appDestructive)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     
                 }

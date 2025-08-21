@@ -16,18 +16,22 @@ struct HomeView: View {
     }
     
     var body: some View {
-        ScrollView {
-        VStack(spacing: 16) {
-                HeaderCardView()
-                PendingGradesView()
-                SummaryView()
+        ZStack(alignment: .top) {
+            Image("homepage-bg")
+                .scaledToFill()
+            ScrollView {
+                VStack(spacing: 16) {
+                    HeaderCardView()
+                    PendingGradesView()
+                    SummaryView()
+                }
+                .padding(.top, 120)
+                .padding(.bottom, 24)
+                .padding(.horizontal, 24)
             }
-            .padding(.top, 120)
-            .padding(.bottom, 24)
-            .padding(.horizontal, 24)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.accentColor)
+        .background(Color.appPrimary)
         .ignoresSafeArea(.all, edges: .top)
     }
 }

@@ -52,23 +52,23 @@ struct MainContentView: View {
                     FirstLaunchWelcomeView(onLoginTapped: {
                         launchManager.markAppAsLaunched()
                     })
-                    .transition(.blurReplace)
+                    .transition(.opacity)
                     // Signed-in and has school --> show main content
                 } else if auth.isSignedIn && isAssignedToSchool {
                     if !didCompleteOnboarding {
                         WelcomeView()
-                            .transition(.blurReplace)
+                            .transition(.opacity)
                     } else {
                         MainTabView()
-                            .transition(.blurReplace)
+                            .transition(.opacity)
                     }
                 } else if hasNoSchool {
                     NotRegisteredView()
-                        .transition(.blurReplace)
+                        .transition(.opacity)
                 } else if !auth.isSignedIn {
                     // Not signed in --> show SignInView
                     SignInView()
-                        .transition(.blurReplace)
+                        .transition(.opacity)
                 }
             }
             
