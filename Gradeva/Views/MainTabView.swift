@@ -45,6 +45,11 @@ struct MainTabView: View {
                 GradingExamView(examId: examId)
             }
         }
+        .onAppear {
+            let tabBarAppearance = UITabBarAppearance()
+            tabBarAppearance.configureWithDefaultBackground()
+            UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance
+        }
     }
 }
 
