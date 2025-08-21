@@ -1,14 +1,14 @@
 //
-//  GradingCard.swift
+//  ExamCard.swift
 //  Gradeva
 //
-//  Created by Ramdan on 14/08/25.
+//  Created by Afga Ghifari on 20/08/25.
 //
 
 import SwiftUI
 
 
-struct GradingCard: View {
+struct ExamCard: View {
     @EnvironmentObject var navManager: NavManager
     let title: String
     
@@ -31,8 +31,6 @@ struct GradingCard: View {
                             .foregroundColor(Color.textPrimary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)
-                            .accessibilityLabel(title)
-                            .accessibilityAddTraits(.isHeader)
                         Spacer()
                     }
                     .frame(maxWidth: .infinity)
@@ -65,16 +63,16 @@ struct GradingCard: View {
                 }
             )
             .onTapGesture {
-                navManager.push(.grading(title))
+                navManager.push(.exam(title))
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title) grading card")
-            .accessibilityHint("Double tap to open grading for \(title)")
+            .accessibilityLabel("\(title) exam card")
+            .accessibilityHint("Double tap to open exam: \(title)")
             .accessibilityAddTraits(.isButton)
     }
 }
 
 #Preview {
-    GradingCard(title: "Digital Marketing")
+    GradingCard(title: "Theory")
         .environmentObject(NavManager())
 }

@@ -41,8 +41,10 @@ struct MainTabView: View {
             switch path {
             case .settings:
                 SettingsView()
-            case .grading(let examId):
-                GradingExamView(examId: examId)
+            case .grading(let subjectId):
+                ExamListView(subjectId: subjectId)
+            case .exam(let examId):
+                StudentGradingListView(examId: examId)
             }
         }
     }
