@@ -19,6 +19,7 @@ struct HomeView: View {
         ZStack(alignment: .top) {
             Image("homepage-bg")
                 .scaledToFill()
+                .accessibilityHidden(true)
             ScrollView {
                 VStack(spacing: 16) {
                     HeaderCardView()
@@ -29,10 +30,12 @@ struct HomeView: View {
                 .padding(.bottom, 24)
                 .padding(.horizontal, 24)
             }
+            .accessibilityLabel("Home screen content")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color.appPrimary)
         .ignoresSafeArea(.all, edges: .top)
+        .accessibilityElement(children: .contain)
     }
 }
 

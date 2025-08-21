@@ -17,11 +17,17 @@ struct HeaderCardView: View {
                 Text(auth.currentUser?.displayName ?? "User")
                     .font(.callout)
                     .foregroundStyle(Color.appPrimary)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityLabel("Name")
+                    .accessibilityValue(auth.currentUser?.displayName ?? "User")
                 
                 Text("Digital Marketing")
                     .font(.title2)
                     .fontWeight(.semibold)
                     .foregroundStyle(Color.appPrimary)
+                    .accessibilityAddTraits(.isStaticText)
+                    .accessibilityLabel("Subject")
+                    .accessibilityValue("Digital Marketing")
                 
                 HStack {
                     Spacer()
@@ -37,6 +43,10 @@ struct HeaderCardView: View {
                         Text("12")
                             .fontWeight(.bold)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Current active batch")
+                    .accessibilityValue("Batch 12")
+                    .accessibilityAddTraits(.isStaticText)
                     
                     Spacer()
                     
@@ -44,6 +54,7 @@ struct HeaderCardView: View {
                         .fill(.white.opacity(0.3))
                         .frame(width: 1)
                         .padding(.vertical)
+                        .accessibilityHidden(true)
                     
                     Spacer()
                     
@@ -58,6 +69,10 @@ struct HeaderCardView: View {
                         Text("28")
                             .fontWeight(.bold)
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Total students in batch 12")
+                    .accessibilityValue("28 students")
+                    .accessibilityAddTraits(.isStaticText)
                     
                     Spacer()
                 }
@@ -87,6 +102,7 @@ struct HeaderCardView: View {
             .clipped()
             .clipShape(Circle())
             .offset(y: -50)
+            .accessibilityHidden(true)
         }
     }
 }

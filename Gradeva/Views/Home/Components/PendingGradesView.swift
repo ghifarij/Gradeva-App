@@ -13,17 +13,24 @@ struct PendingGradesView: View {
             Text("Pending Grades")
                 .font(.title2.bold())
                 .foregroundStyle(.white)
+                .accessibilityAddTraits(.isHeader)
             
             ZStack {
                 Image("pending-grades-bg")
                     .scaledToFill()
+                    .accessibilityHidden(true)
                 VStack {
-                    Text("6 awaiting")
-                        .font(.title3)
-                        .foregroundStyle(.white)
-                    Text("your review")
-                        .font(.title3)
-                        .foregroundStyle(.white)
+                    VStack {
+                        Text("6 awaiting")
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                        Text("your review")
+                            .font(.title3)
+                            .foregroundStyle(.white)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("6 exams awaiting your review")
+                    .accessibilityAddTraits(.isStaticText)
 
                     Button(action: {}) {
                         Label("Grade here", systemImage: "clipboard")
@@ -33,6 +40,9 @@ struct PendingGradesView: View {
                     .frame(minWidth: 176)
                     .background(.white)
                     .clipShape(Capsule())
+                    .accessibilityLabel("Grade pending exams")
+                    .accessibilityHint("Double tap to start grading 6 pending exams")
+                    .accessibilityAddTraits(.isButton)
                 }
             }
             .frame(maxWidth: .infinity)
