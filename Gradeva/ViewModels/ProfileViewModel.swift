@@ -101,6 +101,10 @@ class ProfileViewModel: ObservableObject {
         auth.currentUser?.photoURL ?? ""
     }
     
+    var avatar: String {
+        auth.currentUser?.avatar ?? "avatar-1"
+    }
+    
     var accountStatus: String {
         auth.currentUser?.didCompleteOnboarding == true ? "Active" : "Setup Required"
     }

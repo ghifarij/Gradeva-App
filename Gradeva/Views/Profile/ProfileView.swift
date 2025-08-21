@@ -119,15 +119,9 @@ struct ProfileView: View {
     
     private var profileHeader: some View {
         VStack(spacing: 16) {
-            AsyncImage(url: URL(string: viewModel.photoURL)) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Image("default-avatar")
-                    .resizable()
-                    .scaledToFill()
-            }
+            Image(viewModel.avatar)
+                .resizable()
+                .scaledToFill()
             .frame(width: 100, height: 100)
             .clipped()
             .clipShape(Circle())

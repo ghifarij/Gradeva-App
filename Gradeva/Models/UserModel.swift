@@ -20,6 +20,7 @@ class AppUser: Codable {
     var updatedAt: Timestamp?
     var subjectIds: [String]?
     var photoURL: String?
+    var avatar: String?
     
     init(
         uid: String,
@@ -29,7 +30,8 @@ class AppUser: Codable {
         didCompleteDemoOnboarding: Bool? = nil,
         schoolId: String? = nil,
         subjectIds: [String]? = nil,
-        photoURL: String? = nil
+        photoURL: String? = nil,
+        avatar: String? = nil
     ) {
         self.id = uid
         self.displayName = displayName
@@ -39,6 +41,7 @@ class AppUser: Codable {
         self.schoolId = schoolId
         self.subjectIds = subjectIds
         self.photoURL = photoURL
+        self.avatar = avatar
     }
     
     init(fromFirebaseUser user: FirebaseAuth.User) {
@@ -55,7 +58,8 @@ class AppUser: Codable {
         didCompleteDemoOnboarding: Bool? = nil,
         schoolId: String? = nil,
         subjectIds: [String]? = nil,
-        photoURL: String? = nil
+        photoURL: String? = nil,
+        avatar: String? = nil
     ) -> AppUser {
         return AppUser(
             uid: self.id ?? "",
@@ -65,7 +69,8 @@ class AppUser: Codable {
             didCompleteDemoOnboarding: didCompleteDemoOnboarding ?? self.didCompleteDemoOnboarding,
             schoolId: schoolId ?? self.schoolId,
             subjectIds: subjectIds ?? self.subjectIds,
-            photoURL: photoURL ?? self.photoURL
+            photoURL: photoURL ?? self.photoURL,
+            avatar: avatar ?? self.avatar
         )
     }
 }

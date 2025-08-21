@@ -91,15 +91,9 @@ struct HeaderCardView: View {
             .background(.white)
             .clipShape(RoundedRectangle(cornerRadius: 32))
             
-            AsyncImage(url: URL(string: auth.currentUser?.photoURL ?? "")) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Image("default-avatar")
-                    .resizable()
-                    .scaledToFill()
-            }
+            Image(auth.currentUser?.avatar ?? "avatar-1")
+                .resizable()
+                .scaledToFill()
             .frame(width: 100, height: 100)
             .clipped()
             .clipShape(Circle())
