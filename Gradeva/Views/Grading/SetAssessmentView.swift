@@ -12,15 +12,21 @@ struct SetAssessmentView: View {
     @State private var maxScore = ""
     @State private var passingScore = ""
     
+    @FocusState private var focusedField: Field?
+    
+    enum Field {
+        case assessmentName, maxScore, passingScore
+    }
+    
     @Environment(\.dismiss) var dismiss
     
     var onSave: (String) -> Void
     
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 24) {
+            ScrollView {
                 // Assessment Name Field
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading) {
                     Text("Assessment Name*")
                         .font(.headline)
                         .foregroundColor(.textPrimary)
@@ -34,7 +40,9 @@ struct SetAssessmentView: View {
                                 .background(Color.white)
                                 .cornerRadius(10)
                         )
+                        .focused($focusedField, equals: .assessmentName)
                 }
+                .padding(.bottom)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Assessment name")
                 .accessibilityValue(assessmentName.isEmpty ? "Empty" : assessmentName)
@@ -56,7 +64,9 @@ struct SetAssessmentView: View {
                                 .background(Color.white)
                                 .cornerRadius(10)
                         )
+                        .focused($focusedField, equals: .maxScore)
                 }
+                .padding(.bottom)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Maximum score")
                 .accessibilityValue(maxScore.isEmpty ? "Empty" : maxScore)
@@ -78,13 +88,14 @@ struct SetAssessmentView: View {
                                 .background(Color.white)
                                 .cornerRadius(10)
                         )
+                        .focused($focusedField, equals: .passingScore)
                 }
                 .padding(.bottom)
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Passing score")
                 .accessibilityValue(passingScore.isEmpty ? "Empty" : passingScore)
                 .accessibilityHint("Enter the minimum score required to pass")
-
+                
                 // Action Buttons
                 HStack(spacing: 16) {
                     Button("Cancel") {
@@ -117,13 +128,22 @@ struct SetAssessmentView: View {
                     .accessibilityValue(assessmentName.isEmpty ? "Disabled until name is entered" : "Enabled")
                     .accessibilityAddTraits(.isButton)
                 }
-                
-                Spacer()
             }
             .padding()
+            .padding(.top, 8)
             
             .navigationTitle("Set Assessment")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    if focusedField == .maxScore || focusedField == .passingScore {
+                        Button("Done") {
+                            focusedField = nil
+                        }
+                    }
+                }
+            }
         }
     }
 }

@@ -22,6 +22,8 @@ class StudentGrade: Identifiable, ObservableObject {
 
 struct StudentCardView: View {
     @ObservedObject var student: StudentGrade
+    let onCommentTap: () -> Void
+    let focusedStudent: FocusState<UUID?>.Binding
     private let passingGrade = 80
     @State private var isCommentExpanded = false
     
@@ -46,17 +48,8 @@ struct StudentCardView: View {
     }
     
     private var commentIconColor: Color {
-        isCommentExpanded ? .textPrimary : .gray
+        student.comment.isEmpty ? .gray : .textPrimary
     }
-    
-    //    private var accessibilityScoreValue: String {
-    //        if let score = student.score {
-    //            let status = score >= passingGrade ? "Passing" : "Needs assist"
-    //            return "Score \(score), \(status)"
-    //        } else {
-    //            return "Not graded"
-    //        }
-    //    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -77,15 +70,12 @@ struct StudentCardView: View {
                     if student.score == nil {
                         Text("--")
                             .foregroundStyle(.textPrimary.opacity(0.4))
-                        //                        .accessibilityHidden(true)
                     }
                     TextField("", text: scoreText)
                         .keyboardType(.numberPad)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.textPrimary)
-                    //                    .accessibilityLabel("Score for \(student.name)")
-                    //                    .accessibilityHint("Double tap to edit score")
-                    //                    .accessibilityValue(student.score.map(String.init) ?? "Not graded")
+                        .focused(focusedStudent, equals: student.id)
                 }
                 .frame(width: 60, height: 40)
                 .background(
@@ -96,20 +86,20 @@ struct StudentCardView: View {
                 )
                 
                 Button(action: {
-                    // Add action for showing a comment sheet or view.
-                    withAnimation(.spring()) {
-                        isCommentExpanded.toggle()
-                    }
+                    onCommentTap()
                 }) {
                     Image(systemName: "message")
                         .font(.title2)
                         .foregroundColor(commentIconColor)
                 }
-                //            .accessibilityLabel("Comment for \(student.name)")
-                //            .accessibilityHint("Double tap to add or view a comment")
-                //            .accessibilityAddTraits(.isButton)
             }
             .padding()
+            .contentShape(Rectangle())
+            .onTapGesture {
+                withAnimation(.spring()) {
+                    isCommentExpanded.toggle()
+                }
+            }
             
             if isCommentExpanded {
                 VStack(alignment: .leading, spacing: 0) {
@@ -127,9 +117,6 @@ struct StudentCardView: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
-        //        .accessibilityElement(children: .combine)
-        //        .accessibilityLabel(student.name)
-        //        .accessibilityValue(accessibilityScoreValue)
     }
 }
 
@@ -146,8 +133,30 @@ extension View {
         }
 }
 
-#Preview() {
-    StudentCardView(
-        student: StudentGrade(name: "Putri Tanjung", score: 80, comment: "Good job")
-    )
+private struct StudentCardPreview: View {
+    @FocusState private var focusedStudentID: UUID?
+
+    var body: some View {
+        VStack(spacing: 20) {
+            StudentCardView(
+                student: StudentGrade(name: "Putri Tanjung", score: 80),
+                onCommentTap: { print("Comment tapped") },
+                focusedStudent: $focusedStudentID
+            )
+            StudentCardView(
+                student: StudentGrade(
+                    name: "Ahmad Dhani",
+                    score: 95
+                ),
+                onCommentTap: { print("Comment tapped") },
+                focusedStudent: $focusedStudentID
+            )
+        }
+        .padding()
+    }
 }
+
+#Preview {
+    StudentCardPreview()
+}
+
