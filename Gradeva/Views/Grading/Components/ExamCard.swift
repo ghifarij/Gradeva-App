@@ -49,10 +49,12 @@ struct ExamCard: View {
                             Text("See more")
                                 .foregroundColor(Color.textPrimary)
                                 .font(.callout)
+                                .accessibilityHidden(true)
                             Spacer()
                             Image(systemName: "chevron.right")
                                 .foregroundColor(Color.textPrimary)
                                 .font(.headline)
+                                .accessibilityHidden(true)
                         }
                         .padding(.horizontal)
                         .padding(.top, 4)
@@ -63,6 +65,10 @@ struct ExamCard: View {
             .onTapGesture {
                 navManager.push(.exam(title))
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(title) exam card")
+            .accessibilityHint("Double tap to open exam: \(title)")
+            .accessibilityAddTraits(.isButton)
     }
 }
 

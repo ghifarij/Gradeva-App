@@ -23,5 +23,10 @@ struct InfoCardView: View {
         .frame(maxWidth: .infinity, minHeight: 150)
         .background(Color.gray)
         .cornerRadius(20)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(title)
+        .accessibilityValue("\(count)")
+        .accessibilityHint("Summary card")
+        .accessibilityAddTraits(.isStaticText)
     }
 }

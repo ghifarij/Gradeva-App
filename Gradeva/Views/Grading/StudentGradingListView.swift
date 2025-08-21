@@ -10,7 +10,7 @@ import SwiftUI
 enum GradeStatus: String, CaseIterable {
     case all = "All"
     case passed = "Passed"
-    case failed = "Need Assistance"
+    case failed = "Need Assist"
     case notGraded = "Not Graded"
 }
 
@@ -65,6 +65,8 @@ struct StudentGradingListView: View {
                             .foregroundColor(.appPrimary)
                             .textInputAutocapitalization(.never)
                             .disableAutocorrection(true)
+                            .accessibilityLabel("Search students")
+                            .accessibilityHint("Type to filter students by name")
                     }
                     .padding(.horizontal, 12)
                     .padding(.vertical, 10)
@@ -100,6 +102,10 @@ struct StudentGradingListView: View {
                         )
                         .cornerRadius(12)
                     }
+                    .accessibilityLabel("Filter by status")
+                    .accessibilityValue(selectedStatus.rawValue)
+                    .accessibilityHint("Double tap to choose a status filter")
+                    .accessibilityAddTraits(.isButton)
                 }
                 .padding()
 
@@ -118,6 +124,8 @@ struct StudentGradingListView: View {
             .navigationTitle("Students Grade")
             .navigationBarTitleDisplayMode(.inline)
             .background(Color.appBackground)
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Students grading screen")
         }
     }
 }

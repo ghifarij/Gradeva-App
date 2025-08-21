@@ -65,7 +65,7 @@ struct MainContentView: View {
                         case .settings:
                             SettingsView()
                         case .grading(let subjectId):
-                            GradingExamView(subjectId: subjectId)
+                            ExamListView(subjectId: subjectId)
                         case .exam(let examId):
                             StudentGradingListView(examId: examId)
                         }

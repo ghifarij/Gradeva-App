@@ -35,6 +35,10 @@ struct SetAssessmentView: View {
                                 .cornerRadius(10)
                         )
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Assessment name")
+                .accessibilityValue(assessmentName.isEmpty ? "Empty" : assessmentName)
+                .accessibilityHint("Enter the assessment name")
                 
                 // Max Score Field
                 VStack(alignment: .leading) {
@@ -53,6 +57,10 @@ struct SetAssessmentView: View {
                                 .cornerRadius(10)
                         )
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Maximum score")
+                .accessibilityValue(maxScore.isEmpty ? "Empty" : maxScore)
+                .accessibilityHint("Enter the maximum possible score")
                 
                 // Passing Score Field
                 VStack(alignment: .leading) {
@@ -72,6 +80,10 @@ struct SetAssessmentView: View {
                         )
                 }
                 .padding(.bottom)
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("Passing score")
+                .accessibilityValue(passingScore.isEmpty ? "Empty" : passingScore)
+                .accessibilityHint("Enter the minimum score required to pass")
 
                 // Action Buttons
                 HStack(spacing: 16) {
@@ -84,6 +96,9 @@ struct SetAssessmentView: View {
                     .foregroundColor(.primary)
                     .cornerRadius(50)
                     .fontWeight(.semibold)
+                    .accessibilityLabel("Cancel")
+                    .accessibilityHint("Double tap to close without saving")
+                    .accessibilityAddTraits(.isButton)
                     
                     Button("Save") {
                         if !assessmentName.isEmpty {
@@ -97,6 +112,10 @@ struct SetAssessmentView: View {
                     .foregroundColor(.white)
                     .cornerRadius(50)
                     .fontWeight(.semibold)
+                    .accessibilityLabel("Save assessment")
+                    .accessibilityHint("Double tap to save the assessment")
+                    .accessibilityValue(assessmentName.isEmpty ? "Disabled until name is entered" : "Enabled")
+                    .accessibilityAddTraits(.isButton)
                 }
                 
                 Spacer()

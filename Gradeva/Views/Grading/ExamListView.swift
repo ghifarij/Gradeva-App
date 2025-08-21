@@ -32,6 +32,7 @@ struct ExamListView: View {
                 }
             }
             .padding()
+            .accessibilityLabel("Exam types list")
         }
         .navigationTitle("Exam")
         .navigationBarTitleDisplayMode(.inline)
@@ -45,6 +46,9 @@ struct ExamListView: View {
                         .font(.headline)
                         .foregroundColor(.primary)
                 }
+                .accessibilityLabel("Set assessment")
+                .accessibilityHint("Double tap to create a new assessment")
+                .accessibilityAddTraits(.isButton)
             }
         }
         .sheet(isPresented: $isShowingSetAssessment) {
