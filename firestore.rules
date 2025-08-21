@@ -50,6 +50,12 @@ service cloud.firestore {
       allow read: if belongsToSchool(schoolId) || isSchoolAdmin(schoolId);
       allow write: if isSchoolAdmin(schoolId);
 
+      // Batches subcollection - school members can read, school admins can write
+      match /batches/{batchId} {
+        allow read: if belongsToSchool(schoolId) || isSchoolAdmin(schoolId);
+        allow write: if isSchoolAdmin(schoolId);
+      }
+
       // Students subcollection - school members can read, school admins can write
       match /students/{studentId} {
         allow write: if isSchoolAdmin(schoolId);
