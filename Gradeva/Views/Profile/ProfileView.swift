@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @StateObject private var viewModel = ProfileViewModel()
+    @State private var showingAvatarSelection = false
     
     var body: some View {
         NavigationView {
@@ -115,17 +116,40 @@ struct ProfileView: View {
                 .accessibilityLabel("Confirmation message")
                 .accessibilityValue("Are you sure you want to sign out?")
         }
+        .sheet(isPresented: $showingAvatarSelection) {
+            avatarSelectionSheet
+        }
     }
     
     private var profileHeader: some View {
         VStack(spacing: 16) {
-            Image(viewModel.avatar)
-                .resizable()
-                .scaledToFill()
-            .frame(width: 100, height: 100)
-            .clipped()
-            .clipShape(Circle())
-            .accessibilityHidden(true)
+            Button(action: {
+                showingAvatarSelection = true
+            }) {
+                ZStack(alignment: .bottomTrailing) {
+                    Image(viewModel.avatar)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 100, height: 100)
+                        .clipped()
+                        .clipShape(Circle())
+                    
+                    Image(systemName: "pencil")
+                        .foregroundColor(.white)
+                        .font(.system(size: 12, weight: .medium))
+                        .frame(width: 24, height: 24)
+                        .background(Color.blue)
+                        .clipShape(Circle())
+                        .offset(x: -4, y: -4)
+                        .accessibilityHidden(true)
+                }
+            }
+            .accessibilityLabel("Change avatar")
+            .accessibilityHint("Double tap to select a new avatar")
+            .accessibilityElement(children: .combine)
+            .accessibilityAction {
+                showingAvatarSelection = true
+            }
 
             if viewModel.displayName != "Not set" {
                 Text(viewModel.displayName)
@@ -146,6 +170,60 @@ struct ProfileView: View {
         .frame(maxWidth: .infinity)
         .background(Color(.systemGray6))
         .cornerRadius(16)
+    }
+    
+    private var avatarSelectionSheet: some View {
+        NavigationView {
+            VStack(spacing: 20) {
+                Text("Choose Your Avatar")
+                    .font(.title2)
+                    .fontWeight(.semibold)
+                    .accessibilityAddTraits(.isHeader)
+                
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 20) {
+                    ForEach(1...8, id: \.self) { avatarNumber in
+                        let avatarName = "avatar-\(avatarNumber)"
+                        Button(action: {
+                            viewModel.updateAvatar(avatarName)
+                            showingAvatarSelection = false
+                        }) {
+                            Image(avatarName)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 80, height: 80)
+                                .clipped()
+                                .clipShape(Circle())
+                                .overlay(
+                                    Circle()
+                                        .stroke(
+                                            viewModel.avatar == avatarName ? Color.blue : Color.gray,
+                                            lineWidth: viewModel.avatar == avatarName ? 3 : 1
+                                        )
+                                )
+                        }
+                        .accessibilityLabel("Avatar \(avatarNumber)")
+                        .accessibilityHint("Double tap to select this avatar")
+                        .accessibilityAddTraits(viewModel.avatar == avatarName ? .isSelected : [])
+                    }
+                }
+                .padding(.horizontal)
+                
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Select Avatar")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        showingAvatarSelection = false
+                    }
+                    .accessibilityLabel("Done")
+                    .accessibilityHint("Close avatar selection")
+                }
+            }
+        }
     }
 }
 

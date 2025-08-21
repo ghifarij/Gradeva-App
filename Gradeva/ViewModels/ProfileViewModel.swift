@@ -86,7 +86,7 @@ class ProfileViewModel: ObservableObject {
     }
     
     var isSchoolLoading: Bool {
-        schoolManager.isLoading
+        schoolManager.isLoading && schoolManager.currentSchool?.id == nil
     }
     
     var displayName: String {
@@ -115,5 +115,21 @@ class ProfileViewModel: ObservableObject {
     
     var schoolName: String {
         schoolManager.currentSchool?.name ?? "Not assigned"
+    }
+    
+    func updateAvatar(_ avatar: String) {
+        guard let currentUser = auth.currentUser else { return }
+        
+        let updatedUser = currentUser.copy(avatar: avatar)
+        auth.updateCurrentUser(updatedUser)
+        
+        UserServices().updateUser(user: updatedUser) { result in
+            switch result {
+            case .success:
+                print("Avatar updated successfully")
+            case .failure(let error):
+                print("Failed to update avatar: \(error)")
+            }
+        }
     }
 }

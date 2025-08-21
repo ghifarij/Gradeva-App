@@ -42,7 +42,7 @@ struct MainContentView: View {
     var body: some View {
         NavigationStack(path: $navManager.paths) {
             ZStack {
-                // Show splash screen on first launch for 1.5 seconds
+                // Show splash screen on first launch for 2 seconds
                 if showSplashScreen {
                     SplashScreenView()
                         .transition(.opacity) 
