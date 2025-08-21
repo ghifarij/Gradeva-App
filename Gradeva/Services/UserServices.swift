@@ -85,4 +85,29 @@ class UserServices {
             }
         }
     }
+    
+    func startUserListener(uid: String, onUpdate: @escaping (Result<AppUser, Error>) -> Void) -> ListenerRegistration {
+        let userRef = db.collection("users").document(uid)
+        
+        return userRef.addSnapshotListener { documentSnapshot, error in
+            if let error = error {
+                onUpdate(.failure(error))
+                return
+            }
+            
+            guard let document = documentSnapshot else {
+                let error = NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Document not found"])
+                onUpdate(.failure(error))
+                return
+            }
+            
+            do {
+                let user = try document.data(as: AppUser.self)
+                onUpdate(.success(user))
+            } catch {
+                onUpdate(.failure(error))
+            }
+        }
+    }
+    
 }

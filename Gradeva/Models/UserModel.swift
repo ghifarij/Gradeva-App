@@ -14,6 +14,7 @@ class AppUser: Codable {
     var displayName: String?
     var email: String?
     var didCompleteOnboarding: Bool?
+    var didCompleteDemoOnboarding: Bool?
     var schoolId: String?
     var createdAt: Timestamp?
     var updatedAt: Timestamp?
@@ -24,6 +25,7 @@ class AppUser: Codable {
         displayName: String? = nil,
         email: String? = nil,
         didCompleteOnboarding: Bool? = nil,
+        didCompleteDemoOnboarding: Bool? = nil,
         schoolId: String? = nil,
         subjectIds: [String]? = nil
     ) {
@@ -31,6 +33,7 @@ class AppUser: Codable {
         self.displayName = displayName
         self.email = email
         self.didCompleteOnboarding = didCompleteOnboarding
+        self.didCompleteDemoOnboarding = didCompleteDemoOnboarding
         self.schoolId = schoolId
         self.subjectIds = subjectIds
     }
@@ -45,6 +48,7 @@ class AppUser: Codable {
         displayName: String? = nil,
         email: String? = nil,
         didCompleteOnboarding: Bool? = nil,
+        didCompleteDemoOnboarding: Bool? = nil,
         schoolId: String? = nil,
         subjectIds: [String]? = nil
     ) -> AppUser {
@@ -53,6 +57,7 @@ class AppUser: Codable {
             displayName: displayName ?? self.displayName,
             email: email ?? self.email,
             didCompleteOnboarding: didCompleteOnboarding ?? self.didCompleteOnboarding,
+            didCompleteDemoOnboarding: didCompleteDemoOnboarding ?? self.didCompleteDemoOnboarding,
             schoolId: schoolId ?? self.schoolId,
             subjectIds: subjectIds ?? self.subjectIds
         )
