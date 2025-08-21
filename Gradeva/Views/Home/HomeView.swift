@@ -36,6 +36,16 @@ struct HomeView: View {
         .background(Color.appPrimary)
         .ignoresSafeArea(.all, edges: .top)
         .accessibilityElement(children: .contain)
+        .refreshable {
+            await refreshData()
+        }
+    }
+    
+    private func refreshData() async {
+        guard let schoolId = auth.currentUser?.schoolId else { return }
+        
+        // Refresh school data which will trigger batch data refresh
+        SchoolManager.shared.startSchoolListener(schoolId: schoolId)
     }
 }
 
