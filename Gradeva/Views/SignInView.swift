@@ -10,7 +10,7 @@ import AuthenticationServices
 import GoogleSignIn
 
 struct SignInView: View {
-    @EnvironmentObject private var auth: AuthManager
+    @ObservedObject private var auth = AuthManager.shared
     @Environment(\.colorScheme) var colorScheme
     
     private var signInColor: SignInWithAppleButton.Style {

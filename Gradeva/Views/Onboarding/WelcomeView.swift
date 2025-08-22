@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WelcomeView: View {
     @ObservedObject private var subjectsManager = SubjectsManager.shared
-    @EnvironmentObject private var auth: AuthManager
+    @ObservedObject private var auth = AuthManager.shared
     @State private var currentStep = 0
     @State private var name: String = ""
     @State private var selectedSubjects = Set<String>()
@@ -94,7 +94,6 @@ struct WelcomeView: View {
                         .padding(.horizontal, 24)
                 case 2:
                     SubjectsStepView(selectedSubjects: $selectedSubjects)
-                        .environmentObject(subjectsManager)
                         .transition(.blurReplace)
                     // padding set internally
                 default:
@@ -211,5 +210,4 @@ struct WelcomeView: View {
 
 #Preview {
     WelcomeView()
-        .environmentObject(AuthManager.shared)
 }

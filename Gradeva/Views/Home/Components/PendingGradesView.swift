@@ -73,5 +73,4 @@ struct PendingGradesView: View {
 
 #Preview {
     PendingGradesView()
-        .environmentObject(NavManager.shared)
 }

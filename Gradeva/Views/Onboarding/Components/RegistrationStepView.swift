@@ -10,7 +10,7 @@ import UniformTypeIdentifiers
 
 struct RegistrationStepView: View {
     @StateObject private var registration = RegistrationManager()
-    @EnvironmentObject private var auth: AuthManager
+    @ObservedObject private var auth = AuthManager.shared
     
     var registrationLink: String {
         if let registrationId = registration.myRegistration?.id {
@@ -98,5 +98,4 @@ struct RegistrationStepView: View {
 
 #Preview {
     RegistrationStepView()
-        .environmentObject(AuthManager.shared)
 }

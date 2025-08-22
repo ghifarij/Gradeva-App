@@ -22,12 +22,13 @@ struct MainTabView: View {
                         .accessibilityLabel("Grading tab")
                         .accessibilityHint("Grade student exams and assignments")
                 }
-            AnalyticsView()
-                .tabItem {
-                    Label("Analytics", systemImage: "chart.bar")
-                        .accessibilityLabel("Analytics tab")
-                        .accessibilityHint("View performance statistics and reports")
-                }
+//            TODO: UNCOMMENT WHEN READY
+//            AnalyticsView()
+//                .tabItem {
+//                    Label("Analytics", systemImage: "chart.bar")
+//                        .accessibilityLabel("Analytics tab")
+//                        .accessibilityHint("View performance statistics and reports")
+//                }
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Main navigation tabs")
@@ -53,5 +54,4 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .environmentObject(NavManager.shared)
 }

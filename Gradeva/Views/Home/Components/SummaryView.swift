@@ -20,15 +20,10 @@ struct SummaryView: View {
     }
     
     private var progress: Double {
-        if subjectsManager.selectedSubject?.pendingReview == 0 {
+        if totalStudents == 0 {
             return 1
         } else {
-            
-            if totalStudents == 0 {
-                return 0
-            }
-            
-            return Double(pendingReview / totalStudents)
+            return Double((totalStudents - pendingReview) / totalStudents)
         }
     }
     
@@ -68,7 +63,7 @@ struct SummaryView: View {
                     // Text in center
                     VStack {
                         HStack(alignment: .firstTextBaseline, spacing: 2) {
-                            Text(pendingReview.description)
+                            Text((totalStudents - pendingReview).description)
                                 .font(.title.bold())
                                 .accessibilityHidden(true)
                             Text("/")
@@ -88,8 +83,8 @@ struct SummaryView: View {
                 }
                 .frame(width: 150, height: 150)
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("Grading progress: \(totalStudents - pendingReview) out of \(totalStudents) assignments graded")
-                .accessibilityValue("\(Int(progress * 100)) percent complete")
+                .accessibilityLabel("Grading progress")
+                .accessibilityValue("\(totalStudents - pendingReview) out of \(totalStudents) assignments graded")
                 .accessibilityAddTraits(.isStaticText)
                 
                 HStack(spacing: 12) {

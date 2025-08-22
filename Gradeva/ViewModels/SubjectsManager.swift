@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import SwiftUI
 
 class SubjectsManager: ObservableObject {
     static let shared = SubjectsManager()

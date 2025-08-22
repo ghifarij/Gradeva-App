@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject var auth: AuthManager
-    @EnvironmentObject var navManager: NavManager
+    @ObservedObject var auth = AuthManager.shared
+    @ObservedObject var navManager = NavManager.shared
     
     private var user: AppUser? {
         auth.currentUser
@@ -54,7 +54,5 @@ struct HomeView: View {
 
 #Preview {
     HomeView()
-        .environmentObject(AuthManager())
-        .environmentObject(NavManager.shared)
 }
 
