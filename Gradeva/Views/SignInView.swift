@@ -19,12 +19,13 @@ struct SignInView: View {
     
     var body: some View {
         VStack {
-            Text("Sign In to Gradeva")
+            Text("Gradeva")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.bottom)
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityLabel("Sign In to Gradeva")
+                .multilineTextAlignment(.center)
             
             VStack(spacing: 12) {
                 SignInWithAppleButton(
