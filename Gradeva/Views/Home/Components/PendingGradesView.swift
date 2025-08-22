@@ -9,6 +9,7 @@ import SwiftUI
 
 struct PendingGradesView: View {
     @ObservedObject private var subjectsManager = SubjectsManager.shared
+    @ObservedObject private var navManager = NavManager.shared
     
     private var pendingReview: Int {
         subjectsManager.selectedSubject?.pendingReview ?? 0
@@ -39,7 +40,11 @@ struct PendingGradesView: View {
                         .accessibilityLabel("6 exams awaiting your review")
                         .accessibilityAddTraits(.isStaticText)
                         
-                        Button(action: {}) {
+                        Button(action: {
+                            if let subjectId = subjectsManager.selectedSubject?.id {
+                                navManager.push(.grading(subjectId))
+                            }
+                        }) {
                             Label("Grade here", systemImage: "clipboard")
                                 .foregroundStyle(Color.appPrimary)
                         }
@@ -68,4 +73,5 @@ struct PendingGradesView: View {
 
 #Preview {
     PendingGradesView()
+        .environmentObject(NavManager.shared)
 }
