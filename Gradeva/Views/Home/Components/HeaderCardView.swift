@@ -21,8 +21,9 @@ struct HeaderCardView: View {
                 
                 BatchInfoView()
             }
+            .padding()
+            .padding(.top, 40) // image height
             .frame(maxWidth: .infinity)
-            .frame(height: 240)
             .background(.white)
             .clipShape(RoundedRectangle(cornerRadius: 32))
             

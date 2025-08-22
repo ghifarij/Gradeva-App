@@ -19,12 +19,13 @@ struct SignInView: View {
     
     var body: some View {
         VStack {
-            Text("Sign In to Gradeva")
+            Text("Gradeva")
                 .font(.largeTitle)
                 .fontWeight(.bold)
                 .padding(.bottom)
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityLabel("Sign In to Gradeva")
+                .multilineTextAlignment(.center)
             
             VStack(spacing: 12) {
                 SignInWithAppleButton(
@@ -44,13 +45,13 @@ struct SignInView: View {
                 .accessibilityValue(auth.isAuthLoading ? "Loading" : "")
           
                 Button(action: auth.handleSignInWithGoogle) {
-                    HStack(spacing: 4) {
+                    HStack(spacing: 5) {
                         Image("g")
                             .resizable()
                             .frame(width: 12, height: 12)
                             .accessibilityHidden(true)
                         Text("Sign in with Google")
-                            .font(.headline)
+                            .font(.system(size: 17))
                             .fontWeight(.medium)
                             .foregroundColor(.primary)
                     }

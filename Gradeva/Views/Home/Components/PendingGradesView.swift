@@ -23,9 +23,6 @@ struct PendingGradesView: View {
                 .accessibilityAddTraits(.isHeader)
             
             ZStack {
-                Image("pending-grades-bg")
-                    .scaledToFill()
-                    .accessibilityHidden(true)
                 VStack {
                     if pendingReview > 0 {
                         VStack {
@@ -48,10 +45,9 @@ struct PendingGradesView: View {
                             Label("Grade here", systemImage: "clipboard")
                                 .foregroundStyle(Color.appPrimary)
                         }
-                        .frame(minHeight: 44)
-                        .frame(minWidth: 176)
+                        .padding()
                         .background(.white)
-                        .clipShape(Capsule())
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
                         .accessibilityLabel("Grade pending exams")
                         .accessibilityHint("Double tap to start grading 6 pending exams")
                         .accessibilityAddTraits(.isButton)
@@ -63,8 +59,10 @@ struct PendingGradesView: View {
                     }
                 }
             }
+            .padding()
             .frame(maxWidth: .infinity)
-            .frame(height: 144)
+            .frame(minHeight: 144)
+            .background(.appCard)
             .clipShape(RoundedRectangle(cornerRadius: 24))
         }
         .frame(maxWidth: .infinity)

@@ -34,8 +34,6 @@ struct MainTabView: View {
         .accessibilityLabel("Main navigation tabs")
         .navigationDestination(for: NavPath.self) { path in
             switch path {
-            case .settings:
-                SettingsView()
             case .grading(let subjectId):
                 ExamListView(subjectId: subjectId)
             case .exam(let examId):

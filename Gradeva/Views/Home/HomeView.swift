@@ -26,7 +26,7 @@ struct HomeView: View {
                     PendingGradesView()
                     SummaryView()
                 }
-                .padding(.top, 120)
+                .padding(.top, 150)
                 .padding(.bottom, 24)
                 .padding(.horizontal, 24)
             }
@@ -37,6 +37,9 @@ struct HomeView: View {
         .ignoresSafeArea(.all, edges: .top)
         .accessibilityElement(children: .contain)
         .refreshable {
+            await refreshData()
+        }
+        .task {
             await refreshData()
         }
     }
