@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct PendingGradesView: View {
+    @ObservedObject private var subjectsManager = SubjectsManager.shared
+    
+    private var pendingReview: Int {
+        subjectsManager.selectedSubject?.pendingReview ?? 0
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Pending Grades")
@@ -20,29 +26,36 @@ struct PendingGradesView: View {
                     .scaledToFill()
                     .accessibilityHidden(true)
                 VStack {
-                    VStack {
-                        Text("6 awaiting")
-                            .font(.title3)
+                    if pendingReview > 0 {
+                        VStack {
+                            Text("6 awaiting")
+                                .font(.title3)
+                                .foregroundStyle(.white)
+                            Text("your review")
+                                .font(.title3)
+                                .foregroundStyle(.white)
+                        }
+                        .accessibilityElement(children: .combine)
+                        .accessibilityLabel("6 exams awaiting your review")
+                        .accessibilityAddTraits(.isStaticText)
+                        
+                        Button(action: {}) {
+                            Label("Grade here", systemImage: "clipboard")
+                                .foregroundStyle(Color.appPrimary)
+                        }
+                        .frame(minHeight: 44)
+                        .frame(minWidth: 176)
+                        .background(.white)
+                        .clipShape(Capsule())
+                        .accessibilityLabel("Grade pending exams")
+                        .accessibilityHint("Double tap to start grading 6 pending exams")
+                        .accessibilityAddTraits(.isButton)
+                    } else {
+                        Text("You're all set!")
+                            .font(.headline)
                             .foregroundStyle(.white)
-                        Text("your review")
-                            .font(.title3)
-                            .foregroundStyle(.white)
+                            .accessibilityLabel("No pending grades")
                     }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("6 exams awaiting your review")
-                    .accessibilityAddTraits(.isStaticText)
-
-                    Button(action: {}) {
-                        Label("Grade here", systemImage: "clipboard")
-                            .foregroundStyle(Color.appPrimary)
-                    }
-                    .frame(minHeight: 44)
-                    .frame(minWidth: 176)
-                    .background(.white)
-                    .clipShape(Capsule())
-                    .accessibilityLabel("Grade pending exams")
-                    .accessibilityHint("Double tap to start grading 6 pending exams")
-                    .accessibilityAddTraits(.isButton)
                 }
             }
             .frame(maxWidth: .infinity)

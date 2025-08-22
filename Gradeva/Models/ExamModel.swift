@@ -13,6 +13,9 @@ class Exam: Codable {
     var name: String
     var createdAt: Timestamp?
     var updatedAt: Timestamp?
+    var pendingReview: Int?
+    var totalStudentsPassed: Int?
+    var totalStudentsFailed: Int?
     
     init(id: String? = nil, name: String) {
         self.id = id

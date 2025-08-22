@@ -8,6 +8,38 @@
 import SwiftUI
 
 struct SummaryView: View {
+    @ObservedObject private var subjectsManager = SubjectsManager.shared
+    @ObservedObject private var batchManager = BatchManager.shared
+    
+    private var pendingReview: Int {
+        subjectsManager.selectedSubject?.pendingReview ?? 0
+    }
+    
+    private var totalStudents: Int {
+        batchManager.studentCount
+    }
+    
+    private var progress: Double {
+        if subjectsManager.selectedSubject?.pendingReview == 0 {
+            return 1
+        } else {
+            
+            if totalStudents == 0 {
+                return 0
+            }
+            
+            return Double(pendingReview / totalStudents)
+        }
+    }
+    
+    private var studentsPassed: Int {
+        subjectsManager.selectedSubject?.totalStudentsPassed ?? 0
+    }
+    
+    private var studentsFailed: Int {
+        subjectsManager.selectedSubject?.totalStudentsFailed ?? 0
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Summary")
@@ -25,7 +57,7 @@ struct SummaryView: View {
                     
                     // Progress circle
                     Circle()
-                        .trim(from: 0.0, to: CGFloat(0.4))
+                        .trim(from: 0.0, to: CGFloat(progress))
                         .stroke(
                             Color.appPrimaryDarker,
                             style: StrokeStyle(lineWidth: 12, lineCap: .round, lineJoin: .round)
@@ -36,13 +68,13 @@ struct SummaryView: View {
                     // Text in center
                     VStack {
                         HStack(alignment: .firstTextBaseline, spacing: 2) {
-                            Text("24")
+                            Text(pendingReview.description)
                                 .font(.title.bold())
                                 .accessibilityHidden(true)
                             Text("/")
                                 .font(.headline)
                                 .accessibilityHidden(true)
-                            Text("30")
+                            Text(totalStudents.description)
                                 .font(.headline)
                                 .accessibilityHidden(true)
                         }
@@ -56,14 +88,14 @@ struct SummaryView: View {
                 }
                 .frame(width: 150, height: 150)
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("Grading progress: 24 out of 30 assignments graded")
-                .accessibilityValue("80 percent complete")
+                .accessibilityLabel("Grading progress: \(totalStudents - pendingReview) out of \(totalStudents) assignments graded")
+                .accessibilityValue("\(Int(progress * 100)) percent complete")
                 .accessibilityAddTraits(.isStaticText)
                 
                 HStack(spacing: 12) {
                     VStack(alignment: .leading) {
                         HStack(alignment: .top) {
-                            Text("28")
+                            Text(studentsPassed.description)
                                 .font(.title.bold())
                                 .accessibilityHidden(true)
                             Spacer()
@@ -82,12 +114,12 @@ struct SummaryView: View {
                     .background(.appSuccess)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("28 students passed")
+                    .accessibilityLabel("\(studentsPassed) students passed")
                     .accessibilityAddTraits(.isStaticText)
                     
                     VStack(alignment: .leading) {
                         HStack(alignment: .top) {
-                            Text("2")
+                            Text(studentsFailed.description)
                                 .font(.title.bold())
                                 .accessibilityHidden(true)
                             Spacer()
@@ -106,7 +138,7 @@ struct SummaryView: View {
                     .background(.appDestructive)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("2 students need assistance")
+                    .accessibilityLabel("\(studentsFailed) students need assistance")
                     .accessibilityAddTraits(.isStaticText)
                     
                 }
