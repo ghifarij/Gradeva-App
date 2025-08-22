@@ -6,18 +6,42 @@
 //
 
 import Foundation
+import Combine
 
 class HeaderCardViewModel: ObservableObject {
     private let auth = AuthManager.shared
     private let subjectsManager = SubjectsManager.shared
+    private var cancellables = Set<AnyCancellable>()
     
-    var userSubjects: [Subject] {
+    @Published var userSubjects: [Subject] = []
+    
+    init() {
+        setupListeners()
+        updateUserSubjects()
+    }
+    
+    private func setupListeners() {
+        auth.$currentUser
+            .sink { [weak self] _ in
+                self?.updateUserSubjects()
+            }
+            .store(in: &cancellables)
+        
+        subjectsManager.$subjects
+            .sink { [weak self] _ in
+                self?.updateUserSubjects()
+            }
+            .store(in: &cancellables)
+    }
+    
+    private func updateUserSubjects() {
         guard let subjectIds = auth.currentUser?.subjectIds,
               !subjectIds.isEmpty else {
-            return []
+            userSubjects = []
+            return
         }
         
-        return subjectsManager.subjects.filter { subject in
+        userSubjects = subjectsManager.subjects.filter { subject in
             guard let subjectId = subject.id else { return false }
             return subjectIds.contains(subjectId)
         }
