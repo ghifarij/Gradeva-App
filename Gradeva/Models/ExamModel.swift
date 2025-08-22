@@ -24,12 +24,14 @@ class ExamResult: Codable {
     @DocumentID var id: String?
     var studentID: String
     var score: Int
+    var comment: String?
     var createdAt: Timestamp?
     var updatedAt: Timestamp?
     
-    init(id: String? = nil, studentID: String, score: Int) {
+    init(id: String? = nil, studentID: String, score: Int, comment: String? = "") {
         self.id = id
         self.studentID = studentID
         self.score = score
+        self.comment = comment
     }
 }
