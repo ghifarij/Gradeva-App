@@ -68,5 +68,28 @@ class ExamManager: ObservableObject {
             }
         }
     }
-}
 
+    func createExam(schoolId: String, subjectId: String, name: String, maxScore: Double, passingScore: Double, completion: @escaping (Result<Void, Error>) -> Void) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Assessment name cannot be empty"])) )
+            return
+        }
+        guard maxScore > 0 else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Max score must be greater than 0"])) )
+            return
+        }
+        guard passingScore >= 0 && passingScore <= maxScore else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Passing score must be between 0 and max score"])) )
+            return
+        }
+
+        let newExam = Exam(name: trimmed, maxScore: maxScore, passingScore: passingScore)
+
+        ExamServices().createExam(schoolId: schoolId, subjectId: subjectId, exam: newExam) { result in
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+    }
+}

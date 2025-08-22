@@ -20,7 +20,7 @@ struct SetAssessmentView: View {
     
     @Environment(\.dismiss) var dismiss
     
-    var onSave: (String) -> Void
+    var onSave: (String, Double, Double) -> Void
     
     var body: some View {
         NavigationView {
@@ -55,7 +55,7 @@ struct SetAssessmentView: View {
                         .foregroundColor(.textPrimary)
                     
                     TextField("Max Score (e.g., 100)", text: $maxScore)
-                        .keyboardType(.numberPad)
+                        .keyboardType(.decimalPad)
                         .padding()
                         .foregroundColor(.textPrimary)
                         .background(
@@ -79,7 +79,7 @@ struct SetAssessmentView: View {
                         .foregroundColor(.textPrimary)
                     
                     TextField("Passing Score (e.g., 75)", text: $passingScore)
-                        .keyboardType(.numberPad)
+                        .keyboardType(.decimalPad)
                         .padding()
                         .foregroundColor(.textPrimary)
                         .background(
@@ -112,8 +112,11 @@ struct SetAssessmentView: View {
                     .accessibilityAddTraits(.isButton)
                     
                     Button("Save") {
-                        if !assessmentName.isEmpty {
-                            onSave(assessmentName)
+                        let trimmedName = assessmentName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !trimmedName.isEmpty,
+                           let max = Double(maxScore.replacingOccurrences(of: ",", with: ".")),
+                           let pass = Double(passingScore.replacingOccurrences(of: ",", with: ".")) {
+                            onSave(trimmedName, max, pass)
                             dismiss()
                         }
                     }
@@ -149,7 +152,7 @@ struct SetAssessmentView: View {
 }
 
 #Preview {
-    SetAssessmentView(onSave: { newName in
-        print("Saved: \(newName)")
+    SetAssessmentView(onSave: { name, max, pass in
+        print("Saved: \\(name) | max: \\(max) | pass: \\(pass)")
     })
 }

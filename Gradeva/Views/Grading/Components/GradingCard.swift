@@ -10,7 +10,7 @@ import SwiftUI
 
 struct GradingCard: View {
     @EnvironmentObject var navManager: NavManager
-    let title: String
+    let subject: Subject
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
@@ -26,12 +26,11 @@ struct GradingCard: View {
                     // MARK: Card Hero
                     VStack {
                         Spacer()
-                        Text(title)
+                        Text(subject.name)
                             .font(.title2.weight(.semibold))
                             .foregroundColor(Color.textPrimary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)
-                            .accessibilityLabel(title)
                             .accessibilityAddTraits(.isHeader)
                         Spacer()
                     }
@@ -65,16 +64,16 @@ struct GradingCard: View {
                 }
             )
             .onTapGesture {
-                navManager.push(.grading(title))
+                navManager.push(.grading(subject.id ?? subject.name))
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title) grading card")
-            .accessibilityHint("Double tap to open grading for \(title)")
+            .accessibilityLabel("\(subject.name) grading card")
+            .accessibilityHint("Double tap to open grading for \(subject.name)")
             .accessibilityAddTraits(.isButton)
     }
 }
 
 #Preview {
-    GradingCard(title: "Digital Marketing")
+    GradingCard(subject: Subject(name: "Digital Marketing"))
         .environmentObject(NavManager.shared)
 }

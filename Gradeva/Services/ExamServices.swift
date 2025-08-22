@@ -90,5 +90,30 @@ class ExamServices {
             }
         }
     }
-}
 
+    func createExam(schoolId: String, subjectId: String, exam: Exam, completion: @escaping (Result<Void, Error>) -> Void) {
+        Task {
+            let examsRef = db
+                .collection("schools")
+                .document(schoolId)
+                .collection("subjects")
+                .document(subjectId)
+                .collection("exams")
+
+            do {
+                var examData = try Firestore.Encoder().encode(exam)
+                examData["createdAt"] = FieldValue.serverTimestamp()
+                examData["updatedAt"] = FieldValue.serverTimestamp()
+
+                if let id = exam.id, !id.isEmpty {
+                    try await examsRef.document(id).setData(examData)
+                } else {
+                    _ = try await examsRef.addDocument(data: examData)
+                }
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+}

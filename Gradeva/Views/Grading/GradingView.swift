@@ -8,30 +8,30 @@
 import SwiftUI
 
 struct GradingView: View {
-    // TODO: Use grading model instead of hardcoded strings
-    let subjects = [
-        "Digital Marketing",
-        "Hotel Operations",
-        "Front Office Management",
-        "English",
-        "Spa",
-        "Web Development",
-        "Food & Beverage Services",
-        "Public Speaking"
-    ]
-    
+    @StateObject private var subjectsManager = SubjectsManager()
+
     // Define the grid layout with two flexible columns.
     let columns: [GridItem] = [
         GridItem(.flexible(), spacing: 16),
         GridItem(.flexible(), spacing: 16)
     ]
-    
+
     var body: some View {
         NavigationView {
             ScrollView {
+                if subjectsManager.isLoading {
+                    ProgressView("Loading subjects...")
+                        .padding()
+                }
+
+                if let error = subjectsManager.errorMessage, !error.isEmpty {
+                    InlineErrorView(message: error)
+                        .padding(.horizontal)
+                }
+
                 LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(subjects, id: \.self) { subject in
-                        GradingCard(title: subject)
+                    ForEach(subjectsManager.subjects, id: \.id) { subject in
+                        GradingCard(subject: subject)
                     }
                     .accessibilityElement(children: .contain)
                     .accessibilityLabel("Subjects list")
@@ -39,9 +39,9 @@ struct GradingView: View {
                 .padding()
                 .accessibilityLabel("Grading subjects scroll view")
             }
-            .navigationTitle("Grading")
+            .navigationTitle("Subjects")
             .accessibilityElement(children: .contain)
-            .accessibilityLabel("Grading screen")
+            .accessibilityLabel("Subject screen")
         }
     }
 }
@@ -49,4 +49,3 @@ struct GradingView: View {
 #Preview {
     GradingView()
 }
-

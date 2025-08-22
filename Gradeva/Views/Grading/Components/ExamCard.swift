@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ExamCard: View {
     @EnvironmentObject var navManager: NavManager
-    let title: String
+    let exam: Exam
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
@@ -26,7 +26,7 @@ struct ExamCard: View {
                     // MARK: Card Hero
                     VStack {
                         Spacer()
-                        Text(title)
+                        Text(exam.name)
                             .font(.title2.weight(.semibold))
                             .foregroundColor(Color.textPrimary)
                             .multilineTextAlignment(.center)
@@ -63,16 +63,16 @@ struct ExamCard: View {
                 }
             )
             .onTapGesture {
-                navManager.push(.exam(title))
+                navManager.push(.exam(exam.id ?? exam.name))
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title) exam card")
-            .accessibilityHint("Double tap to open exam: \(title)")
+            .accessibilityLabel("\(exam.name) exam card")
+            .accessibilityHint("Double tap to open exam: \(exam.name)")
             .accessibilityAddTraits(.isButton)
     }
 }
 
 #Preview {
-    GradingCard(title: "Theory")
+    ExamCard(exam: Exam(name: "Theory"))
         .environmentObject(NavManager.shared)
 }
