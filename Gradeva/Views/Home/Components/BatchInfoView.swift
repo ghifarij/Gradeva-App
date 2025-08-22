@@ -11,7 +11,7 @@ struct BatchInfoView: View {
     @ObservedObject private var batchManager = BatchManager.shared
     
     var body: some View {
-        HStack {
+        DynamicHStack {
             Spacer()
             
             VStack(spacing: 4) {
@@ -32,12 +32,9 @@ struct BatchInfoView: View {
             
             Spacer()
             
-            Rectangle()
-                .fill(.white.opacity(0.3))
-                .frame(width: 1)
-                .padding(.vertical)
-                .accessibilityHidden(true)
-            
+            Divider()
+                .background(.white)
+                        
             Spacer()
             
             VStack(spacing: 4) {
@@ -58,13 +55,12 @@ struct BatchInfoView: View {
             
             Spacer()
         }
+        .padding()
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity)
         .background(Color.appPrimary)
-        .frame(height: 100)
+//        .frame(height: 100)
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .padding(.horizontal)
-        .padding(.bottom)
     }
 }
 

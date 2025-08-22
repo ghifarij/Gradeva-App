@@ -11,6 +11,11 @@ struct SubjectNavigationView: View {
     @ObservedObject var auth = AuthManager.shared
     @ObservedObject var subjectsManager = SubjectsManager.shared
     @StateObject private var viewModel = HeaderCardViewModel()
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var isTextLarge: Bool {
+        dynamicTypeSize > .xxLarge
+    }
     
     private var otherSubjects: [Subject] {
         subjectsManager.subjects.filter { subject in
@@ -19,20 +24,22 @@ struct SubjectNavigationView: View {
     }
     
     var body: some View {
-        HStack {
-            Button(action: viewModel.goToPrevSubject) {
-                Image(systemName: "chevron.left")
-                    .foregroundStyle(.white)
+        DynamicHStack {
+            if !isTextLarge {
+                Button(action: viewModel.goToPrevSubject) {
+                    Image(systemName: "chevron.left")
+                        .foregroundStyle(.white)
+                }
+                .padding()
+                .background(Color.appPrimary)
+                .clipShape(Circle())
+                .accessibilityLabel("Previous subject")
+                .accessibilityValue(viewModel.previousSubject?.name ?? "None")
+                .accessibilityHint("Double tap to switch to \(viewModel.previousSubject?.name ?? "previous subject")")
+                .accessibilityAddTraits(.isButton)
+                .disabled(!viewModel.canNavigateToPrevious)
+                .opacity(viewModel.canNavigateToPrevious ? 1.0 : 0.5)
             }
-            .padding()
-            .background(Color.appPrimary)
-            .clipShape(Circle())
-            .accessibilityLabel("Previous subject")
-            .accessibilityValue(viewModel.previousSubject?.name ?? "None")
-            .accessibilityHint("Double tap to switch to \(viewModel.previousSubject?.name ?? "previous subject")")
-            .accessibilityAddTraits(.isButton)
-            .disabled(!viewModel.canNavigateToPrevious)
-            .opacity(viewModel.canNavigateToPrevious ? 1.0 : 0.5)
             
             Spacer()
             
@@ -68,19 +75,36 @@ struct SubjectNavigationView: View {
             
             Spacer()
             
-            Button(action: viewModel.goToNextSubject) {
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.white)
+            HStack(spacing: 16) {
+                if isTextLarge {
+                    Button(action: viewModel.goToPrevSubject) {
+                        Image(systemName: "chevron.left")
+                            .foregroundStyle(.white)
+                    }
+                    .padding()
+                    .background(Color.appPrimary)
+                    .clipShape(Circle())
+                    .accessibilityLabel("Previous subject")
+                    .accessibilityValue(viewModel.previousSubject?.name ?? "None")
+                    .accessibilityHint("Double tap to switch to \(viewModel.previousSubject?.name ?? "previous subject")")
+                    .accessibilityAddTraits(.isButton)
+                    .disabled(!viewModel.canNavigateToPrevious)
+                    .opacity(viewModel.canNavigateToPrevious ? 1.0 : 0.5)
+                }
+                Button(action: viewModel.goToNextSubject) {
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.white)
+                }
+                .padding()
+                .background(Color.appPrimary)
+                .clipShape(Circle())
+                .accessibilityLabel("Next subject")
+                .accessibilityValue(viewModel.nextSubject?.name ?? "None")
+                .accessibilityHint("Double tap to switch to \(viewModel.nextSubject?.name ?? "next subject")")
+                .accessibilityAddTraits(.isButton)
+                .disabled(!viewModel.canNavigateToNext)
+                .opacity(viewModel.canNavigateToNext ? 1.0 : 0.5)
             }
-            .padding()
-            .background(Color.appPrimary)
-            .clipShape(Circle())
-            .accessibilityLabel("Next subject")
-            .accessibilityValue(viewModel.nextSubject?.name ?? "None")
-            .accessibilityHint("Double tap to switch to \(viewModel.nextSubject?.name ?? "next subject")")
-            .accessibilityAddTraits(.isButton)
-            .disabled(!viewModel.canNavigateToNext)
-            .opacity(viewModel.canNavigateToNext ? 1.0 : 0.5)
         }
         .padding(.horizontal)
         .onChange(of: viewModel.userSubjects.count, {
