@@ -8,7 +8,6 @@
 import Foundation
 
 enum NavPath: Hashable {
-    case settings
     case grading(String)
     case exam(String)
     case profile
