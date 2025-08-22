@@ -10,6 +10,8 @@ import SwiftUI
 import Combine
 
 class ProfileViewModel: ObservableObject {
+    static let shared = ProfileViewModel()
+    
     @Published var userSubjects: [Subject] = []
     @Published var isRefreshing = false
     @Published var showingSignOutAlert = false
@@ -19,7 +21,7 @@ class ProfileViewModel: ObservableObject {
     private let subjectsManager = SubjectsManager.shared
     private var cancellables = Set<AnyCancellable>()
     
-    init() {
+    private init() {
         setupObservers()
         loadUserSubjects()
     }
