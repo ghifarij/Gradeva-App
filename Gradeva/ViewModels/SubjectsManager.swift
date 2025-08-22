@@ -78,8 +78,7 @@ class SubjectsManager: ObservableObject {
                         
                         switch updateResult {
                         case .success:
-                            // Refresh user data to trigger reactivity
-                            self.auth.refreshCurrentUser()
+                            // User data will update automatically via Firestore listener
                             completion(.success(()))
                         case .failure(let error):
                             self.errorMessage = "Failed to update profile: \(error.localizedDescription)"
@@ -113,8 +112,7 @@ class SubjectsManager: ObservableObject {
                 
                 switch result {
                 case .success:
-                    // Refresh user data to trigger reactivity
-                    self.auth.refreshCurrentUser()
+                    // User data will update automatically via Firestore listener
                     completion(.success(()))
                 case .failure(let error):
                     completion(.failure(error))

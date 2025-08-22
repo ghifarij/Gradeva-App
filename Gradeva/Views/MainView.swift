@@ -11,10 +11,16 @@ import FirebaseAuth
 
 struct MainContentView: View {
     @ObservedObject private var auth = AuthManager.shared
-    @StateObject private var navManager = NavManager()
+    @ObservedObject private var navManager = NavManager.shared
+    @StateObject private var launchManager = AppLaunchManager.shared
+    @State private var showSplashScreen = true
     
     var didCompleteOnboarding: Bool {
         auth.currentUser?.didCompleteOnboarding ?? false
+    }
+    
+    var didCompleteDemoOnboarding: Bool {
+        auth.currentUser?.didCompleteDemoOnboarding ?? false
     }
     
     var isAssignedToSchool: Bool {
@@ -25,57 +31,45 @@ struct MainContentView: View {
         !isAssignedToSchool && auth.isSignedIn
     }
     
+    private func hideSplashScreen() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation {
+                showSplashScreen = false
+            }
+        }
+    }
+    
     var body: some View {
         NavigationStack(path: $navManager.paths) {
-            // Signed-in  --> show HomeView
-            if auth.isSignedIn && isAssignedToSchool {
-                if !didCompleteOnboarding {
-                    WelcomeView()
-                } else {
-                    TabView {
-                        HomeView()
-                            .tabItem {
-                                Label("Home", systemImage: "house")
-                                    .accessibilityLabel("Home tab")
-                                    .accessibilityHint("View dashboard and overview")
-                            }
-                        GradingView()
-                            .tabItem {
-                                Label("Grading", systemImage: "pencil")
-                                    .accessibilityLabel("Grading tab")
-                                    .accessibilityHint("Grade student exams and assignments")
-                            }
-                        AnalyticsView()
-                            .tabItem {
-                                Label("Analytics", systemImage: "chart.bar")
-                                    .accessibilityLabel("Analytics tab")
-                                    .accessibilityHint("View performance statistics and reports")
-                            }
-                        ProfileView()
-                            .tabItem {
-                                Label("Profile", systemImage: "person")
-                                    .accessibilityLabel("Profile tab")
-                                    .accessibilityHint("Manage your account and settings")
-                            }
+            ZStack {
+                // Show splash screen on first launch for 2 seconds
+                if showSplashScreen {
+                    SplashScreenView()
+                        .transition(.opacity) 
+                        .onAppear(perform: hideSplashScreen)
+                    // First launch - show welcome screen with login button
+                } else if launchManager.isFirstLaunch {
+                    FirstLaunchWelcomeView(onLoginTapped: {
+                        launchManager.markAppAsLaunched()
+                    })
+                    .transition(.opacity)
+                    // Signed-in and has school --> show main content
+                } else if auth.isSignedIn && isAssignedToSchool {
+                    if !didCompleteOnboarding {
+                        WelcomeView()
+                            .transition(.opacity)
+                    } else {
+                        MainTabView()
+                            .transition(.opacity)
                     }
-                    .accessibilityElement(children: .contain)
-                    .accessibilityLabel("Main navigation tabs")
-                    .navigationDestination(for: NavPath.self) { path in
-                        switch path {
-                        case .settings:
-                            SettingsView()
-                        case .grading(let subjectId):
-                            ExamListView(subjectId: subjectId)
-                        case .exam(let examId):
-                            StudentGradingListView(examId: examId)
-                        }
-                    }
+                } else if hasNoSchool {
+                    NotRegisteredView()
+                        .transition(.opacity)
+                } else if !auth.isSignedIn {
+                    // Not signed in --> show SignInView
+                    SignInView()
+                        .transition(.opacity)
                 }
-            } else if hasNoSchool {
-                NotRegisteredView()
-            } else {
-                // Not signed in --> show SignInView
-                SignInView()
             }
             
         }

@@ -74,5 +74,5 @@ struct ExamCard: View {
 
 #Preview {
     GradingCard(title: "Theory")
-        .environmentObject(NavManager())
+        .environmentObject(NavManager.shared)
 }

@@ -42,4 +42,27 @@ class RegistrationManager: ObservableObject {
                 }
             }
     }
+    
+    func registerToDemo() {
+        guard let user = auth.currentUser else { return }
+        
+        isLoading = true
+        errorMessage = nil
+        
+        let updatedUser = user.copy(didCompleteDemoOnboarding: true, schoolId: "demo-school")
+        
+        UserServices().updateUser(user: updatedUser) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                self.isLoading = false
+                
+                switch result {
+                case .success:
+                    self.auth.currentUser = updatedUser
+                case .failure(let error):
+                    self.errorMessage = "Failed to register to demo school: \(error.localizedDescription)"
+                }
+            }
+        }
+    }
 }

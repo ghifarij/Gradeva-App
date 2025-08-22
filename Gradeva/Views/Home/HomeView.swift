@@ -8,42 +8,50 @@
 import SwiftUI
 
 struct HomeView: View {
-    // State for the selected batch in the picker.
-    @State private var selectedBatch = "Batch 1"
-    private let batches = ["Batch 1", "Batch 2", "Batch 3"]
+    @EnvironmentObject var auth: AuthManager
+    @EnvironmentObject var navManager: NavManager
     
-    private let name = "Shinta"
-    private let subject = "Hospitality"
+    private var user: AppUser? {
+        auth.currentUser
+    }
     
     var body: some View {
-        NavigationView {
+        ZStack(alignment: .top) {
+            Image("homepage-bg")
+                .scaledToFill()
+                .accessibilityHidden(true)
             ScrollView {
-                VStack(spacing: 24) {
-                    // Dropdown menu for selecting a batch.
-                    Picker("Select your batch", selection: $selectedBatch) {
-                        ForEach(batches, id: \.self) { batch in
-                            Text(batch)
-                        }
-                    }
-                    .pickerStyle(.menu)
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color(UIColor.systemGray6))
-                    .cornerRadius(12)
-                    
-                    // Horizontal stack for the info cards.
-                    HStack(spacing: 16) {
-                        InfoCardView(title: "Students", count: 26)
-                        InfoCardView(title: "Teachers", count: 7)
-                    }
+                VStack(spacing: 16) {
+                    HeaderCardView()
+                    PendingGradesView()
+                    SummaryView()
                 }
-                .padding()
+                .padding(.top, 120)
+                .padding(.bottom, 24)
+                .padding(.horizontal, 24)
             }
-            .navigationTitle("Hello \(name)")
+            .accessibilityLabel("Home screen content")
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.appPrimary)
+        .ignoresSafeArea(.all, edges: .top)
+        .accessibilityElement(children: .contain)
+        .refreshable {
+            await refreshData()
+        }
+    }
+    
+    private func refreshData() async {
+        guard let schoolId = auth.currentUser?.schoolId else { return }
+        
+        // Refresh school data which will trigger batch data refresh
+        SchoolManager.shared.startSchoolListener(schoolId: schoolId)
     }
 }
 
 #Preview {
     HomeView()
+        .environmentObject(AuthManager())
+        .environmentObject(NavManager.shared)
 }
+
