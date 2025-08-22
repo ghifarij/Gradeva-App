@@ -80,6 +80,7 @@ struct SubjectNavigationView: View {
                             }
                         }
                     }
+                    .multilineTextAlignment(.center)
             }
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isStaticText)

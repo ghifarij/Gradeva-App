@@ -44,13 +44,13 @@ struct SignInView: View {
                 .accessibilityValue(auth.isAuthLoading ? "Loading" : "")
           
                 Button(action: auth.handleSignInWithGoogle) {
-                    HStack(spacing: 4) {
+                    HStack(spacing: 5) {
                         Image("g")
                             .resizable()
                             .frame(width: 12, height: 12)
                             .accessibilityHidden(true)
                         Text("Sign in with Google")
-                            .font(.headline)
+                            .font(.system(size: 17))
                             .fontWeight(.medium)
                             .foregroundColor(.primary)
                     }
