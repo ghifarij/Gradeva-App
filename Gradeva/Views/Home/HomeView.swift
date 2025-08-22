@@ -39,6 +39,9 @@ struct HomeView: View {
         .refreshable {
             await refreshData()
         }
+        .task {
+            await refreshData()
+        }
     }
     
     private func refreshData() async {
