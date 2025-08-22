@@ -73,5 +73,5 @@ struct ExamCard: View {
 }
 
 #Preview {
-    GradingCard(title: "Theory")
+    ExamCard(title: "Theory")
 }

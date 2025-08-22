@@ -47,6 +47,16 @@ struct AvatarSelectionView: View {
             .padding()
             .navigationTitle("Select Avatar")
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden()
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("Done") {
+                        isPresented = false
+                    }
+                    .accessibilityLabel("Done")
+                    .accessibilityHint("Close avatar selection")
+                }
+            }
         }
     }
 }
