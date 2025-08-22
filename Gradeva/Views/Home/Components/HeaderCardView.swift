@@ -12,25 +12,69 @@ struct HeaderCardView: View {
     @EnvironmentObject var navManager: NavManager
     @ObservedObject private var schoolManager = SchoolManager.shared
     @ObservedObject private var batchManager = BatchManager.shared
+    @ObservedObject private var subjectsManager = SubjectsManager.shared
+    @StateObject private var viewModel = HeaderCardViewModel()
     
     var body: some View {
         ZStack(alignment: .top) {
             VStack {
                 Spacer()
-                Text(auth.currentUser?.displayName ?? "User")
-                    .font(.callout)
-                    .foregroundStyle(Color.appPrimary)
-                    .accessibilityAddTraits(.isHeader)
-                    .accessibilityLabel("Name")
-                    .accessibilityValue(auth.currentUser?.displayName ?? "User")
-                
-                Text("Digital Marketing")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(Color.appPrimary)
+                HStack {
+                    Button(action: viewModel.goToPrevSubject) {
+                        Image(systemName: "chevron.left")
+                            .foregroundStyle(.white)
+                    }
+                    .padding()
+                    .background(Color.appPrimary)
+                    .clipShape(Circle())
+                    .accessibilityLabel("Previous subject")
+                    .accessibilityValue(viewModel.previousSubject?.name ?? "None")
+                    .accessibilityHint("Double tap to switch to \(viewModel.previousSubject?.name ?? "previous subject")")
+                    .accessibilityAddTraits(.isButton)
+                    .disabled(!viewModel.canNavigateToPrevious)
+                    .opacity(viewModel.canNavigateToPrevious ? 1.0 : 0.5)
+                    
+                    Spacer()
+                    
+                    VStack {
+                        Text(auth.currentUser?.displayName ?? "User")
+                            .font(.callout)
+                            .foregroundStyle(Color.appPrimary)
+                        
+                        Text(subjectsManager.selectedSubject?.name ?? "-")
+                            .font(.title2)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(Color.appPrimary)
+                    }
+                    .accessibilityElement(children: .combine)
                     .accessibilityAddTraits(.isStaticText)
-                    .accessibilityLabel("Subject")
-                    .accessibilityValue("Digital Marketing")
+                    .accessibilityLabel("Current subject")
+                    .accessibilityValue(subjectsManager.selectedSubject?.name ?? "None")
+                    .accessibilityAction(named: "Switch to \(viewModel.previousSubject?.name ?? "previous subject")", viewModel.goToPrevSubject)
+                    .accessibilityAction(named: "Switch to \(viewModel.nextSubject?.name ?? "next subject")", viewModel.goToNextSubject)
+                    
+                    Spacer()
+                    
+                    Button(action: viewModel.goToNextSubject) {
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.white)
+                    }
+                    .padding()
+                    .background(Color.appPrimary)
+                    .clipShape(Circle())
+                    .accessibilityLabel("Next subject")
+                    .accessibilityValue(viewModel.nextSubject?.name ?? "None")
+                    .accessibilityHint("Double tap to switch to \(viewModel.nextSubject?.name ?? "next subject")")
+                    .accessibilityAddTraits(.isButton)
+                    .disabled(!viewModel.canNavigateToNext)
+                    .opacity(viewModel.canNavigateToNext ? 1.0 : 0.5)
+                }
+                .padding(.horizontal)
+                .onChange(of: viewModel.userSubjects.count, {
+                    if viewModel.userSubjects.count > 0 {
+                        subjectsManager.setSelectedSubject(viewModel.userSubjects.first)
+                    }
+                })
                 
                 HStack {
                     Spacer()
@@ -107,7 +151,7 @@ struct HeaderCardView: View {
                         .foregroundColor(.white)
                         .font(.system(size: 12, weight: .medium))
                         .frame(width: 24, height: 24)
-                        .background(Color.blue)
+                        .background(Color.appPrimary)
                         .clipShape(Circle())
                         .offset(x: -4, y: -4)
                 }

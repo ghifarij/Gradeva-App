@@ -136,7 +136,7 @@ struct ProfileView: View {
                         .foregroundColor(.white)
                         .font(.system(size: 12, weight: .medium))
                         .frame(width: 24, height: 24)
-                        .background(Color.blue)
+                        .background(Color.appPrimary)
                         .clipShape(Circle())
                         .offset(x: -4, y: -4)
                 }
@@ -193,7 +193,7 @@ struct ProfileView: View {
                                 .overlay(
                                     Circle()
                                         .stroke(
-                                            viewModel.avatar == avatarName ? Color.blue : Color.gray,
+                                            viewModel.avatar == avatarName ? Color.appPrimary : Color.gray,
                                             lineWidth: viewModel.avatar == avatarName ? 3 : 1
                                         )
                                 )

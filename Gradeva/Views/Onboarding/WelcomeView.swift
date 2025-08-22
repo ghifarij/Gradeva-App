@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @StateObject private var subjectsManager = SubjectsManager()
+    @ObservedObject private var subjectsManager = SubjectsManager.shared
     @EnvironmentObject private var auth: AuthManager
     @State private var currentStep = 0
     @State private var name: String = ""

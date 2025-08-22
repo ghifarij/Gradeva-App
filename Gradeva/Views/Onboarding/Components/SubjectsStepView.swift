@@ -55,5 +55,5 @@ struct SubjectsStepView: View {
     SubjectsStepView(
         selectedSubjects: .constant(Set<String>())
     )
-    .environmentObject(SubjectsManager())
+    .environmentObject(SubjectsManager.shared)
 }

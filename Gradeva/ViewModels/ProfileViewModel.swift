@@ -16,7 +16,7 @@ class ProfileViewModel: ObservableObject {
     
     private let auth = AuthManager.shared
     private let schoolManager = SchoolManager.shared
-    private let subjectsManager = SubjectsManager()
+    private let subjectsManager = SubjectsManager.shared
     private var cancellables = Set<AnyCancellable>()
     
     init() {

@@ -9,15 +9,18 @@ import Foundation
 import Combine
 
 class SubjectsManager: ObservableObject {
+    static let shared = SubjectsManager()
+    
     @Published var subjects: [Subject] = []
     @Published var isLoading: Bool = false
     @Published var isClaimingSubjects: Bool = false
     @Published var errorMessage: String?
+    @Published var selectedSubject: Subject?
     
     private var auth = AuthManager.shared
     private var cancellables = Set<AnyCancellable>()
     
-    init() {
+    private init() {
         // Subscribe to changes in auth.currentUser
         auth.$currentUser
             .compactMap { $0?.schoolId }
@@ -119,5 +122,9 @@ class SubjectsManager: ObservableObject {
                 }
             }
         }
+    }
+    
+    func setSelectedSubject(_ subject: Subject?) {
+        selectedSubject = subject
     }
 }
