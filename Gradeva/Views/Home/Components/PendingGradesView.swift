@@ -29,7 +29,7 @@ struct PendingGradesView: View {
                 VStack {
                     if pendingReview > 0 {
                         VStack {
-                            Text("6 awaiting")
+                            Text("\(pendingReview) awaiting")
                                 .font(.title3)
                                 .foregroundStyle(.white)
                             Text("your review")
@@ -37,7 +37,7 @@ struct PendingGradesView: View {
                                 .foregroundStyle(.white)
                         }
                         .accessibilityElement(children: .combine)
-                        .accessibilityLabel("6 exams awaiting your review")
+                        .accessibilityLabel("\(pendingReview) exams awaiting your review")
                         .accessibilityAddTraits(.isStaticText)
                         
                         Button(action: {

@@ -45,6 +45,9 @@ struct HomeView: View {
         guard let schoolId = auth.currentUser?.schoolId else { return }
         
         // Refresh school data which will trigger batch data refresh
+        SubjectsManager.shared.loadSubjects(schoolId: schoolId)
+        
+        // Refetch subjects data
         SchoolManager.shared.startSchoolListener(schoolId: schoolId)
     }
 }

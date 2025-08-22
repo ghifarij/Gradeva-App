@@ -24,6 +24,10 @@ class NavManager: ObservableObject {
         paths.append(path)
     }
     
+    func push(_ paths: [NavPath]) {
+        self.paths.append(contentsOf: paths)
+    }
+    
     // Back to home
     func reset() {
         paths.removeAll()
