@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NotRegisteredView: View {
-    @EnvironmentObject private var auth: AuthManager
+    @ObservedObject private var auth = AuthManager.shared
     @State private var currentStep = 0
     @State private var name: String = ""
     @State private var isUpdatingUser = false

@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct HomeView: View {
-    @EnvironmentObject var auth: AuthManager
-    @EnvironmentObject var navManager: NavManager
+    @ObservedObject var auth = AuthManager.shared
+    @ObservedObject var navManager = NavManager.shared
     
     private var user: AppUser? {
         auth.currentUser
@@ -45,13 +45,14 @@ struct HomeView: View {
         guard let schoolId = auth.currentUser?.schoolId else { return }
         
         // Refresh school data which will trigger batch data refresh
+        SubjectsManager.shared.loadSubjects(schoolId: schoolId)
+        
+        // Refetch subjects data
         SchoolManager.shared.startSchoolListener(schoolId: schoolId)
     }
 }
 
 #Preview {
     HomeView()
-        .environmentObject(AuthManager())
-        .environmentObject(NavManager.shared)
 }
 

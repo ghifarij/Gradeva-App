@@ -73,8 +73,6 @@ struct MainContentView: View {
             }
             
         }
-        .environmentObject(auth)
-        .environmentObject(navManager)
     }
 }
 
