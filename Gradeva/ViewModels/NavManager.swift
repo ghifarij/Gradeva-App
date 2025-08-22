@@ -11,10 +11,13 @@ enum NavPath: Hashable {
     case settings
     case grading(String)
     case exam(String)
+    case profile
 }
 
 class NavManager: ObservableObject {
     @Published var paths: [NavPath] = []
+    
+    static let shared = NavManager()
     
     // Push
     func push(_ path: NavPath) {

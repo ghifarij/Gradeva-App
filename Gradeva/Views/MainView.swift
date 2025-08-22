@@ -11,7 +11,7 @@ import FirebaseAuth
 
 struct MainContentView: View {
     @ObservedObject private var auth = AuthManager.shared
-    @StateObject private var navManager = NavManager()
+    @ObservedObject private var navManager = NavManager.shared
     @StateObject private var launchManager = AppLaunchManager.shared
     @State private var showSplashScreen = true
     
@@ -42,7 +42,7 @@ struct MainContentView: View {
     var body: some View {
         NavigationStack(path: $navManager.paths) {
             ZStack {
-                // Show splash screen on first launch for 1.5 seconds
+                // Show splash screen on first launch for 2 seconds
                 if showSplashScreen {
                     SplashScreenView()
                         .transition(.opacity) 
@@ -52,23 +52,23 @@ struct MainContentView: View {
                     FirstLaunchWelcomeView(onLoginTapped: {
                         launchManager.markAppAsLaunched()
                     })
-                    .transition(.blurReplace)
+                    .transition(.opacity)
                     // Signed-in and has school --> show main content
                 } else if auth.isSignedIn && isAssignedToSchool {
                     if !didCompleteOnboarding {
                         WelcomeView()
-                            .transition(.blurReplace)
+                            .transition(.opacity)
                     } else {
                         MainTabView()
-                            .transition(.blurReplace)
+                            .transition(.opacity)
                     }
                 } else if hasNoSchool {
                     NotRegisteredView()
-                        .transition(.blurReplace)
+                        .transition(.opacity)
                 } else if !auth.isSignedIn {
                     // Not signed in --> show SignInView
                     SignInView()
-                        .transition(.blurReplace)
+                        .transition(.opacity)
                 }
             }
             

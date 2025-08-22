@@ -31,12 +31,15 @@ class AuthManager: ObservableObject {
             getUserDataFromFirestore(user: user)
         }
         
-        Auth.auth().addStateDidChangeListener { _, user in
+        let _ = Auth.auth().addStateDidChangeListener { _, user in
             if let user = user {
                 self.getUserDataFromFirestore(user: user)
             } else {
                     // User signed out - clean up listener
                 self.stopUserListener()
+                DispatchQueue.main.async {
+                    NavManager.shared.reset()
+                }
             }
         }
         
@@ -53,6 +56,11 @@ class AuthManager: ObservableObject {
             withAnimation {
                 self.currentUser = user
             }
+        }
+        
+        // Start school listener when user is set
+        if let schoolId = user.schoolId {
+            SchoolManager.shared.startSchoolListener(schoolId: schoolId)
         }
     }
     
@@ -101,11 +109,13 @@ class AuthManager: ObservableObject {
     func signOut() {
         do {
             stopUserListener()
+            SchoolManager.shared.stopSchoolListener()
             try Auth.auth().signOut()
             self.setIsSignedIn(false)
             DispatchQueue.main.async {
                 self.currentUser = nil
                 self.clearError()
+                NavManager.shared.reset()
             }
         } catch {
             let authError = AuthError.firebaseSignOutFailed(error.localizedDescription)

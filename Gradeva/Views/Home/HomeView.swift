@@ -16,25 +16,42 @@ struct HomeView: View {
     }
     
     var body: some View {
-        ScrollView {
-        VStack(spacing: 16) {
-                HeaderCardView()
-                PendingGradesView()
-                SummaryView()
+        ZStack(alignment: .top) {
+            Image("homepage-bg")
+                .scaledToFill()
+                .accessibilityHidden(true)
+            ScrollView {
+                VStack(spacing: 16) {
+                    HeaderCardView()
+                    PendingGradesView()
+                    SummaryView()
+                }
+                .padding(.top, 120)
+                .padding(.bottom, 24)
+                .padding(.horizontal, 24)
             }
-            .padding(.top, 120)
-            .padding(.bottom, 24)
-            .padding(.horizontal, 24)
+            .accessibilityLabel("Home screen content")
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.accentColor)
+        .background(Color.appPrimary)
         .ignoresSafeArea(.all, edges: .top)
+        .accessibilityElement(children: .contain)
+        .refreshable {
+            await refreshData()
+        }
+    }
+    
+    private func refreshData() async {
+        guard let schoolId = auth.currentUser?.schoolId else { return }
+        
+        // Refresh school data which will trigger batch data refresh
+        SchoolManager.shared.startSchoolListener(schoolId: schoolId)
     }
 }
 
 #Preview {
     HomeView()
         .environmentObject(AuthManager())
-        .environmentObject(NavManager())
+        .environmentObject(NavManager.shared)
 }
 

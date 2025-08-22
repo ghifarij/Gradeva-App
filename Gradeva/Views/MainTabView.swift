@@ -28,12 +28,6 @@ struct MainTabView: View {
                         .accessibilityLabel("Analytics tab")
                         .accessibilityHint("View performance statistics and reports")
                 }
-            ProfileView()
-                .tabItem {
-                    Label("Profile", systemImage: "person")
-                        .accessibilityLabel("Profile tab")
-                        .accessibilityHint("Manage your account and settings")
-                }
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Main navigation tabs")
@@ -45,6 +39,8 @@ struct MainTabView: View {
                 ExamListView(subjectId: subjectId)
             case .exam(let examId):
                 StudentGradingListView(examId: examId)
+            case .profile:
+                ProfileView()
             }
         }
         .onAppear {
@@ -57,5 +53,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .environmentObject(NavManager())
+        .environmentObject(NavManager.shared)
 }
