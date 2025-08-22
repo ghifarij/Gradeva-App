@@ -14,12 +14,6 @@ struct ExamListView: View {
     @ObservedObject private var examManager = ExamManager.shared
     @State private var isShowingSetAssessment = false
 
-    // 2-column grid
-    let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-
     var body: some View {
         ScrollView {
             if let error = examManager.errorMessage, !error.isEmpty {
@@ -27,7 +21,7 @@ struct ExamListView: View {
                     .padding(.horizontal)
             }
 
-            LazyVGrid(columns: columns, spacing: 16) {
+            LazyVStack(spacing: 20) {
                 ForEach(examManager.exams, id: \.id) { exam in
                     ExamCard(exam: exam) {
                         if let schoolId = auth.currentUser?.schoolId {

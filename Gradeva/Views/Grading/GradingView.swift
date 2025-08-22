@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GradingView: View {
     @StateObject private var subjectsManager = SubjectsManager()
+    @EnvironmentObject private var auth: AuthManager
 
     // Define the grid layout with two flexible columns.
     let columns: [GridItem] = [
@@ -24,15 +25,32 @@ struct GradingView: View {
                         .padding(.horizontal)
                 }
 
-                LazyVGrid(columns: columns, spacing: 16) {
-                    ForEach(subjectsManager.subjects, id: \.id) { subject in
-                        GradingCard(subject: subject)
-                    }
-                    .accessibilityElement(children: .contain)
-                    .accessibilityLabel("Subjects list")
+                let assignedIds = Set(auth.currentUser?.subjectIds ?? [])
+                let assignedSubjects = subjectsManager.subjects.filter { subj in
+                    if let id = subj.id { return assignedIds.contains(id) }
+                    return false
                 }
-                .padding()
-                .accessibilityLabel("Grading subjects scroll view")
+
+                if assignedSubjects.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "book.closed")
+                            .foregroundColor(.secondary)
+                        Text("No assigned subjects")
+                            .foregroundColor(.secondary)
+                    }
+                    .padding()
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("No assigned subjects")
+                } else {
+                    LazyVGrid(columns: columns, spacing: 16) {
+                        ForEach(assignedSubjects, id: \.id) { subject in
+                            GradingCard(subject: subject)
+                        }
+                        .accessibilityElement(children: .contain)
+                        .accessibilityLabel("Subjects list")
+                    }
+                    .padding()
+                }
             }
             .navigationTitle("Subjects")
             .accessibilityElement(children: .contain)
