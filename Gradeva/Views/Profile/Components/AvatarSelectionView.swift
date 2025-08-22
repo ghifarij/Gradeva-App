@@ -14,11 +14,6 @@ struct AvatarSelectionView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 20) {
-                Text("Choose Your Avatar")
-                    .font(.title2)
-                    .fontWeight(.semibold)
-                    .accessibilityAddTraits(.isHeader)
-                
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 4), spacing: 20) {
                     ForEach(1...9, id: \.self) { avatarNumber in
                         let avatarName = "avatar-\(avatarNumber)"
@@ -52,16 +47,6 @@ struct AvatarSelectionView: View {
             .padding()
             .navigationTitle("Select Avatar")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarBackButtonHidden()
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
-                        isPresented = false
-                    }
-                    .accessibilityLabel("Done")
-                    .accessibilityHint("Close avatar selection")
-                }
-            }
         }
     }
 }

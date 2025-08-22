@@ -9,7 +9,7 @@ import SwiftUI
 
 
 struct GradingCard: View {
-    @EnvironmentObject var navManager: NavManager
+    @ObservedObject var navManager = NavManager.shared
     let title: String
     
     var body: some View {
@@ -76,5 +76,4 @@ struct GradingCard: View {
 
 #Preview {
     GradingCard(title: "Digital Marketing")
-        .environmentObject(NavManager.shared)
 }
