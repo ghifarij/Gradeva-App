@@ -41,8 +41,8 @@ struct PendingGradesView: View {
                         .accessibilityAddTraits(.isStaticText)
                         
                         Button(action: {
-                            if let subjectId = subjectsManager.selectedSubject?.id {
-                                navManager.push(.grading(subjectId))
+                            if let subjectId = subjectsManager.selectedSubject?.id, let examId = subjectsManager.selectedSubject?.targetExamid {
+                                navManager.push([.grading(subjectId), .exam(examId)])
                             }
                         }) {
                             Label("Grade here", systemImage: "clipboard")
