@@ -10,7 +10,8 @@ import SwiftUI
 struct ExamListView: View {
     let subjectId: String
     @EnvironmentObject private var auth: AuthManager
-    @StateObject private var examManager = ExamManager()
+    @EnvironmentObject private var navManager: NavManager
+    @ObservedObject private var examManager = ExamManager.shared
     @State private var isShowingSetAssessment = false
 
     // 2-column grid
@@ -21,11 +22,6 @@ struct ExamListView: View {
 
     var body: some View {
         ScrollView {
-            if examManager.isLoadingExams {
-                ProgressView("Loading exams...")
-                    .padding()
-            }
-
             if let error = examManager.errorMessage, !error.isEmpty {
                 InlineErrorView(message: error)
                     .padding(.horizontal)
@@ -33,7 +29,12 @@ struct ExamListView: View {
 
             LazyVGrid(columns: columns, spacing: 16) {
                 ForEach(examManager.exams, id: \.id) { exam in
-                    ExamCard(exam: exam)
+                    ExamCard(exam: exam) {
+                        if let schoolId = auth.currentUser?.schoolId {
+                            examManager.selectExam(schoolId: schoolId, subjectId: subjectId, exam: exam)
+                            navManager.push(.exam(exam.id ?? exam.name))
+                        }
+                    }
                 }
             }
             .padding()
@@ -61,7 +62,7 @@ struct ExamListView: View {
             }
         }
         .sheet(isPresented: $isShowingSetAssessment) {
-            SetAssessmentView { newAssessmentName, maxScore, passingScore in
+            SetAssessmentView(onSave: { newAssessmentName, maxScore, passingScore in
                 if let schoolId = auth.currentUser?.schoolId {
                     examManager.createExam(
                         schoolId: schoolId,
@@ -73,7 +74,7 @@ struct ExamListView: View {
                         examManager.loadExams(schoolId: schoolId, subjectId: subjectId)
                     }
                 }
-            }
+            })
             .presentationDragIndicator(.visible)
         }
     }

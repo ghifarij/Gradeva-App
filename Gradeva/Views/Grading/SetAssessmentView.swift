@@ -114,8 +114,8 @@ struct SetAssessmentView: View {
                     Button("Save") {
                         let trimmedName = assessmentName.trimmingCharacters(in: .whitespacesAndNewlines)
                         if !trimmedName.isEmpty,
-                           let max = Double(maxScore.replacingOccurrences(of: ",", with: ".")),
-                           let pass = Double(passingScore.replacingOccurrences(of: ",", with: ".")) {
+                           let max = parseDecimal(maxScore),
+                           let pass = parseDecimal(passingScore) {
                             onSave(trimmedName, max, pass)
                             dismiss()
                         }

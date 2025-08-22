@@ -40,6 +40,8 @@ class ExamServices {
         }
     }
 
+    // Removed getExamById to keep navigation unchanged and avoid collectionGroup lookups.
+
     func getExam(schoolId: String, subjectId: String, examId: String, completion: @escaping (Result<Exam, Error>) -> Void) {
         Task {
             let examRef = db
@@ -110,6 +112,30 @@ class ExamServices {
                 } else {
                     _ = try await examsRef.addDocument(data: examData)
                 }
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+
+    func updateExamScores(schoolId: String, subjectId: String, examId: String, maxScore: Double, passingScore: Double, completion: @escaping (Result<Void, Error>) -> Void) {
+        Task {
+            let examRef = db
+                .collection("schools")
+                .document(schoolId)
+                .collection("subjects")
+                .document(subjectId)
+                .collection("exams")
+                .document(examId)
+
+            do {
+                var updates: [String: Any] = [
+                    "maxScore": maxScore,
+                    "passingScore": passingScore,
+                    "updatedAt": FieldValue.serverTimestamp()
+                ]
+                try await examRef.updateData(updates)
                 completion(.success(()))
             } catch {
                 completion(.failure(error))

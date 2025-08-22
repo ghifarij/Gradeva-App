@@ -9,6 +9,7 @@ import Foundation
 import Combine
 
 class ExamManager: ObservableObject {
+    static let shared = ExamManager()
     @Published var exams: [Exam] = []
     @Published var examResults: [ExamResult] = []
     @Published var selectedExam: Exam?
@@ -17,6 +18,8 @@ class ExamManager: ObservableObject {
     @Published var errorMessage: String?
 
     private var cancellables = Set<AnyCancellable>()
+    private(set) var selectedExamSubjectId: String?
+    private(set) var selectedExamSchoolId: String?
 
     func loadExams(schoolId: String, subjectId: String) {
         DispatchQueue.main.async {
@@ -43,10 +46,20 @@ class ExamManager: ObservableObject {
                 switch result {
                 case .success(let exam):
                     self.selectedExam = exam
+                    self.selectedExamSubjectId = subjectId
+                    self.selectedExamSchoolId = schoolId
                 case .failure(let error):
                     self.errorMessage = "Failed to load exam: \(error.localizedDescription)"
                 }
             }
+        }
+    }
+
+    func selectExam(schoolId: String, subjectId: String, exam: Exam) {
+        DispatchQueue.main.async {
+            self.selectedExamSchoolId = schoolId
+            self.selectedExamSubjectId = subjectId
+            self.selectedExam = exam
         }
     }
 
@@ -89,6 +102,41 @@ class ExamManager: ObservableObject {
         ExamServices().createExam(schoolId: schoolId, subjectId: subjectId, exam: newExam) { result in
             DispatchQueue.main.async {
                 completion(result)
+            }
+        }
+    }
+
+    func updateExamScores(schoolId: String, subjectId: String, examId: String, maxScore: Double, passingScore: Double, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard maxScore > 0 else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Max score must be greater than 0"])) )
+            return
+        }
+        guard passingScore >= 0 && passingScore <= maxScore else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Passing score must be between 0 and max score"])) )
+            return
+        }
+
+        ExamServices().updateExamScores(schoolId: schoolId, subjectId: subjectId, examId: examId, maxScore: maxScore, passingScore: passingScore) { result in
+            DispatchQueue.main.async {
+                completion(result)
+            }
+        }
+    }
+
+    func updateExamScoresUsingLoadedContext(maxScore: Double, passingScore: Double, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let subjectId = selectedExamSubjectId, let schoolId = selectedExamSchoolId, let examId = selectedExam?.id else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing subject context for the exam"])) )
+            return
+        }
+        updateExamScores(schoolId: schoolId, subjectId: subjectId, examId: examId, maxScore: maxScore, passingScore: passingScore) { [weak self] result in
+            guard let self else { completion(result); return }
+            switch result {
+            case .success:
+                // Refresh selected exam from Firestore so future sheets show updated values
+                self.loadExam(schoolId: schoolId, subjectId: subjectId, examId: examId)
+                completion(.success(()))
+            case .failure(let error):
+                completion(.failure(error))
             }
         }
     }

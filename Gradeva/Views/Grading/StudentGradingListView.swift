@@ -92,6 +92,9 @@ struct CommentOverlayView: View {
 
 struct StudentGradingListView: View {
     let examId: String
+    @EnvironmentObject private var auth: AuthManager
+    @ObservedObject private var examManager = ExamManager.shared
+    @State private var isShowingEditScores = false
     @State private var searchText = ""
     @State private var selectedStatus: GradeStatus = .all
     @State private var showingCommentFor: StudentGrade?
@@ -134,6 +137,10 @@ struct StudentGradingListView: View {
         NavigationView {
             ZStack {
                 ScrollView {
+                    if let error = examManager.errorMessage, !error.isEmpty {
+                        InlineErrorView(message: error)
+                            .padding()
+                    }
                     // MARK: Search and Filter UI
                     HStack(spacing: 16) {
                         // SEARCH BAR
@@ -209,6 +216,16 @@ struct StudentGradingListView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .background(Color.appBackground)
                 .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button(action: { isShowingEditScores = true }) {
+                            Image(systemName: "pencil.line")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+                        }
+                        .accessibilityLabel("Edit exam scores")
+                        .accessibilityHint("Double tap to edit max and passing score")
+                        .accessibilityAddTraits(.isButton)
+                    }
                     ToolbarItemGroup(placement: .keyboard) {
                         if focusedStudentID != nil {        // ← show only for numeric score fields
                             Spacer()
@@ -241,10 +258,20 @@ struct StudentGradingListView: View {
                 }
             }
         }
+        .onAppear { /* context already set before navigation */ }
+        .sheet(isPresented: $isShowingEditScores) {
+            EditScoreView(
+                initialMaxScore: examManager.selectedExam?.maxScore,
+                initialPassingScore: examManager.selectedExam?.passingScore
+            ) { max, pass in
+                examManager.updateExamScoresUsingLoadedContext(maxScore: max, passingScore: pass) { _ in }
+            }
+            .presentationDragIndicator(.visible)
+        }
     }
 }
 
 
 #Preview {
-    StudentGradingListView(examId: "some_ID")
+    StudentGradingListView(examId: "exam_456")
 }

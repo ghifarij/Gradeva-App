@@ -9,8 +9,8 @@ import SwiftUI
 
 
 struct ExamCard: View {
-    @EnvironmentObject var navManager: NavManager
     let exam: Exam
+    let onTap: () -> Void
     
     var body: some View {
         RoundedRectangle(cornerRadius: 12)
@@ -62,9 +62,7 @@ struct ExamCard: View {
                     }
                 }
             )
-            .onTapGesture {
-                navManager.push(.exam(exam.id ?? exam.name))
-            }
+            .onTapGesture(perform: onTap)
             .accessibilityElement(children: .combine)
             .accessibilityLabel("\(exam.name) exam card")
             .accessibilityHint("Double tap to open exam: \(exam.name)")
@@ -73,6 +71,5 @@ struct ExamCard: View {
 }
 
 #Preview {
-    ExamCard(exam: Exam(name: "Theory"))
-        .environmentObject(NavManager.shared)
+    ExamCard(exam: Exam(name: "Theory"), onTap: {})
 }

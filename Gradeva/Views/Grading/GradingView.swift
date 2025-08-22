@@ -19,11 +19,6 @@ struct GradingView: View {
     var body: some View {
         NavigationView {
             ScrollView {
-                if subjectsManager.isLoading {
-                    ProgressView("Loading subjects...")
-                        .padding()
-                }
-
                 if let error = subjectsManager.errorMessage, !error.isEmpty {
                     InlineErrorView(message: error)
                         .padding(.horizontal)
