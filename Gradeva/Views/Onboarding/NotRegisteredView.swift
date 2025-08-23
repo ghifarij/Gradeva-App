@@ -90,22 +90,24 @@ struct NotRegisteredView: View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel("Registration progress")
             .accessibilityValue("Step \(currentStep + 1) of 3")
+            .accessibilityHidden(currentStep == 0)
             .padding(.top)
             
             // Step content with sliding animation
             ZStack {
                 switch currentStep {
                 case 0:
-                    WelcomeStepView()
-                        .transition(.blurReplace)
-                        .padding(.horizontal, 24)
+                    WelcomeStepView {
+                        getNextAction()
+                    }
+                    .transition(.opacity)
                 case 1:
                     NameStepView(name: $name)
-                        .transition(.blurReplace)
+                        .transition(.opacity)
                         .padding(.horizontal, 24)
                 case 2:
                     RegistrationStepView()
-                        .transition(.blurReplace)
+                        .transition(.opacity)
                         .padding(.horizontal, 24)
                 default:
                     EmptyView()
@@ -114,63 +116,60 @@ struct NotRegisteredView: View {
             .frame(maxHeight: .infinity)
             
             // Bottom navigation
-            VStack(spacing: 12) {
-                // Back button (outlined)
-                
-                Button(action: previousStep) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "chevron.left")
-                            .accessibilityHidden(true)
-                        Text("Back")
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.accentColor, lineWidth: 1)
-                    )
-                }
-                .transition(.blurReplace)
-                .opacity(currentStep == 0 ? 0 : 1)
-                .disabled(currentStep == 0)
-                .accessibilityHidden(currentStep == 0)
-                .accessibilityLabel("Back")
-                .accessibilityHint("Double tap to go to previous step")
-                .accessibilityAddTraits(.isButton)
-                .frame(minHeight: 44)
-                
-                
-                // Main button (show for all steps)
-                Button(action: getNextAction) {
-                    HStack {
-                        if isUpdatingUser && currentStep == 1 {
-                            ProgressView()
-                                .accessibilityLabel("Updating profile")
-                        } else {
-                            Text(buttonTitle)
-                            Image(systemName: buttonIcon)
+            if currentStep > 0 {
+                VStack(spacing: 12) {
+                    // Back button (outlined)
+                    Button(action: previousStep) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
                                 .accessibilityHidden(true)
+                            Text("Back")
                         }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.accentColor, lineWidth: 1)
+                        )
                     }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical)
-                    .background(buttonEnabled ? Color.accentColor : Color.gray.opacity(0.3))
-                    .foregroundStyle(.white)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                    .transition(.opacity)
+                    .opacity(currentStep == 0 ? 0 : 1)
+                    .disabled(isUpdatingUser || currentStep == 0)
+                    .accessibilityHidden(currentStep == 0)
+                    .accessibilityLabel("Back")
+                    .accessibilityHint("Double tap to go to previous registration step")
+                    .accessibilityAddTraits(.isButton)
+                    
+                    // Main button
+                    Button(action: getNextAction) {
+                        HStack {
+                            if isUpdatingUser && currentStep == 1 {
+                                ProgressView()
+                                    .accessibilityLabel("Updating profile")
+                            } else {
+                                Text(buttonTitle)
+                                Image(systemName: buttonIcon)
+                                    .accessibilityHidden(true)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical)
+                        .background(buttonEnabled ? Color.accentColor : Color.gray.opacity(0.3))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .transition(.opacity)
+                    }
+                    .disabled(!buttonEnabled || isUpdatingUser)
+                    .accessibilityLabel(buttonTitle)
+                    .accessibilityHint(buttonHint)
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityValue(buttonEnabled ? "" : "Disabled")
+                    .accessibilityHidden(currentStep == 0)
                 }
-                .disabled(!buttonEnabled)
-                .accessibilityLabel(buttonTitle)
-                .accessibilityHint(buttonHint)
-                .accessibilityAddTraits(.isButton)
-                .accessibilityValue(buttonEnabled ? "" : "Disabled")
-                .frame(minHeight: 44)
-                
+                .padding(.bottom, 18)
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Registration navigation")
+                .padding(.horizontal, 20)
             }
-            .accessibilityElement(children: .contain)
-            .accessibilityLabel("Registration navigation")
-            .padding(.horizontal, 24)
-            .padding(.bottom, 40)
         }
         .ignoresSafeArea(.keyboard)
         .onAppear {

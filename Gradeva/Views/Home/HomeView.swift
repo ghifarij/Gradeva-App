@@ -17,6 +17,7 @@ struct HomeView: View {
     
     var body: some View {
         ZStack(alignment: .top) {
+            Color.appPrimary.ignoresSafeArea()
             Image("homepage-bg")
                 .scaledToFill()
                 .accessibilityHidden(true)
@@ -32,8 +33,6 @@ struct HomeView: View {
             }
             .accessibilityLabel("Home screen content")
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.appPrimary)
         .ignoresSafeArea(.all, edges: .top)
         .accessibilityElement(children: .contain)
         .refreshable {

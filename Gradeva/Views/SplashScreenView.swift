@@ -8,28 +8,29 @@
 import SwiftUI
 
 struct SplashScreenView: View {
+    private let backgroundColor = LinearGradient(colors: [Color.appPrimary, Color.appPrimaryDarker], startPoint: .top, endPoint: .bottom)
+    
     var body: some View {
         ZStack {
-            Color.accentColor
-                .ignoresSafeArea()
-            
-            VStack(spacing: 30) {
-                Image(systemName: "graduationcap.fill")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 80, height: 80)
-                    .foregroundColor(.white)
-                
-                Text("Gradeva")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                
-                ProgressView()
-                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                    .controlSize(.large)
+            VStack {
+                DynamicHStack(spacing: 10) {
+                    Image(systemName: "graduationcap.fill")
+                        .font(.largeTitle)
+                        .aspectRatio(contentMode: .fit)
+                        .foregroundColor(.white)
+                        .accessibilityHidden(true)
+                    
+                    Text("Assessio")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
             }
         }
+        .frame(maxWidth: .infinity)
+        .frame(maxHeight: .infinity)
+        .background(backgroundColor)
+        .ignoresSafeArea()
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Gradeva app loading")
         .accessibilityValue("Please wait while the app loads")
