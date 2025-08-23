@@ -94,9 +94,6 @@ struct SummaryView: View {
                 }
                 .frame(maxWidth: .infinity)
                 .accessibilityElement(children: .combine)
-                .accessibilityLabel("Grading progress")
-                .accessibilityValue("\(totalStudents - pendingReview) out of \(totalStudents) assignments graded")
-                .accessibilityAddTraits(.isStaticText)
                 
                 DynamicHStack(spacing: 12) {
                     VStack(alignment: .leading) {
@@ -121,7 +118,6 @@ struct SummaryView: View {
                     .background(.appSuccess)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("\(studentsPassed) students passed")
                     .accessibilityAddTraits(.isStaticText)
                     
                     VStack(alignment: .leading) {
@@ -146,7 +142,6 @@ struct SummaryView: View {
                     .background(.appDestructive)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("\(studentsFailed) students need assistance")
                     .accessibilityAddTraits(.isStaticText)
                     
                 }
@@ -159,6 +154,8 @@ struct SummaryView: View {
             .frame(maxWidth: .infinity)
             .background(.white.opacity(0.3))
             .clipShape(RoundedRectangle(cornerRadius: 24))
+            .accessibilityElement(children: .combine)
+            .accessibilityValue("\(totalStudents - pendingReview) out of \(totalStudents) assignments graded. \(studentsPassed) students passed, \(studentsFailed) students need assistance.")
         }
         .frame(maxWidth: .infinity)
     }

@@ -25,10 +25,6 @@ struct BatchInfoView: View {
                 Text(batchManager.currentBatch?.name ?? "-")
                     .fontWeight(.bold)
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Current active batch")
-            .accessibilityValue("Batch \(batchManager.currentBatch?.name ?? "unknown")")
-            .accessibilityAddTraits(.isStaticText)
             
             Spacer()
             
@@ -48,19 +44,15 @@ struct BatchInfoView: View {
                 Text("\(batchManager.studentCount)")
                     .fontWeight(.bold)
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("Total students in active batch")
-            .accessibilityValue("\(batchManager.studentCount) students")
-            .accessibilityAddTraits(.isStaticText)
-            
             Spacer()
         }
         .padding()
         .foregroundStyle(.white)
         .frame(maxWidth: .infinity)
         .background(Color.appPrimary)
-//        .frame(height: 100)
         .clipShape(RoundedRectangle(cornerRadius: 16))
+        .accessibilityLabel("Current active batch: \(batchManager.currentBatch?.name ?? "none"), with \(batchManager.studentCount) students in total")
+        .accessibilityElement(children: .combine)
     }
 }
 

@@ -15,6 +15,13 @@ struct PendingGradesView: View {
         subjectsManager.selectedSubject?.pendingReview ?? 0
     }
     
+    private func goToReview() {
+        navManager.push(.profile)
+        if let subjectId = subjectsManager.selectedSubject?.id, let examId = subjectsManager.selectedSubject?.targetExamid {
+            navManager.push([.grading(subjectId), .exam(examId)])
+        }
+    }
+    
     var body: some View {
         VStack(alignment: .leading) {
             Text("Pending Grades")
@@ -33,24 +40,16 @@ struct PendingGradesView: View {
                                 .font(.title3)
                                 .foregroundStyle(.white)
                         }
-                        .accessibilityElement(children: .combine)
-                        .accessibilityLabel("\(pendingReview) exams awaiting your review")
-                        .accessibilityAddTraits(.isStaticText)
                         
-                        Button(action: {
-                            if let subjectId = subjectsManager.selectedSubject?.id, let examId = subjectsManager.selectedSubject?.targetExamid {
-                                navManager.push([.grading(subjectId), .exam(examId)])
-                            }
-                        }) {
+                        Button(action: goToReview) {
                             Label("Grade here", systemImage: "clipboard")
                                 .foregroundStyle(Color.appPrimary)
                         }
                         .padding()
                         .background(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
-                        .accessibilityLabel("Grade pending exams")
-                        .accessibilityHint("Double tap to start grading 6 pending exams")
-                        .accessibilityAddTraits(.isButton)
+                        .accessibilityRemoveTraits(.isButton)
+                        .accessibilityHidden(true)
                     } else {
                         Text("You're all set!")
                             .font(.headline)
@@ -64,6 +63,19 @@ struct PendingGradesView: View {
             .frame(minHeight: 144)
             .background(.appCard)
             .clipShape(RoundedRectangle(cornerRadius: 24))
+            .accessibilityElement(children: .combine)
+            .if(pendingReview > 0) {
+                $0
+                    .accessibilityLabel("\(pendingReview) students awaiting your review")
+                    .accessibilityHint("Double tap to grade")
+                    .accessibilityAction {
+                        goToReview()
+                    }
+            }
+            .if(pendingReview == 0) {
+                $0
+                    .accessibilityLabel("You have reviewed all students in latest exam")
+            }
         }
         .frame(maxWidth: .infinity)
     }
