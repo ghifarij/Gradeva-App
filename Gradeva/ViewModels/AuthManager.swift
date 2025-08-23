@@ -28,14 +28,14 @@ class AuthManager: ObservableObject {
     
     init() {
         if let user = Auth.auth().currentUser {
-            startUserListener(uid: user.uid)
+            getUserDataFromFirestore(user: user)
         }
         
         let _ = Auth.auth().addStateDidChangeListener { _, user in
             if let user = user {
-                self.startUserListener(uid: user.uid)
+                self.getUserDataFromFirestore(user: user)
             } else {
-                    // User signed out - clean up listener
+                // User signed out - clean up listener
                 self.stopUserListener()
                 DispatchQueue.main.async {
                     NavManager.shared.reset()
@@ -139,6 +139,28 @@ class AuthManager: ObservableObject {
             let authError = AuthError.firebaseSignInFailed(error.localizedDescription)
             handleAuthError(authError)
             return
+        }
+    }
+    
+    private func getUserDataFromFirestore(user: FirebaseAuth.User) {
+        setLoading(true)
+        Task {
+            try await Task.sleep(for: .seconds(0.5)) // waiting for cloud functions to finish
+            
+            startUserListener(uid: user.uid)
+            
+            userServices.getUser(uid: user.uid) { firestoreResult in
+                switch firestoreResult {
+                case .success(let userData):
+                    self.setUser(user: userData)
+                    self.setIsSignedIn(true)
+                    
+                case .failure(_):
+                    break
+                }
+                
+                self.setLoading(false)
+            }
         }
     }
     
