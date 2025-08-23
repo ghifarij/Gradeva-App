@@ -28,12 +28,12 @@ class AuthManager: ObservableObject {
     
     init() {
         if let user = Auth.auth().currentUser {
-            getUserDataFromFirestore(user: user)
+            startUserListener(uid: user.uid)
         }
         
         let _ = Auth.auth().addStateDidChangeListener { _, user in
             if let user = user {
-                self.getUserDataFromFirestore(user: user)
+                self.startUserListener(uid: user.uid)
             } else {
                     // User signed out - clean up listener
                 self.stopUserListener()
@@ -139,35 +139,6 @@ class AuthManager: ObservableObject {
             let authError = AuthError.firebaseSignInFailed(error.localizedDescription)
             handleAuthError(authError)
             return
-        }
-    }
-    
-    private func getUserDataFromFirestore(user: FirebaseAuth.User) {
-        setLoading(true)
-        startUserListener(uid: user.uid)
-        
-        userServices.getUser(uid: user.uid) { firestoreResult in
-            switch firestoreResult {
-            case .success(let userData):
-                self.setUser(user: userData)
-                self.setIsSignedIn(true)
-                self.setLoading(false)
-                
-            case .failure(_):
-                let appUser = AppUser(fromFirebaseUser: user)
-                
-                self.userServices.handleFirstTimeLogin(user: appUser) { registrationResult in
-                    switch registrationResult {
-                    case .success():
-                        self.setUser(user: appUser)
-                        self.setIsSignedIn(true)
-                        self.setLoading(false)
-                    case .failure(let error):
-                        let authError = AuthError.userRegistrationFailed(error.localizedDescription)
-                        self.handleAuthError(authError)
-                    }
-                }
-            }
         }
     }
     

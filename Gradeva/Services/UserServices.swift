@@ -66,26 +66,6 @@ class UserServices {
         }
     }
     
-    func handleFirstTimeLogin(user: AppUser, completion: @escaping (Result<Void, Error>) -> Void) {
-        Task {
-            createUser(user: user) { result in
-                switch result {
-                case .success:
-                    RegistrationService().registerToQueue(user: user) { result in
-                        switch result {
-                        case .success:
-                            completion(.success(()))
-                        case .failure(let error):
-                            completion(.failure(error))
-                        }
-                    }
-                case .failure(let error):
-                    completion(.failure(error))
-                }
-            }
-        }
-    }
-    
     func startUserListener(uid: String, onUpdate: @escaping (Result<AppUser, Error>) -> Void) -> ListenerRegistration {
         let userRef = db.collection("users").document(uid)
         

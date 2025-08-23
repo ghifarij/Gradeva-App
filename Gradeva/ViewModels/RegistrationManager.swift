@@ -19,17 +19,17 @@ class RegistrationManager: ObservableObject {
     init() {
         // Subscribe to changes in auth.currentUser
         auth.$currentUser
-            .compactMap { $0?.email }
-            .sink { [weak self] email in
-                self?.loadRegistration(email: email)
+            .compactMap { $0?.id }
+            .sink { [weak self] id in
+                self?.loadRegistration(userId: id)
             }
             .store(in: &cancellables)
     }
     
-    private func loadRegistration(email: String) {
+    private func loadRegistration(userId: String) {
         isLoading = true
         RegistrationService()
-            .checkExistingRegistration(email: email) { [weak self] result in
+            .checkExistingRegistration(userId: userId) { [weak self] result in
                 DispatchQueue.main.async {
                     guard let self else { return }
                     self.isLoading = false
