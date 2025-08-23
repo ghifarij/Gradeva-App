@@ -99,7 +99,6 @@ struct SubjectNavigationView: View {
                 }
             }
         }
-        .accessibilityAddTraits(.isStaticText) // to remove "activate: default" voiceover
     }
 }
 

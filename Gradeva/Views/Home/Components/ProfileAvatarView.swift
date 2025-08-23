@@ -33,6 +33,8 @@ struct ProfileAvatarView: View {
             }
         }
         .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
+        .accessibilityRemoveTraits(.isImage)
         .accessibilityLabel("Profile picture")
         .accessibilityHint("Double tap to view profile")
     }

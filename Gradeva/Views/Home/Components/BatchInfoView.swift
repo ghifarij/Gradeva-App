@@ -51,8 +51,8 @@ struct BatchInfoView: View {
         .frame(maxWidth: .infinity)
         .background(Color.appPrimary)
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .accessibilityLabel("Current active batch: \(batchManager.currentBatch?.name ?? "none"), with \(batchManager.studentCount) students in total")
         .accessibilityElement(children: .combine)
+        .accessibilityLabel("Current active batch: \(batchManager.currentBatch?.name ?? "none"), with \(batchManager.studentCount) students in total")
     }
 }
 

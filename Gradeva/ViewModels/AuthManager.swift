@@ -144,23 +144,19 @@ class AuthManager: ObservableObject {
     
     private func getUserDataFromFirestore(user: FirebaseAuth.User) {
         setLoading(true)
-        Task {
-            try await Task.sleep(for: .seconds(0.5)) // waiting for cloud functions to finish
-            
-            startUserListener(uid: user.uid)
-            
-            userServices.getUser(uid: user.uid) { firestoreResult in
-                switch firestoreResult {
-                case .success(let userData):
-                    self.setUser(user: userData)
-                    self.setIsSignedIn(true)
-                    
-                case .failure(_):
-                    break
-                }
+        startUserListener(uid: user.uid)
+        
+        userServices.getUser(uid: user.uid) { firestoreResult in
+            switch firestoreResult {
+            case .success(let userData):
+                self.setUser(user: userData)
+                self.setIsSignedIn(true)
                 
-                self.setLoading(false)
+            case .failure(_):
+                break
             }
+            
+            self.setLoading(false)
         }
     }
     
