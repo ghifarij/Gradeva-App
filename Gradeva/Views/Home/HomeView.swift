@@ -41,6 +41,7 @@ struct HomeView: View {
         .task {
             await refreshData()
         }
+        .accessibilityLabel("Home screen")
     }
     
     private func refreshData() async {

@@ -30,8 +30,6 @@ struct MainTabView: View {
 //                        .accessibilityHint("View performance statistics and reports")
 //                }
         }
-//        .accessibilityElement(children: .contain)
-//        .accessibilityLabel("Main navigation tabs")
         .navigationDestination(for: NavPath.self) { path in
             switch path {
             case .grading(let subjectId):
