@@ -128,6 +128,10 @@ class ExamManager: ObservableObject {
             completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing subject context for the exam"])) )
             return
         }
+        
+        selectedExam?.maxScore = maxScore
+        selectedExam?.passingScore = passingScore
+        
         updateExamScores(schoolId: schoolId, subjectId: subjectId, examId: examId, maxScore: maxScore, passingScore: passingScore) { [weak self] result in
             guard let self else { completion(result); return }
             switch result {
