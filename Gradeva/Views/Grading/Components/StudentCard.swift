@@ -9,11 +9,13 @@ import SwiftUI
 
 class StudentGrade: Identifiable, ObservableObject {
     let id = UUID()
+    let studentId: String
     @Published var name: String
-    @Published var score: Int?
+    @Published var score: Double?
     @Published var comment: String = ""
-    
-    init(name: String, score: Int? = nil, comment: String = "") {
+
+    init(studentId: String, name: String, score: Double? = nil, comment: String = "") {
+        self.studentId = studentId
         self.name = name
         self.score = score
         self.comment = comment
@@ -22,29 +24,51 @@ class StudentGrade: Identifiable, ObservableObject {
 
 struct StudentCardView: View {
     @ObservedObject var student: StudentGrade
+    let passingGrade: Double?
+    let onScoreChange: (Double?) -> Void
     let onCommentTap: () -> Void
     let focusedStudent: FocusState<UUID?>.Binding
-    private let passingGrade = 80
     @State private var isCommentExpanded = false
     
     private var scoreText: Binding<String> {
         Binding(
-            get: { student.score.map(String.init) ?? "" },
+            get: {
+                if let score = student.score {
+                    if floor(score) == score { return String(Int(score)) }
+                    return String(score)
+                }
+                return ""
+            },
             set: { newValue in
-                let digits = newValue.filter { $0.isNumber }
-                student.score = digits.isEmpty ? nil : Int(digits)
+                // Allow digits and a single dot for decimals
+                let filtered = newValue.filter { $0.isNumber || $0 == "." }
+                // Avoid multiple dots
+                let sanitized: String
+                if filtered.components(separatedBy: ".").count > 2 {
+                    // drop extra dots
+                    var seenDot = false
+                    sanitized = filtered.reduce(into: "") { acc, ch in
+                        if ch == "." {
+                            if !seenDot { acc.append(ch); seenDot = true }
+                        } else {
+                            acc.append(ch)
+                        }
+                    }
+                } else {
+                    sanitized = filtered
+                }
+                if sanitized.isEmpty {
+                    student.score = nil
+                } else if let value = Double(sanitized) {
+                    student.score = value
+                }
             }
         )
     }
     
     private var indicatorColor: Color {
-        guard let score = student.score else { return .gray }
-        
-        if score >= passingGrade {
-            return .green
-        } else {
-            return .red
-        }
+        guard let score = student.score, let passing = passingGrade else { return .gray }
+        return score >= passing ? .green : .red
     }
     
     private var commentIconColor: Color {
@@ -117,6 +141,9 @@ struct StudentCardView: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
+        .onChange(of: student.score) { newValue in
+            onScoreChange(newValue)
+        }
     }
 }
 
@@ -139,15 +166,20 @@ private struct StudentCardPreview: View {
     var body: some View {
         VStack(spacing: 20) {
             StudentCardView(
-                student: StudentGrade(name: "Putri Tanjung", score: 80),
+                student: StudentGrade(studentId: "s1", name: "Putri Tanjung", score: 80),
+                passingGrade: 80,
+                onScoreChange: { _ in },
                 onCommentTap: { print("Comment tapped") },
                 focusedStudent: $focusedStudentID
             )
             StudentCardView(
                 student: StudentGrade(
+                    studentId: "s2",
                     name: "Ahmad Dhani",
                     score: 95
                 ),
+                passingGrade: 80,
+                onScoreChange: { _ in },
                 onCommentTap: { print("Comment tapped") },
                 focusedStudent: $focusedStudentID
             )
@@ -159,4 +191,3 @@ private struct StudentCardPreview: View {
 #Preview {
     StudentCardPreview()
 }
-

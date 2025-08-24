@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct GradingView: View {
-    @ObservedObject private var subjectsManager = SubjectsManager.shared
-    @EnvironmentObject private var auth: AuthManager
+    @ObservedObject var subjectsManager = SubjectsManager.shared
+    @ObservedObject var auth = AuthManager.shared
 
     // Define the grid layout with two flexible columns.
     let columns: [GridItem] = [
@@ -61,4 +61,5 @@ struct GradingView: View {
 
 #Preview {
     GradingView()
+        .environmentObject(AuthManager.shared)
 }

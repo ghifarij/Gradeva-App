@@ -9,8 +9,8 @@ import SwiftUI
 
 struct ExamListView: View {
     let subjectId: String
-    @EnvironmentObject private var auth: AuthManager
-    @EnvironmentObject private var navManager: NavManager
+    @ObservedObject var auth = AuthManager.shared
+    @ObservedObject var navManager = NavManager.shared
     @ObservedObject private var examManager = ExamManager.shared
     @State private var isShowingSetAssessment = false
 
@@ -78,4 +78,6 @@ struct ExamListView: View {
     NavigationView {
         ExamListView(subjectId: "some_ID")
     }
+    .environmentObject(AuthManager.shared)
+    .environmentObject(NavManager.shared)
 }

@@ -35,36 +35,32 @@ class ExamResultServices {
         }
     }
     
-    func createExamResult(schoolId: String, subjectId: String, examId: String, examResult: ExamResult, completion: @escaping (Result<Void, Error>) -> Void) {
+    // Upsert by using studentID as the document id
+    func upsertExamResult(schoolId: String, subjectId: String, examId: String, examResult: ExamResult, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
             let examResultsRef = db.collection("schools").document(schoolId).collection("subjects").document(subjectId).collection("exams").document(examId).collection("examResults")
-            
             do {
                 var examResultData = try Firestore.Encoder().encode(examResult)
-                examResultData["createdAt"] = FieldValue.serverTimestamp()
-                examResultData["updatedAt"] = FieldValue.serverTimestamp()
-                
-                try await examResultsRef.addDocument(data: examResultData)
+                // Managed timestamps
+                if try await examResultsRef.document(examResult.studentID).getDocument().exists {
+                    examResultData["updatedAt"] = FieldValue.serverTimestamp()
+                } else {
+                    examResultData["createdAt"] = FieldValue.serverTimestamp()
+                    examResultData["updatedAt"] = FieldValue.serverTimestamp()
+                }
+                try await examResultsRef.document(examResult.studentID).setData(examResultData, merge: true)
                 completion(.success(()))
             } catch {
                 completion(.failure(error))
             }
         }
     }
-    
-    func updateExamResult(schoolId: String, subjectId: String, examId: String, examResult: ExamResult, completion: @escaping (Result<Void, Error>) -> Void) {
+
+    func deleteExamResult(schoolId: String, subjectId: String, examId: String, studentId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
             let examResultsRef = db.collection("schools").document(schoolId).collection("subjects").document(subjectId).collection("exams").document(examId).collection("examResults")
-            guard let examResultId = examResult.id else {
-                completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not get exam result id"])))
-                return
-            }
-            
             do {
-                var examResultData = try Firestore.Encoder().encode(examResult)
-                examResultData["updatedAt"] = FieldValue.serverTimestamp()
-                
-                try await examResultsRef.document(examResultId).updateData(examResultData)
+                try await examResultsRef.document(studentId).delete()
                 completion(.success(()))
             } catch {
                 completion(.failure(error))

@@ -55,6 +55,88 @@ class ExamResultsManager: ObservableObject {
         }
     }
     
+    // MARK: - Updates
+    func updateScore(examId: String, studentId: String, score: Double?) {
+        guard let schoolId = auth.currentUser?.schoolId, let subjectId = subjectsManager.selectedSubject?.id else { return }
+
+        // Determine current comment if any
+        let existing = examResults.first { $0.studentID == studentId }
+        let comment = existing?.comment
+
+        if score == nil && (comment == nil || comment?.isEmpty == true) {
+            // No score and no comment -> delete
+            examResultServices.deleteExamResult(schoolId: schoolId, subjectId: subjectId, examId: examId, studentId: studentId) { [weak self] result in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success:
+                        self.examResults.removeAll { $0.studentID == studentId }
+                    case .failure(let error):
+                        self.error = error
+                    }
+                }
+            }
+            return
+        }
+
+        let updated = ExamResult(id: studentId, studentID: studentId, score: score, comment: comment)
+        examResultServices.upsertExamResult(schoolId: schoolId, subjectId: subjectId, examId: examId, examResult: updated) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    if let index = self.examResults.firstIndex(where: { $0.studentID == studentId }) {
+                        self.examResults[index] = updated
+                    } else {
+                        self.examResults.append(updated)
+                    }
+                case .failure(let error):
+                    self.error = error
+                }
+            }
+        }
+    }
+
+    func updateComment(examId: String, studentId: String, comment: String?) {
+        guard let schoolId = auth.currentUser?.schoolId, let subjectId = subjectsManager.selectedSubject?.id else { return }
+
+        let existing = examResults.first { $0.studentID == studentId }
+        let score = existing?.score
+
+        if (comment == nil || comment?.isEmpty == true) && score == nil {
+            // No comment and no score -> delete
+            examResultServices.deleteExamResult(schoolId: schoolId, subjectId: subjectId, examId: examId, studentId: studentId) { [weak self] result in
+                guard let self = self else { return }
+                DispatchQueue.main.async {
+                    switch result {
+                    case .success:
+                        self.examResults.removeAll { $0.studentID == studentId }
+                    case .failure(let error):
+                        self.error = error
+                    }
+                }
+            }
+            return
+        }
+
+        let updated = ExamResult(id: studentId, studentID: studentId, score: score, comment: comment)
+        examResultServices.upsertExamResult(schoolId: schoolId, subjectId: subjectId, examId: examId, examResult: updated) { [weak self] result in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    if let index = self.examResults.firstIndex(where: { $0.studentID == studentId }) {
+                        self.examResults[index] = updated
+                    } else {
+                        self.examResults.append(updated)
+                    }
+                case .failure(let error):
+                    self.error = error
+                }
+            }
+        }
+    }
+
     func clearError() {
         self.error = nil
     }
