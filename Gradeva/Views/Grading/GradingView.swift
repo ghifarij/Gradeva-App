@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct GradingView: View {
-    @StateObject private var subjectsManager = SubjectsManager()
+    @ObservedObject private var subjectsManager = SubjectsManager.shared
     @EnvironmentObject private var auth: AuthManager
 
     // Define the grid layout with two flexible columns.
