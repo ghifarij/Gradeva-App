@@ -15,6 +15,9 @@ class Exam: Codable {
     var passingScore: Double?
     var createdAt: Timestamp?
     var updatedAt: Timestamp?
+    var pendingReview: Int?
+    var totalStudentsPassed: Int?
+    var totalStudentsFailed: Int?
     
     init(id: String? = nil, name: String, maxScore: Double? = nil, passingScore: Double? = nil) {
         self.id = id

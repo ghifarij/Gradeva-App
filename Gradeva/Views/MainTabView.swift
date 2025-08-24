@@ -22,19 +22,18 @@ struct MainTabView: View {
                         .accessibilityLabel("Grading tab")
                         .accessibilityHint("Grade student exams and assignments")
                 }
-            AnalyticsView()
-                .tabItem {
-                    Label("Analytics", systemImage: "chart.bar")
-                        .accessibilityLabel("Analytics tab")
-                        .accessibilityHint("View performance statistics and reports")
-                }
+//            TODO: UNCOMMENT WHEN READY
+//            AnalyticsView()
+//                .tabItem {
+//                    Label("Analytics", systemImage: "chart.bar")
+//                        .accessibilityLabel("Analytics tab")
+//                        .accessibilityHint("View performance statistics and reports")
+//                }
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Main navigation tabs")
         .navigationDestination(for: NavPath.self) { path in
             switch path {
-            case .settings:
-                SettingsView()
             case .grading(let subjectId):
                 ExamListView(subjectId: subjectId)
             case .exam(let examId):
@@ -53,5 +52,4 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .environmentObject(NavManager.shared)
 }

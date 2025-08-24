@@ -8,7 +8,6 @@
 import Foundation
 
 enum NavPath: Hashable {
-    case settings
     case grading(String)
     case exam(String)
     case profile
@@ -22,6 +21,10 @@ class NavManager: ObservableObject {
     // Push
     func push(_ path: NavPath) {
         paths.append(path)
+    }
+    
+    func push(_ paths: [NavPath]) {
+        self.paths.append(contentsOf: paths)
     }
     
     // Back to home

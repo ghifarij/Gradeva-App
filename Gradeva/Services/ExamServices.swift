@@ -2,7 +2,7 @@
 //  ExamServices.swift
 //  Gradeva
 //
-//  Created by Codex CLI on 21/08/25.
+//  Created by Ramdan on 22/08/25.
 //
 
 import Foundation
@@ -136,6 +136,20 @@ class ExamServices {
                     "updatedAt": FieldValue.serverTimestamp()
                 ]
                 try await examRef.updateData(updates)
+    
+    func updateExam(schoolId: String, subjectId: String, exam: Exam, completion: @escaping (Result<Void, Error>) -> Void) {
+        Task {
+            let examsRef = db.collection("schools").document(schoolId).collection("subjects").document(subjectId).collection("exams")
+            guard let examId = exam.id else {
+                completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not get exam id"])))
+                return
+            }
+            
+            do {
+                var examData = try Firestore.Encoder().encode(exam)
+                examData["updatedAt"] = FieldValue.serverTimestamp()
+                
+                try await examsRef.document(examId).updateData(examData)
                 completion(.success(()))
             } catch {
                 completion(.failure(error))

@@ -13,6 +13,10 @@ class Subject: Codable {
     var name: String
     var createdAt: Timestamp?
     var updatedAt: Timestamp?
+    var pendingReview: Int?
+    var totalStudentsPassed: Int?
+    var totalStudentsFailed: Int?
+    var targetExamid: String?
     
     init(id: String? = nil, name: String) {
         self.id = id
