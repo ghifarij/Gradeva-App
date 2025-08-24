@@ -20,7 +20,7 @@ struct ExamCard: View {
                     .stroke(Color.appPrimary, lineWidth: 1)
             )
             .shadow(color: .primary.opacity(0.1), radius: 6, x: 0, y: 4)
-            .frame(height: 100)
+            .frame(height: 120)
             .overlay(
                 VStack(spacing: 0) {
                     // MARK: Card Hero

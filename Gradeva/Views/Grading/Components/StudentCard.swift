@@ -72,7 +72,7 @@ struct StudentCardView: View {
                             .foregroundStyle(.textPrimary.opacity(0.4))
                     }
                     TextField("", text: scoreText)
-                        .keyboardType(.numberPad)
+                        .keyboardType(.decimalPad)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.textPrimary)
                         .focused(focusedStudent, equals: student.id)
