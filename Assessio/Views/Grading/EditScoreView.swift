@@ -104,7 +104,6 @@ struct EditScoreView: View {
                 }
             }
             .padding()
-            .padding(.top, 8)
             .navigationTitle("Edit Scores")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

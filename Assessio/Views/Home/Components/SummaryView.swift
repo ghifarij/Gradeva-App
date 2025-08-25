@@ -59,7 +59,7 @@ struct SummaryView: View {
                             
                             // Progress circle
                             Circle()
-                                .trim(from: 0.0, to: CGFloat(progress))
+                                .trim(from: 0.0, to: progress)
                                 .stroke(
                                     Color.appPrimaryDarker,
                                     style: StrokeStyle(lineWidth: 12, lineCap: .round, lineJoin: .round)
@@ -108,7 +108,7 @@ struct SummaryView: View {
                         }
                         Spacer()
                         Text("Passed")
-                            .font(.headline)
+                            .font(.body)
                             .fontWeight(.medium)
                             .accessibilityHidden(true)
                     }
@@ -131,8 +131,8 @@ struct SummaryView: View {
                                 .accessibilityHidden(true)
                         }
                         Spacer()
-                        Text("Need assistance")
-                            .font(.headline)
+                        Text("Need Assist")
+                            .font(.body)
                             .fontWeight(.medium)
                             .accessibilityHidden(true)
                     }

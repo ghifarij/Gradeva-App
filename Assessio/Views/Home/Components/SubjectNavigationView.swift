@@ -43,9 +43,13 @@ struct SubjectNavigationView: View {
         }
     }
     
+    private var hasMultipleSubjects: Bool {
+        viewModel.userSubjects.count > 1
+    }
+    
     var body: some View {
         DynamicHStack {
-            if !isTextLarge {
+            if !isTextLarge && hasMultipleSubjects {
                 NavigationButton(
                     systemName: "chevron.left",
                     action: viewModel.goToPrevSubject,
@@ -71,18 +75,20 @@ struct SubjectNavigationView: View {
             Spacer()
             
             HStack(spacing: 16) {
-                if isTextLarge {
+                if isTextLarge && hasMultipleSubjects {
                     NavigationButton(
                         systemName: "chevron.left",
                         action: viewModel.goToPrevSubject,
                         isEnabled: viewModel.canNavigateToPrevious
                     )
                 }
-                NavigationButton(
-                    systemName: "chevron.right",
-                    action: viewModel.goToNextSubject,
-                    isEnabled: viewModel.canNavigateToNext
-                )
+                if hasMultipleSubjects {
+                    NavigationButton(
+                        systemName: "chevron.right",
+                        action: viewModel.goToNextSubject,
+                        isEnabled: viewModel.canNavigateToNext
+                    )
+                }
             }
         }
         .padding(.horizontal)

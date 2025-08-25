@@ -133,8 +133,6 @@ struct SetAssessmentView: View {
                 }
             }
             .padding()
-            .padding(.top, 8)
-            
             .navigationTitle("Set Assessment")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

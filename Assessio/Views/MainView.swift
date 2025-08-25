@@ -71,8 +71,8 @@ struct MainContentView: View {
                         .transition(.opacity)
                 }
             }
-            
         }
+        .tint(.black)
     }
 }
 

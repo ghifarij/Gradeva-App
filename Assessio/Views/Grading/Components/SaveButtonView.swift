@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct SaveButtonView: View {
     let hasPendingChanges: Bool
@@ -21,6 +22,7 @@ struct SaveButtonView: View {
                     onSave()
                 }
                 .padding()
+                .frame(width: UIScreen.main.bounds.width / 2.2)
                 .fontWeight(.semibold)
                 .foregroundColor(.white)
                 .background(Color.appPrimary)
