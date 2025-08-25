@@ -85,14 +85,25 @@ class ExamResultServices {
                         continue
                     }
 
-                    var data: [String: Any] = [
-                        "studentId": studentId,
-                        "updatedAt": FieldValue.serverTimestamp()
-                    ]
-                    if let score = payload.score { data["score"] = score } else { data["score"] = FieldValue.delete() }
-                    if hasComment { data["comment"] = trimmedComment! } else { data["comment"] = FieldValue.delete() }
+                    // Create update data structure
+                    let updateData = ExamResultUpdateData(
+                        studentId: studentId,
+                        score: payload.score,
+                        comment: hasComment ? trimmedComment! : nil,
+                        updatedAt: FieldValue.serverTimestamp()
+                    )
 
-                    batch.setData(data, forDocument: docRef, merge: true)
+                    var encodedData = try Firestore.Encoder().encode(updateData)
+                    
+                    // Handle field deletions for nil values
+                    if payload.score == nil {
+                        encodedData["score"] = FieldValue.delete()
+                    }
+                    if !hasComment {
+                        encodedData["comment"] = FieldValue.delete()
+                    }
+
+                    batch.setData(encodedData, forDocument: docRef, merge: true)
                 }
 
                 try await batch.commit()
