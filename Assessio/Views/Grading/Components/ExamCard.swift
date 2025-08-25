@@ -10,7 +10,10 @@ import SwiftUI
 
 struct ExamCard: View {
     let exam: Exam
-    let onTap: () -> Void
+    
+    @ObservedObject var auth = AuthManager.shared
+    @ObservedObject var navManager = NavManager.shared
+    @ObservedObject private var examManager = ExamManager.shared
     
     var body: some View {
         RoundedRectangle(cornerRadius: 16)
@@ -69,7 +72,12 @@ struct ExamCard: View {
                     )
                 }
             )
-            .onTapGesture(perform: onTap)
+            .onTapGesture(perform: {
+                if let schoolId = auth.currentUser?.schoolId {
+                    examManager.selectExam(schoolId: schoolId, subjectId: subjectId, exam: exam)
+                    navManager.push(.exam(exam.id ?? exam.name))
+                }
+            })
             .accessibilityElement(children: .combine)
             .accessibilityLabel("\(exam.name) exam card")
             .accessibilityHint("Double tap to open exam: \(exam.name)")
