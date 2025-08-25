@@ -278,7 +278,7 @@ struct StudentGradingListView: View {
     }
     
     private func syncStudentGrades() {
-        let resultsByStudent = Dictionary(uniqueKeysWithValues: examResultsManager.examResults.map { ($0.studentID, $0) })
+        let resultsByStudent = Dictionary(uniqueKeysWithValues: examResultsManager.examResults.map { ($0.studentId, $0) })
         var newGrades: [StudentGrade] = []
         for s in studentsManager.students {
             guard let sid = s.id else { continue }
@@ -300,7 +300,7 @@ struct StudentGradingListView: View {
     }
     
     private func existingScore(for studentId: String) -> Double? {
-        examResultsManager.examResults.first(where: { $0.studentID == studentId })?.score
+        examResultsManager.examResults.first(where: { $0.studentId == studentId })?.score
     }
     
     private func handleScoreChange(for studentId: String, newScore: Double?) {

@@ -29,15 +29,15 @@ class Exam: Codable {
 
 class ExamResult: Codable {
     @DocumentID var id: String?
-    var studentID: String
+    var studentId: String
     var score: Double?
     var comment: String?
     var createdAt: Timestamp?
     var updatedAt: Timestamp?
     
-    init(id: String? = nil, studentID: String, score: Double? = nil, comment: String? = "") {
+    init(id: String? = nil, studentId: String, score: Double? = nil, comment: String? = "") {
         self.id = id
-        self.studentID = studentID
+        self.studentId = studentId
         self.score = score
         self.comment = comment
     }
