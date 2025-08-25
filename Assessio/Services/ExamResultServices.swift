@@ -35,20 +35,20 @@ class ExamResultServices {
         }
     }
     
-    // Upsert by using studentID as the document id
+    // Upsert by using studentId as the document id
     func upsertExamResult(schoolId: String, subjectId: String, examId: String, examResult: ExamResult, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
             let examResultsRef = db.collection("schools").document(schoolId).collection("subjects").document(subjectId).collection("exams").document(examId).collection("examResults")
             do {
                 var examResultData = try Firestore.Encoder().encode(examResult)
                 // Managed timestamps
-                if try await examResultsRef.document(examResult.studentID).getDocument().exists {
+                if try await examResultsRef.document(examResult.studentId).getDocument().exists {
                     examResultData["updatedAt"] = FieldValue.serverTimestamp()
                 } else {
                     examResultData["createdAt"] = FieldValue.serverTimestamp()
                     examResultData["updatedAt"] = FieldValue.serverTimestamp()
                 }
-                try await examResultsRef.document(examResult.studentID).setData(examResultData, merge: true)
+                try await examResultsRef.document(examResult.studentId).setData(examResultData, merge: true)
                 completion(.success(()))
             } catch {
                 completion(.failure(error))
@@ -85,14 +85,25 @@ class ExamResultServices {
                         continue
                     }
 
-                    var data: [String: Any] = [
-                        "studentID": studentId,
-                        "updatedAt": FieldValue.serverTimestamp()
-                    ]
-                    if let score = payload.score { data["score"] = score } else { data["score"] = FieldValue.delete() }
-                    if hasComment { data["comment"] = trimmedComment! } else { data["comment"] = FieldValue.delete() }
+                    // Create update data structure
+                    let updateData = ExamResultUpdateData(
+                        studentId: studentId,
+                        score: payload.score,
+                        comment: hasComment ? trimmedComment! : nil
+                    )
 
-                    batch.setData(data, forDocument: docRef, merge: true)
+                    var encodedData = try Firestore.Encoder().encode(updateData)
+                    encodedData["updatedAt"] = FieldValue.serverTimestamp()
+                    
+                    // Handle field deletions for nil values
+                    if payload.score == nil {
+                        encodedData["score"] = FieldValue.delete()
+                    }
+                    if !hasComment {
+                        encodedData["comment"] = FieldValue.delete()
+                    }
+
+                    batch.setData(encodedData, forDocument: docRef, merge: true)
                 }
 
                 try await batch.commit()

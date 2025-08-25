@@ -23,12 +23,7 @@ struct ExamListView: View {
 
             LazyVStack(spacing: 20) {
                 ForEach(examManager.exams, id: \.id) { exam in
-                    ExamCard(exam: exam) {
-                        if let schoolId = auth.currentUser?.schoolId {
-                            examManager.selectExam(schoolId: schoolId, subjectId: subjectId, exam: exam)
-                            navManager.push(.exam(exam.id ?? exam.name))
-                        }
-                    }
+                    ExamCard(exam: exam, subjectId: subjectId) 
                 }
             }
             .padding()

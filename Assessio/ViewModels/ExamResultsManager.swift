@@ -69,10 +69,10 @@ class ExamResultsManager: ObservableObject {
                 switch result {
                 case .success:
                     for (studentId, payload) in updates {
-                        let updated = ExamResult(id: studentId, studentID: studentId, score: payload.score, comment: payload.comment)
+                        let updated = ExamResult(id: studentId, studentId: studentId, score: payload.score, comment: payload.comment)
                         if (payload.score == nil) && ((payload.comment ?? "").isEmpty) {
-                            self.examResults.removeAll { $0.studentID == studentId }
-                        } else if let idx = self.examResults.firstIndex(where: { $0.studentID == studentId }) {
+                            self.examResults.removeAll { $0.studentId == studentId }
+                        } else if let idx = self.examResults.firstIndex(where: { $0.studentId == studentId }) {
                             self.examResults[idx] = updated
                         } else {
                             self.examResults.append(updated)

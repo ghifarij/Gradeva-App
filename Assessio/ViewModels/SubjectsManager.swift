@@ -37,6 +37,7 @@ class SubjectsManager: ObservableObject {
             switch result {
             case .success(let subjects):
                 DispatchQueue.main.async {
+                    self.setSelectedSubject(subjects.first)
                     self.subjects = subjects
                 }
             case .failure(let error):
