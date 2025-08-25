@@ -9,40 +9,34 @@ import SwiftUI
 
 struct ExamListView: View {
     let subjectId: String
+    @ObservedObject var auth = AuthManager.shared
+    @ObservedObject var navManager = NavManager.shared
+    @ObservedObject private var examManager = ExamManager.shared
     @State private var isShowingSetAssessment = false
-    
-    @State private var examTypes = [
-        "Theory",
-        "Practical",
-        "Interview",
-        "Final Exam"
-    ]
-    
-    // TODO: In a real app, you would use this subjectId to fetch the subject name
-    let columns: [GridItem] = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
-    ]
-    
+
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 16) {
-                ForEach(examTypes, id: \.self) { examType in
-                    ExamCard(title: examType)
+            if let error = examManager.errorMessage, !error.isEmpty {
+                InlineErrorView(message: error)
+                    .padding(.horizontal)
+            }
+
+            LazyVStack(spacing: 20) {
+                ForEach(examManager.exams, id: \.id) { exam in
+                    ExamCard(exam: exam, subjectId: subjectId) 
                 }
             }
             .padding()
-            .accessibilityLabel("Exam types list")
+            .accessibilityLabel("Exam list")
         }
-        .navigationTitle("Exam")
+        .navigationTitle("Assessments")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {
-                    // Set the state to true to show the sheet
                     isShowingSetAssessment = true
                 }) {
-                    Image(systemName: "pencil.line")
+                    Image(systemName: "plus")
                         .font(.headline)
                         .foregroundColor(.primary)
                 }
@@ -51,11 +45,25 @@ struct ExamListView: View {
                 .accessibilityAddTraits(.isButton)
             }
         }
-        .sheet(isPresented: $isShowingSetAssessment) {
-            // Present the SetAssessmentView sheet
-            SetAssessmentView { newAssessmentName in
-                examTypes.append(newAssessmentName)
+        .onAppear {
+            if let schoolId = auth.currentUser?.schoolId {
+                examManager.loadExams(schoolId: schoolId, subjectId: subjectId)
             }
+        }
+        .sheet(isPresented: $isShowingSetAssessment) {
+            SetAssessmentView(onSave: { newAssessmentName, maxScore, passingScore in
+                if let schoolId = auth.currentUser?.schoolId {
+                    examManager.createExam(
+                        schoolId: schoolId,
+                        subjectId: subjectId,
+                        name: newAssessmentName,
+                        maxScore: maxScore,
+                        passingScore: passingScore
+                    ) { _ in
+                        examManager.loadExams(schoolId: schoolId, subjectId: subjectId)
+                    }
+                }
+            })
             .presentationDragIndicator(.visible)
         }
     }
@@ -65,4 +73,6 @@ struct ExamListView: View {
     NavigationView {
         ExamListView(subjectId: "some_ID")
     }
+    .environmentObject(AuthManager.shared)
+    .environmentObject(NavManager.shared)
 }

@@ -10,13 +10,13 @@ import SwiftUI
 
 struct GradingCard: View {
     @ObservedObject var navManager = NavManager.shared
-    let title: String
+    let subject: Subject
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 12)
+        RoundedRectangle(cornerRadius: 16)
             .fill(Color.white.opacity(0.2))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.appPrimary, lineWidth: 1)
             )
             .shadow(color: .primary.opacity(0.1), radius: 6, x: 0, y: 4)
@@ -26,12 +26,11 @@ struct GradingCard: View {
                     // MARK: Card Hero
                     VStack {
                         Spacer()
-                        Text(title)
-                            .font(.title2.weight(.semibold))
+                        Text(subject.name)
+                            .font(.title3.weight(.semibold))
                             .foregroundColor(Color.textPrimary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)
-                            .accessibilityLabel(title)
                             .accessibilityAddTraits(.isHeader)
                         Spacer()
                     }
@@ -39,8 +38,8 @@ struct GradingCard: View {
                     .background(Color.white.opacity(0.2))
                     .clipShape(
                         UnevenRoundedRectangle(
-                            topLeadingRadius: 12,
-                            topTrailingRadius: 12
+                            topLeadingRadius: 16,
+                            topTrailingRadius: 16
                         )
                     )
                     
@@ -49,12 +48,12 @@ struct GradingCard: View {
                         Divider()
                         HStack {
                             Text("See more")
-                                .foregroundColor(Color.textPrimary)
+                                .foregroundColor(.white)
                                 .font(.callout)
                                 .accessibilityHidden(true)
                             Spacer()
                             Image(systemName: "chevron.right")
-                                .foregroundColor(Color.textPrimary)
+                                .foregroundColor(.white)
                                 .font(.headline)
                                 .accessibilityHidden(true)
                         }
@@ -62,18 +61,26 @@ struct GradingCard: View {
                         .padding(.top, 4)
                         .padding(.bottom, 12)
                     }
+                    .background(Color.appPrimary)
+                    .clipShape(
+                        UnevenRoundedRectangle(
+                            bottomLeadingRadius: 16,
+                            bottomTrailingRadius: 16
+                        )
+                    )
                 }
             )
             .onTapGesture {
-                navManager.push(.grading(title))
+                navManager.push(.grading(subject.id ?? subject.name))
             }
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title) grading card")
-            .accessibilityHint("Double tap to open grading for \(title)")
+            .accessibilityLabel("\(subject.name) grading card")
+            .accessibilityHint("Double tap to open grading for \(subject.name)")
             .accessibilityAddTraits(.isButton)
     }
 }
 
 #Preview {
-    GradingCard(title: "Digital Marketing")
+    GradingCard(subject: Subject(name: "Digital Marketing"))
+        .environmentObject(NavManager.shared)
 }

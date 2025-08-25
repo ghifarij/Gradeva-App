@@ -9,25 +9,29 @@ import SwiftUI
 
 
 struct ExamCard: View {
+    let exam: Exam
+    let subjectId: String
+    
+    @ObservedObject var auth = AuthManager.shared
     @ObservedObject var navManager = NavManager.shared
-    let title: String
+    @ObservedObject private var examManager = ExamManager.shared
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 12)
+        RoundedRectangle(cornerRadius: 16)
             .fill(Color.white.opacity(0.2))
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
+                RoundedRectangle(cornerRadius: 16)
                     .stroke(Color.appPrimary, lineWidth: 1)
             )
             .shadow(color: .primary.opacity(0.1), radius: 6, x: 0, y: 4)
-            .frame(height: 160)
+            .frame(height: 120)
             .overlay(
                 VStack(spacing: 0) {
                     // MARK: Card Hero
                     VStack {
                         Spacer()
-                        Text(title)
-                            .font(.title2.weight(.semibold))
+                        Text(exam.name)
+                            .font(.title3.weight(.semibold))
                             .foregroundColor(Color.textPrimary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 8)
@@ -37,8 +41,8 @@ struct ExamCard: View {
                     .background(Color.white.opacity(0.2))
                     .clipShape(
                         UnevenRoundedRectangle(
-                            topLeadingRadius: 12,
-                            topTrailingRadius: 12
+                            topLeadingRadius: 16,
+                            topTrailingRadius: 16
                         )
                     )
                     
@@ -46,13 +50,13 @@ struct ExamCard: View {
                     VStack {
                         Divider()
                         HStack {
-                            Text("See more")
-                                .foregroundColor(Color.textPrimary)
+                            Text("Start Grading")
+                                .foregroundColor(.white)
                                 .font(.callout)
                                 .accessibilityHidden(true)
                             Spacer()
                             Image(systemName: "chevron.right")
-                                .foregroundColor(Color.textPrimary)
+                                .foregroundColor(.white)
                                 .font(.headline)
                                 .accessibilityHidden(true)
                         }
@@ -60,18 +64,28 @@ struct ExamCard: View {
                         .padding(.top, 4)
                         .padding(.bottom, 12)
                     }
+                    .background(Color.appPrimary)
+                    .clipShape(
+                        UnevenRoundedRectangle(
+                            bottomLeadingRadius: 16,
+                            bottomTrailingRadius: 16
+                        )
+                    )
                 }
             )
-            .onTapGesture {
-                navManager.push(.exam(title))
-            }
+            .onTapGesture(perform: {
+                if let schoolId = auth.currentUser?.schoolId {
+                    examManager.selectExam(schoolId: schoolId, subjectId: subjectId, exam: exam)
+                    navManager.push(.exam(exam.id ?? exam.name))
+                }
+            })
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(title) exam card")
-            .accessibilityHint("Double tap to open exam: \(title)")
+            .accessibilityLabel("\(exam.name) exam card")
+            .accessibilityHint("Double tap to open exam: \(exam.name)")
             .accessibilityAddTraits(.isButton)
     }
 }
 
 #Preview {
-    ExamCard(title: "Theory")
+    ExamCard(exam: Exam(name: "Theory"), subjectId: "123")
 }

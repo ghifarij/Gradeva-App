@@ -17,7 +17,7 @@ class ExamResultsManager: ObservableObject {
     private let examResultServices = ExamResultServices()
     private var auth = AuthManager.shared
     private var subjectsManager = SubjectsManager.shared
-    private var examsManager = ExamsManager.shared
+    private var examsManager = ExamManager.shared
     private var cancellables = Set<AnyCancellable>()
     
     static let shared = ExamResultsManager()
@@ -54,7 +54,39 @@ class ExamResultsManager: ObservableObject {
             }
         }
     }
-    
+
+    // Apply a batch of updates including scores and comments.
+    // updates: studentId -> (score, comment)
+    func batchUpdateResults(examId: String, updates: [String: (score: Double?, comment: String?)], completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let schoolId = auth.currentUser?.schoolId, let subjectId = subjectsManager.selectedSubject?.id else {
+            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing school or subject context"])) )
+            return
+        }
+
+        examResultServices.batchUpdateExamResults(schoolId: schoolId, subjectId: subjectId, examId: examId, updates: updates) { [weak self] result in
+            guard let self = self else { completion(result); return }
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    for (studentId, payload) in updates {
+                        let updated = ExamResult(id: studentId, studentId: studentId, score: payload.score, comment: payload.comment)
+                        if (payload.score == nil) && ((payload.comment ?? "").isEmpty) {
+                            self.examResults.removeAll { $0.studentId == studentId }
+                        } else if let idx = self.examResults.firstIndex(where: { $0.studentId == studentId }) {
+                            self.examResults[idx] = updated
+                        } else {
+                            self.examResults.append(updated)
+                        }
+                    }
+                    completion(.success(()))
+                case .failure(let error):
+                    self.error = error
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+
     func clearError() {
         self.error = nil
     }

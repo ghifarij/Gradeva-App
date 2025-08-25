@@ -9,46 +9,79 @@ import SwiftUI
 
 class StudentGrade: Identifiable, ObservableObject {
     let id = UUID()
+    let studentId: String
     @Published var name: String
-    @Published var score: Int?
-    @Published var comment: String = ""
-    
-    init(name: String, score: Int? = nil, comment: String = "") {
+    // The score currently stored in backend (used for filtering/status)
+    @Published var committedScore: Double?
+    // The score being edited locally (used for TextField binding)
+    @Published var draftScore: Double?
+    // The comment currently stored in backend
+    @Published var committedComment: String
+    // The local draft comment
+    @Published var draftComment: String
+
+    init(studentId: String, name: String, score: Double? = nil, comment: String = "") {
+        self.studentId = studentId
         self.name = name
-        self.score = score
-        self.comment = comment
+        self.committedScore = score
+        self.draftScore = score
+        self.committedComment = comment
+        self.draftComment = comment
     }
 }
 
 struct StudentCardView: View {
     @ObservedObject var student: StudentGrade
+    let passingGrade: Double?
+    let onScoreChange: (Double?) -> Void
     let onCommentTap: () -> Void
     let focusedStudent: FocusState<UUID?>.Binding
-    private let passingGrade = 80
     @State private var isCommentExpanded = false
     
     private var scoreText: Binding<String> {
         Binding(
-            get: { student.score.map(String.init) ?? "" },
+            get: {
+                if let score = student.draftScore {
+                    if floor(score) == score { return String(Int(score)) }
+                    return String(score)
+                }
+                return ""
+            },
             set: { newValue in
-                let digits = newValue.filter { $0.isNumber }
-                student.score = digits.isEmpty ? nil : Int(digits)
+                // Allow digits and a single dot for decimals
+                let filtered = newValue.filter { $0.isNumber || $0 == "." }
+                // Avoid multiple dots
+                let sanitized: String
+                if filtered.components(separatedBy: ".").count > 2 {
+                    // drop extra dots
+                    var seenDot = false
+                    sanitized = filtered.reduce(into: "") { acc, ch in
+                        if ch == "." {
+                            if !seenDot { acc.append(ch); seenDot = true }
+                        } else {
+                            acc.append(ch)
+                        }
+                    }
+                } else {
+                    sanitized = filtered
+                }
+                if sanitized.isEmpty {
+                    student.draftScore = nil
+                } else if let value = Double(sanitized) {
+                    student.draftScore = value
+                }
             }
         )
     }
     
     private var indicatorColor: Color {
-        guard let score = student.score else { return .gray }
-        
-        if score >= passingGrade {
-            return .green
-        } else {
-            return .red
-        }
+        // Indicator reflects committed status, not the draft
+        guard let score = student.committedScore, let passing = passingGrade else { return .gray }
+        return score >= passing ? .green : .red
     }
     
     private var commentIconColor: Color {
-        student.comment.isEmpty ? .gray : .textPrimary
+        student.draftComment.isEmpty ? .gray : .textPrimary
     }
     
     var body: some View {
@@ -67,12 +100,12 @@ struct StudentCardView: View {
                 Spacer()
                 
                 ZStack {
-                    if student.score == nil {
+                    if student.draftScore == nil {
                         Text("--")
                             .foregroundStyle(.textPrimary.opacity(0.4))
                     }
                     TextField("", text: scoreText)
-                        .keyboardType(.numberPad)
+                        .keyboardType(.decimalPad)
                         .multilineTextAlignment(.center)
                         .foregroundStyle(.textPrimary)
                         .focused(focusedStudent, equals: student.id)
@@ -105,9 +138,9 @@ struct StudentCardView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Divider()
                     // Display the comment as text
-                    Text(student.comment.isEmpty ? "No comment added." : student.comment)
+                    Text(student.draftComment.isEmpty ? "No comment added." : student.draftComment)
                         .font(.callout)
-                        .foregroundColor(student.comment.isEmpty ? .gray : .textPrimary)
+                        .foregroundColor(student.draftComment.isEmpty ? .gray : .textPrimary)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -117,6 +150,9 @@ struct StudentCardView: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
+        .onChange(of: student.draftScore) { newValue in
+            onScoreChange(newValue)
+        }
     }
 }
 
@@ -139,15 +175,20 @@ private struct StudentCardPreview: View {
     var body: some View {
         VStack(spacing: 20) {
             StudentCardView(
-                student: StudentGrade(name: "Putri Tanjung", score: 80),
+                student: StudentGrade(studentId: "s1", name: "Putri Tanjung", score: 80),
+                passingGrade: 80,
+                onScoreChange: { _ in },
                 onCommentTap: { print("Comment tapped") },
                 focusedStudent: $focusedStudentID
             )
             StudentCardView(
                 student: StudentGrade(
+                    studentId: "s2",
                     name: "Ahmad Dhani",
                     score: 95
                 ),
+                passingGrade: 80,
+                onScoreChange: { _ in },
                 onCommentTap: { print("Comment tapped") },
                 focusedStudent: $focusedStudentID
             )
@@ -159,4 +200,3 @@ private struct StudentCardPreview: View {
 #Preview {
     StudentCardPreview()
 }
-
