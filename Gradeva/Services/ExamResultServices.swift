@@ -56,6 +56,52 @@ class ExamResultServices {
         }
     }
 
+    // Batch upsert/delete exam results based on provided updates.
+    // Pass a map of studentId -> (score, comment). If both score and comment are nil/empty, the document is deleted.
+    func batchUpdateExamResults(
+        schoolId: String,
+        subjectId: String,
+        examId: String,
+        updates: [String: (score: Double?, comment: String?)],
+        completion: @escaping (Result<Void, Error>) -> Void
+    ) {
+        Task {
+            let examResultsRef = db.collection("schools").document(schoolId)
+                .collection("subjects").document(subjectId)
+                .collection("exams").document(examId)
+                .collection("examResults")
+
+            let batch = db.batch()
+
+            do {
+                for (studentId, payload) in updates {
+                    let docRef = examResultsRef.document(studentId)
+                    let trimmedComment = payload.comment?.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let hasComment = (trimmedComment?.isEmpty == false)
+                    let hasScore = (payload.score != nil)
+
+                    if !hasComment && !hasScore {
+                        batch.deleteDocument(docRef)
+                        continue
+                    }
+
+                    var data: [String: Any] = [
+                        "studentID": studentId,
+                        "updatedAt": FieldValue.serverTimestamp()
+                    ]
+                    if let score = payload.score { data["score"] = score } else { data["score"] = FieldValue.delete() }
+                    if hasComment { data["comment"] = trimmedComment! } else { data["comment"] = FieldValue.delete() }
+
+                    batch.setData(data, forDocument: docRef, merge: true)
+                }
+
+                try await batch.commit()
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
     func deleteExamResult(schoolId: String, subjectId: String, examId: String, studentId: String, completion: @escaping (Result<Void, Error>) -> Void) {
         Task {
             let examResultsRef = db.collection("schools").document(schoolId).collection("subjects").document(subjectId).collection("exams").document(examId).collection("examResults")

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 enum GradeStatus: String, CaseIterable {
     case all = "All"
@@ -29,6 +30,9 @@ struct StudentGradingListView: View {
     @FocusState private var focusedStudentID: UUID?
     // Local observable wrappers around Student + ExamResult
     @State private var studentGrades: [StudentGrade] = []
+    // Pending local edits for scores (studentId -> score)
+    @State private var pendingScores: [String: Double?] = [:]
+    @State private var showSaveToast: Bool = false
     
     private var passingGrade: Double? { examManager.selectedExam?.passingScore }
     
@@ -125,24 +129,22 @@ struct StudentGradingListView: View {
                     
                     
                     // MARK: Student List
-                    ScrollView {
-                        VStack(spacing: 12) {
-                            ForEach(filteredStudents) { student in
-                                StudentCardView(
-                                    student: student,
-                                    passingGrade: passingGrade,
-                                    onScoreChange: { newScore in
-                                        examResultsManager.updateScore(examId: examId, studentId: student.studentId, score: newScore)
-                                    },
-                                    onCommentTap: {
-                                        showingCommentFor = student
-                                    },
-                                    focusedStudent: $focusedStudentID
-                                )
-                            }
+                    VStack(spacing: 12) {
+                        ForEach(filteredStudents) { student in
+                            StudentCardView(
+                                student: student,
+                                passingGrade: passingGrade,
+                                onScoreChange: { newScore in
+                                    handleScoreChange(for: student.studentId, newScore: newScore)
+                                },
+                                onCommentTap: {
+                                    showingCommentFor = student
+                                },
+                                focusedStudent: $focusedStudentID
+                            )
                         }
-                        .padding(.horizontal)
                     }
+                    .padding(.horizontal)
                 }
                 .navigationTitle("Students Grade")
                 .navigationBarTitleDisplayMode(.inline)
@@ -159,7 +161,7 @@ struct StudentGradingListView: View {
                         .accessibilityAddTraits(.isButton)
                     }
                     ToolbarItemGroup(placement: .keyboard) {
-                        if focusedStudentID != nil {   
+                        if focusedStudentID != nil {
                             Spacer()
                             Button("Done") { focusedStudentID = nil }
                         }
@@ -167,6 +169,31 @@ struct StudentGradingListView: View {
                 }
                 .accessibilityElement(children: .contain)
                 .accessibilityLabel("Students grading screen")
+                .safeAreaInset(edge: .bottom) {
+                    // Floating Save button
+                    if !pendingScores.isEmpty && focusedStudentID == nil {
+                        HStack {
+                            Spacer()
+                            
+                            Button("Save") {
+                                savePendingScores()
+                            }
+                            .padding()
+                            .frame(width: UIScreen.main.bounds.width / 2.2)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.white)
+                            .background(Color.appPrimary)
+                            .cornerRadius(50)
+                            
+                            Spacer()
+                        }
+                        .padding(.bottom, 8)
+                        .background(Color.clear)
+                        .ignoresSafeArea(.keyboard, edges: .bottom)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+                }
+                
                 
                 // Global comment overlay
                 if let student = showingCommentFor {
@@ -188,6 +215,27 @@ struct StudentGradingListView: View {
                             showingCommentFor = nil
                         }
                     )
+                }
+                
+                // Success toast
+                if showSaveToast {
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Image(systemName: "checkmark.circle.fill").foregroundColor(.white)
+                            Text("Scores saved")
+                                .foregroundColor(.white)
+                                .fontWeight(.semibold)
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(Color.green.opacity(0.9))
+                        .cornerRadius(14)
+                        .padding(.bottom, 90)
+                    }
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Scores saved successfully")
                 }
             }
         }
@@ -221,7 +269,7 @@ struct StudentGradingListView: View {
             .presentationDragIndicator(.visible)
         }
     }
-
+    
     private func syncStudentGrades() {
         let resultsByStudent = Dictionary(uniqueKeysWithValues: examResultsManager.examResults.map { ($0.studentID, $0) })
         var newGrades: [StudentGrade] = []
@@ -232,6 +280,45 @@ struct StudentGradingListView: View {
             newGrades.append(grade)
         }
         self.studentGrades = newGrades
+    }
+    
+    private func existingScore(for studentId: String) -> Double? {
+        examResultsManager.examResults.first(where: { $0.studentID == studentId })?.score
+    }
+    
+    private func handleScoreChange(for studentId: String, newScore: Double?) {
+        let existing = existingScore(for: studentId)
+        pendingScores[studentId] = newScore
+        if existing == newScore { pendingScores.removeValue(forKey: studentId) }
+    }
+    
+    private func savePendingScores() {
+        // Prevent keyboard lingering
+        focusedStudentID = nil
+        
+        let updates = pendingScores // make a stable capture for compiler
+        examResultsManager.batchUpdateScores(examId: examId, updates: updates) { result in
+            switch result {
+            case .success:
+                // Clear pending and resync UI
+                pendingScores.removeAll()
+                showSuccessToast()
+                // Optionally refresh from backend to reflect server timestamps
+                if let schoolId = examManager.selectedExamSchoolId, let subjectId = examManager.selectedExamSubjectId {
+                    examResultsManager.loadExamResults(schoolId: schoolId, subjectId: subjectId, examId: examId)
+                }
+            case .failure:
+                break
+            }
+        }
+    }
+    
+    private func showSuccessToast() {
+        withAnimation(.spring()) { showSaveToast = true }
+        UIAccessibility.post(notification: .announcement, argument: "Scores saved")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            withAnimation(.easeInOut) { showSaveToast = false }
+        }
     }
 }
 
