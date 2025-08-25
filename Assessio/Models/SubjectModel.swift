@@ -1,0 +1,25 @@
+//
+//  SubjectModel.swift
+//  Assessio
+//
+//  Created by Ramdan on 19/08/25.
+//
+
+import Foundation
+import FirebaseFirestore
+
+class Subject: Codable {
+    @DocumentID var id: String?
+    var name: String
+    var createdAt: Timestamp?
+    var updatedAt: Timestamp?
+    var pendingReview: Int?
+    var totalStudentsPassed: Int?
+    var totalStudentsFailed: Int?
+    var targetExamid: String?
+    
+    init(id: String? = nil, name: String) {
+        self.id = id
+        self.name = name
+    }
+}

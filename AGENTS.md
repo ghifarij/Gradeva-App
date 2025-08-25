@@ -1,7 +1,7 @@
-# Gradeva iOS App
+# Assessio iOS App
 
 ## Project Overview
-Gradeva is an iOS application for grading and analytics management, built with SwiftUI and Firebase. It features user authentication, comprehensive onboarding with teacher registration, tabbed navigation, and cloud data storage.
+Assessio is an iOS application for grading and analytics management, built with SwiftUI and Firebase. It features user authentication, comprehensive onboarding with teacher registration, tabbed navigation, and cloud data storage.
 
 ## Technology Stack
 - **Platform**: iOS 18.4+
@@ -13,8 +13,8 @@ Gradeva is an iOS application for grading and analytics management, built with S
 
 ## Project Structure
 ```
-Gradeva/
-├── GradevaApp.swift           # Main app entry point with Firebase configuration
+Assessio/
+├── AssessioApp.swift           # Main app entry point with Firebase configuration
 ├── Models/
 │   ├── UserModel.swift        # AppUser model with Firebase integration & copy function
 │   ├── DatabaseModel.swift    # Firebase database manager singleton
@@ -102,7 +102,7 @@ Gradeva/
 ├── Assets.xcassets/           # App icons, color assets, and avatar images
 ├── GoogleService-Info.plist   # Firebase configuration
 ├── Info.plist                 # App configuration and URL schemes
-├── Gradeva.entitlements       # App capabilities (Sign in with Apple)
+├── Assessio.entitlements       # App capabilities (Sign in with Apple)
 └── firestore.rules            # Firestore security rules
 ```
 
@@ -126,10 +126,10 @@ Gradeva/
 ### Building the App
 ```bash
 # Open project in Xcode
-open Gradeva.xcodeproj
+open Assessio.xcodeproj
 
 # Build from command line
-xcodebuild -project Gradeva.xcodeproj -scheme Gradeva -destination 'platform=iOS Simulator,name=iPhone 15' build
+xcodebuild -project Assessio.xcodeproj -scheme Assessio -destination 'platform=iOS Simulator,name=iPhone 15' build
 ```
 
 ### Dependencies
@@ -190,13 +190,13 @@ All dependencies are managed through Swift Package Manager:
 ### Xcode Operations
 ```bash
 # Clean build folder
-xcodebuild clean -project Gradeva.xcodeproj
+xcodebuild clean -project Assessio.xcodeproj
 
 # Archive for distribution
-xcodebuild archive -project Gradeva.xcodeproj -scheme Gradeva -archivePath build/Gradeva.xcarchive
+xcodebuild archive -project Assessio.xcodeproj -scheme Assessio -archivePath build/Assessio.xcarchive
 
 # Run on simulator
-xcodebuild -project Gradeva.xcodeproj -scheme Gradeva -destination 'platform=iOS Simulator,name=iPhone 15' -allowProvisioningUpdates
+xcodebuild -project Assessio.xcodeproj -scheme Assessio -destination 'platform=iOS Simulator,name=iPhone 15' -allowProvisioningUpdates
 ```
 
 ### Package Management
