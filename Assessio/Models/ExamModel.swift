@@ -56,3 +56,9 @@ class ExamResultUpdateData: Codable {
         self.updatedAt = updatedAt
     }
 }
+
+struct ExamScoreUpdateData: Codable {
+    let maxScore: Double
+    let passingScore: Double
+    let updatedAt: FieldValue
+}

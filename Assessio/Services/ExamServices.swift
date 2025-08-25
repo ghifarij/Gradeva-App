@@ -130,32 +130,36 @@ class ExamServices {
                 .document(examId)
             
             do {
-                var updates: [String: Any] = [
-                    "maxScore": maxScore,
-                    "passingScore": passingScore,
-                    "updatedAt": FieldValue.serverTimestamp()
-                ]
-                try await examRef.updateData(updates)
+                let updateData = ExamScoreUpdateData(
+                    maxScore: maxScore,
+                    passingScore: passingScore,
+                    updatedAt: FieldValue.serverTimestamp()
+                )
+                let encodedData = try Firestore.Encoder().encode(updateData)
+                try await examRef.updateData(encodedData)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func updateExam(schoolId: String, subjectId: String, exam: Exam, completion: @escaping (Result<Void, Error>) -> Void) {
+        Task {
+            let examsRef = db.collection("schools").document(schoolId).collection("subjects").document(subjectId).collection("exams")
+            guard let examId = exam.id else {
+                completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not get exam id"])))
+                return
+            }
+            
+            do {
+                var examData = try Firestore.Encoder().encode(exam)
+                examData["updatedAt"] = FieldValue.serverTimestamp()
                 
-                func updateExam(schoolId: String, subjectId: String, exam: Exam, completion: @escaping (Result<Void, Error>) -> Void) {
-                    Task {
-                        let examsRef = db.collection("schools").document(schoolId).collection("subjects").document(subjectId).collection("exams")
-                        guard let examId = exam.id else {
-                            completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Could not get exam id"])))
-                            return
-                        }
-                        
-                        do {
-                            var examData = try Firestore.Encoder().encode(exam)
-                            examData["updatedAt"] = FieldValue.serverTimestamp()
-                            
-                            try await examsRef.document(examId).updateData(examData)
-                            completion(.success(()))
-                        } catch {
-                            completion(.failure(error))
-                        }
-                    }
-                }
+                try await examsRef.document(examId).updateData(examData)
+                completion(.success(()))
+            } catch {
+                completion(.failure(error))
             }
         }
     }
