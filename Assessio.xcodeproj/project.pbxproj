@@ -18,22 +18,9 @@
 		FE19B8B22E4596FB006F28DE /* Assessio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Assessio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2FB429692E535DF400D16F92 /* Exceptions for "Assessio" folder in "Assessio" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = FE19B8B12E4596FB006F28DE /* Assessio */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FE19B8B42E4596FB006F28DE /* Assessio */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				2FB429692E535DF400D16F92 /* Exceptions for "Assessio" folder in "Assessio" target */,
-			);
 			path = Assessio;
 			sourceTree = "<group>";
 		};
@@ -322,7 +309,7 @@
 				CODE_SIGN_ENTITLEMENTS = Assessio/Assessio.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 2835P8Z43C;
+				DEVELOPMENT_TEAM = C4SQMCY5WT;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Assessio/Info.plist;
@@ -337,7 +324,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.afgaghifari.Assessio;
+				PRODUCT_BUNDLE_IDENTIFIER = com.afgaghifari.Gradeva;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
