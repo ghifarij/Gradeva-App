@@ -1,0 +1,235 @@
+//
+//  WelcomeView.swift
+//  Assessio
+//
+//  Created by Ramdan on 13/08/25.
+//
+
+import SwiftUI
+
+struct WelcomeView: View {
+    @ObservedObject private var subjectsManager = SubjectsManager.shared
+    @ObservedObject private var auth = AuthManager.shared
+    @State private var currentStep = 0
+    @State private var name: String = ""
+    @State private var selectedSubjects = Set<String>()
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    
+    private var isTextLarge: Bool {
+        dynamicTypeSize > .xxLarge
+    }
+    
+    private var canContinueFromName: Bool {
+        !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+    }
+    
+    private var canContinueFromSubjects: Bool {
+        !selectedSubjects.isEmpty
+    }
+    
+    private func nextStep() {
+        withAnimation {
+            currentStep += 1
+        }
+    }
+    
+    private func previousStep() {
+        withAnimation {
+            currentStep -= 1
+        }
+    }
+    
+    private func finishOnboarding() {
+        let subjectIds = Array(selectedSubjects)
+        subjectsManager.completeOnboarding(name: name, subjectIds: subjectIds) { result in
+            switch result {
+            case .success:
+                // Onboarding completion is handled by the ViewModel
+                break
+            case .failure:
+                // Error handling is managed by SubjectsManager's errorMessage
+                break
+            }
+        }
+    }
+    
+    private func getNextAction() {
+        switch currentStep {
+        case 0:
+            nextStep()
+        case 1:
+            if canContinueFromName {
+                nextStep()
+            }
+        case 2:
+            if canContinueFromSubjects {
+                finishOnboarding()
+            }
+        default:
+            break
+        }
+    }
+    
+    var body: some View {
+        VStack {
+            // Header with step indicator
+            HStack(spacing: 8) {
+                ForEach(0..<3, id: \.self) { index in
+                    Circle()
+                        .fill(index <= currentStep ? Color.appPrimary : Color.gray.opacity(0.3))
+                        .frame(width: 8, height: 8)
+                        .scaleEffect(index == currentStep ? 1.2 : 1.0)
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Onboarding progress")
+            .accessibilityValue("Step \(currentStep + 1) of 3")
+            .accessibilityHidden(currentStep == 0)
+            .padding(.top)
+            
+            // Step content with sliding animation
+            ZStack {
+                switch currentStep {
+                case 0:
+                    WelcomeStepView {
+                        getNextAction()
+                    }
+                    .transition(.opacity)
+                case 1:
+                    if isTextLarge {
+                        ScrollView {
+                            NameStepView(name: $name)
+                                .transition(.opacity)
+                                .padding(.horizontal, 24)
+                        }
+                    } else {
+                        NameStepView(name: $name)
+                            .transition(.opacity)
+                            .padding(.horizontal, 24)
+                    }
+                case 2:
+                    if isTextLarge {
+                        ScrollView {
+                            SubjectsStepView(selectedSubjects: $selectedSubjects)
+                                .transition(.opacity)
+                        }
+                    } else {
+                        SubjectsStepView(selectedSubjects: $selectedSubjects)
+                            .transition(.opacity)
+                    }
+                default:
+                    EmptyView()
+                }
+            }
+            .frame(maxHeight: .infinity)
+            
+            // Bottom navigation
+            if currentStep > 0 {
+                VStack(spacing: 12) {
+                    // Back button (outlined)
+                    Button(action: previousStep) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "chevron.left")
+                                .accessibilityHidden(true)
+                            Text("Back")
+                        }
+                        .foregroundStyle(.appPrimary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16)
+                                .stroke(Color.appPrimary, lineWidth: 1)
+                        )
+                    }
+                    .opacity(currentStep == 0 ? 0 : 1)
+                    .disabled(subjectsManager.isClaimingSubjects || currentStep == 0)
+                    .accessibilityHidden(currentStep == 0)
+                    .accessibilityLabel("Back")
+                    .accessibilityHint("Double tap to go to previous onboarding step")
+                    .accessibilityAddTraits(.isButton)
+                    
+                    // Main button
+                    Button(action: getNextAction) {
+                        HStack {
+                            if subjectsManager.isClaimingSubjects && currentStep == 2 {
+                                ProgressView()
+                                    .accessibilityLabel("Setting up your account")
+                            } else {
+                                Text(buttonTitle)
+                                Image(systemName: buttonIcon)
+                                    .accessibilityHidden(true)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical)
+                        .background(buttonEnabled ? Color.appPrimary : Color.gray.opacity(0.3))
+                        .foregroundStyle(.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .transition(.opacity)
+                    }
+                    .disabled(!buttonEnabled || subjectsManager.isClaimingSubjects)
+                    .accessibilityLabel(buttonTitle)
+                    .accessibilityHint(buttonHint)
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityValue(buttonEnabled ? "" : "Disabled")
+                    .accessibilityHidden(currentStep == 0)
+                }
+                .padding(.bottom, 18)
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Onboarding navigation")
+                .padding(.horizontal, 20)
+            }
+        }
+        .ignoresSafeArea(.keyboard)
+        .onAppear {
+            // Prefill name field with user's current display name
+            if name.isEmpty, let displayName = auth.currentUser?.displayName, !displayName.isEmpty {
+                name = displayName
+            }
+            
+            // Skip to step 2 if user already completed demo onboarding
+            if auth.currentUser?.didCompleteDemoOnboarding == true {
+                currentStep = 2
+            }
+        }
+    }
+    
+    private var buttonTitle: String {
+        switch currentStep {
+        case 0: return "Get Started"
+        case 1: return "Continue"
+        case 2: return "Finish Setup"
+        default: return "Continue"
+        }
+    }
+    
+    private var buttonIcon: String {
+        switch currentStep {
+        case 0, 1: return "arrow.right"
+        case 2: return "checkmark"
+        default: return "arrow.right"
+        }
+    }
+    
+    private var buttonEnabled: Bool {
+        switch currentStep {
+        case 0: return true
+        case 1: return canContinueFromName
+        case 2: return canContinueFromSubjects
+        default: return false
+        }
+    }
+    
+    private var buttonHint: String {
+        switch currentStep {
+        case 0: return "Double tap to start the onboarding process"
+        case 1: return canContinueFromName ? "Double tap to continue to subject selection" : "Enter your name to continue"
+        case 2: return canContinueFromSubjects ? "Double tap to complete onboarding and start using the app" : "Select at least one subject to continue"
+        default: return "Double tap to continue to next step"
+        }
+    }
+}
+
+#Preview {
+    WelcomeView()
+}
