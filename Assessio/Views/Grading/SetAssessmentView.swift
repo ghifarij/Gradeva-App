@@ -46,7 +46,7 @@ struct SetAssessmentView: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Assessment name")
                 .accessibilityValue(assessmentName.isEmpty ? "Empty" : assessmentName)
-                .accessibilityHint("Enter the assessment name")
+                .accessibilityHint("Double tap to input assessment name.")
                 
                 // Max Score Field
                 VStack(alignment: .leading) {
@@ -70,7 +70,7 @@ struct SetAssessmentView: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Maximum score")
                 .accessibilityValue(maxScore.isEmpty ? "Empty" : maxScore)
-                .accessibilityHint("Enter the maximum possible score")
+                .accessibilityHint("Double tap to input maximum score.")
                 
                 // Passing Score Field
                 VStack(alignment: .leading) {
@@ -94,10 +94,10 @@ struct SetAssessmentView: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityLabel("Passing score")
                 .accessibilityValue(passingScore.isEmpty ? "Empty" : passingScore)
-                .accessibilityHint("Enter the minimum score required to pass")
+                .accessibilityHint("Double tap to input the minimum score required to pass")
                 
                 // Action Buttons
-                HStack(spacing: 16) {
+                DynamicHStack(spacing: 16) {
                     Button("Cancel") {
                         dismiss()
                     }

@@ -17,26 +17,18 @@ struct ExamCard: View {
     @ObservedObject private var examManager = ExamManager.shared
     
     var body: some View {
-        RoundedRectangle(cornerRadius: 16)
-            .fill(Color.white.opacity(0.2))
-            .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(Color.appPrimary, lineWidth: 1)
-            )
-            .shadow(color: .primary.opacity(0.1), radius: 6, x: 0, y: 4)
-            .frame(height: 120)
-            .overlay(
-                VStack(spacing: 0) {
-                    // MARK: Card Hero
-                    VStack {
-                        Spacer()
-                        Text(exam.name)
-                            .font(.title3.weight(.semibold))
-                            .foregroundColor(Color.textPrimary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, 8)
-                        Spacer()
-                    }
+        Button(action: {
+            if let schoolId = auth.currentUser?.schoolId {
+                examManager.selectExam(schoolId: schoolId, subjectId: subjectId, exam: exam)
+                navManager.push(.exam(exam.id ?? exam.name))
+            }
+        }) {
+            VStack {
+                Text(exam.name)
+                    .padding()
+                    .font(.title3.weight(.semibold))
+                    .foregroundColor(Color.textPrimary)
+                    .multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity)
                     .background(Color.white.opacity(0.2))
                     .clipShape(
@@ -45,44 +37,36 @@ struct ExamCard: View {
                             topTrailingRadius: 16
                         )
                     )
-                    
-                    // MARK: Action Hint
-                    VStack {
-                        Divider()
-                        HStack {
-                            Text("Start Grading")
-                                .foregroundColor(.white)
-                                .font(.callout)
-                                .accessibilityHidden(true)
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .foregroundColor(.white)
-                                .font(.headline)
-                                .accessibilityHidden(true)
-                        }
-                        .padding(.horizontal)
-                        .padding(.top, 4)
-                        .padding(.bottom, 12)
+                
+                // MARK: Action Hint
+                VStack {
+                    HStack {
+                        Text("Input Grade")
+                            .foregroundColor(.white)
+                            .font(.callout)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.white)
+                            .font(.headline)
                     }
-                    .background(Color.appPrimary)
-                    .clipShape(
-                        UnevenRoundedRectangle(
-                            bottomLeadingRadius: 16,
-                            bottomTrailingRadius: 16
-                        )
+                    .padding()
+                }
+                .background(Color.appPrimary)
+                .clipShape(
+                    UnevenRoundedRectangle(
+                        bottomLeadingRadius: 16,
+                        bottomTrailingRadius: 16
                     )
-                }
-            )
-            .onTapGesture(perform: {
-                if let schoolId = auth.currentUser?.schoolId {
-                    examManager.selectExam(schoolId: schoolId, subjectId: subjectId, exam: exam)
-                    navManager.push(.exam(exam.id ?? exam.name))
-                }
-            })
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("\(exam.name) exam card")
-            .accessibilityHint("Double tap to open exam: \(exam.name)")
-            .accessibilityAddTraits(.isButton)
+                )
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color.appPrimary, lineWidth: 1)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(exam.name)
+        .accessibilityHint("Double tap to start grading \(exam.name)")
     }
 }
 

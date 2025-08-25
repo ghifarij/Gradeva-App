@@ -16,8 +16,7 @@ struct PendingGradesView: View {
     }
     
     private func goToReview() {
-        navManager.push(.profile)
-        if let subjectId = subjectsManager.selectedSubject?.id, let examId = subjectsManager.selectedSubject?.targetExamid {
+        if let subjectId = subjectsManager.selectedSubject?.id, let examId = subjectsManager.selectedSubject?.targetExamId {
             navManager.push([.grading(subjectId), .exam(examId)])
         }
     }
