@@ -54,76 +54,21 @@ class ExamResultsManager: ObservableObject {
             }
         }
     }
-    
-    // MARK: - Updates
-    // Immediate per-student mutation (deprecated in favor of batchUpdateScores)
-    func updateScore(examId: String, studentId: String, score: Double?) {
-        // Intentionally left to no-op to prevent immediate remote writes.
-        // Kept for backward compatibility with existing call sites.
-    }
 
-    func updateComment(examId: String, studentId: String, comment: String?) {
-        guard let schoolId = auth.currentUser?.schoolId, let subjectId = subjectsManager.selectedSubject?.id else { return }
-
-        let existing = examResults.first { $0.studentID == studentId }
-        let score = existing?.score
-
-        if (comment == nil || comment?.isEmpty == true) && score == nil {
-            // No comment and no score -> delete
-            examResultServices.deleteExamResult(schoolId: schoolId, subjectId: subjectId, examId: examId, studentId: studentId) { [weak self] result in
-                guard let self = self else { return }
-                DispatchQueue.main.async {
-                    switch result {
-                    case .success:
-                        self.examResults.removeAll { $0.studentID == studentId }
-                    case .failure(let error):
-                        self.error = error
-                    }
-                }
-            }
-            return
-        }
-
-        let updated = ExamResult(id: studentId, studentID: studentId, score: score, comment: comment)
-        examResultServices.upsertExamResult(schoolId: schoolId, subjectId: subjectId, examId: examId, examResult: updated) { [weak self] result in
-            guard let self = self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    if let index = self.examResults.firstIndex(where: { $0.studentID == studentId }) {
-                        self.examResults[index] = updated
-                    } else {
-                        self.examResults.append(updated)
-                    }
-                case .failure(let error):
-                    self.error = error
-                }
-            }
-        }
-    }
-
-    // MARK: - Batch Updates
-    // Apply a batch of score updates (studentId -> score). Does not change comments.
-    func batchUpdateScores(examId: String, updates: [String: Double?], completion: @escaping (Result<Void, Error>) -> Void) {
+    // Apply a batch of updates including scores and comments.
+    // updates: studentId -> (score, comment)
+    func batchUpdateResults(examId: String, updates: [String: (score: Double?, comment: String?)], completion: @escaping (Result<Void, Error>) -> Void) {
         guard let schoolId = auth.currentUser?.schoolId, let subjectId = subjectsManager.selectedSubject?.id else {
             completion(.failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Missing school or subject context"])) )
             return
         }
 
-        // Merge with existing comments so we don't drop them when writing.
-        var merged: [String: (score: Double?, comment: String?)] = [:]
-        for (studentId, score) in updates {
-            let existing = examResults.first { $0.studentID == studentId }
-            merged[studentId] = (score: score, comment: existing?.comment)
-        }
-
-        examResultServices.batchUpdateExamResults(schoolId: schoolId, subjectId: subjectId, examId: examId, updates: merged) { [weak self] result in
-            guard let self else { completion(result); return }
+        examResultServices.batchUpdateExamResults(schoolId: schoolId, subjectId: subjectId, examId: examId, updates: updates) { [weak self] result in
+            guard let self = self else { completion(result); return }
             DispatchQueue.main.async {
                 switch result {
                 case .success:
-                    // Apply updates to local state and then optionally refresh from backend.
-                    for (studentId, payload) in merged {
+                    for (studentId, payload) in updates {
                         let updated = ExamResult(id: studentId, studentID: studentId, score: payload.score, comment: payload.comment)
                         if (payload.score == nil) && ((payload.comment ?? "").isEmpty) {
                             self.examResults.removeAll { $0.studentID == studentId }

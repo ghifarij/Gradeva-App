@@ -27,11 +27,14 @@ struct StudentGradingListView: View {
     @State private var searchText = ""
     @State private var selectedStatus: GradeStatus = .all
     @State private var showingCommentFor: StudentGrade?
+    @State private var originalDraftComment: String = ""
     @FocusState private var focusedStudentID: UUID?
     // Local observable wrappers around Student + ExamResult
     @State private var studentGrades: [StudentGrade] = []
     // Pending local edits for scores (studentId -> score)
     @State private var pendingScores: [String: Double?] = [:]
+    // Pending local edits for comments (studentId -> comment)
+    @State private var pendingComments: [String: String?] = [:]
     @State private var showSaveToast: Bool = false
     
     private var passingGrade: Double? { examManager.selectedExam?.passingScore }
@@ -138,6 +141,7 @@ struct StudentGradingListView: View {
                                     handleScoreChange(for: student.studentId, newScore: newScore)
                                 },
                                 onCommentTap: {
+                                    originalDraftComment = student.draftComment
                                     showingCommentFor = student
                                 },
                                 focusedStudent: $focusedStudentID
@@ -171,12 +175,12 @@ struct StudentGradingListView: View {
                 .accessibilityLabel("Students grading screen")
                 .safeAreaInset(edge: .bottom) {
                     // Floating Save button
-                    if !pendingScores.isEmpty && focusedStudentID == nil {
+                    if (!pendingScores.isEmpty || !pendingComments.isEmpty) && focusedStudentID == nil {
                         HStack {
                             Spacer()
                             
                             Button("Save") {
-                                savePendingScores()
+                                savePendingChanges()
                             }
                             .padding()
                             .frame(width: UIScreen.main.bounds.width / 2.2)
@@ -199,8 +203,8 @@ struct StudentGradingListView: View {
                 if let student = showingCommentFor {
                     CommentOverlayView(
                         comment: Binding(
-                            get: { student.comment },
-                            set: { student.comment = $0 }
+                            get: { student.draftComment },
+                            set: { student.draftComment = $0 }
                         ),
                         isShowing: Binding(
                             get: { showingCommentFor != nil },
@@ -208,10 +212,13 @@ struct StudentGradingListView: View {
                         ),
                         studentName: student.name,
                         onSave: {
-                            examResultsManager.updateComment(examId: examId, studentId: student.studentId, comment: student.comment)
+                            // Save comment draft locally and close overlay
+                            pendingComments[student.studentId] = student.draftComment
                             showingCommentFor = nil
                         },
                         onCancel: {
+                            // Revert to original draft if user cancels
+                            showingCommentFor?.draftComment = originalDraftComment
                             showingCommentFor = nil
                         }
                     )
@@ -223,7 +230,7 @@ struct StudentGradingListView: View {
                         Spacer()
                         HStack {
                             Image(systemName: "checkmark.circle.fill").foregroundColor(.white)
-                            Text("Scores saved")
+                            Text("Changes saved")
                                 .foregroundColor(.white)
                                 .fontWeight(.semibold)
                         }
@@ -235,7 +242,7 @@ struct StudentGradingListView: View {
                     }
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                     .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Scores saved successfully")
+                    .accessibilityLabel("Changes saved successfully")
                 }
             }
         }
@@ -281,10 +288,13 @@ struct StudentGradingListView: View {
         }
         // Replace local list
         self.studentGrades = newGrades
-        // Reapply any draft/pending scores so UI reflects unsaved edits
+        // Reapply any draft/pending edits so UI reflects unsaved edits
         for grade in self.studentGrades {
             if let pending = pendingScores[grade.studentId] {
                 grade.draftScore = pending
+            }
+            if let pending = pendingComments[grade.studentId] {
+                grade.draftComment = pending ?? ""
             }
         }
     }
@@ -299,16 +309,24 @@ struct StudentGradingListView: View {
         if existing == newScore { pendingScores.removeValue(forKey: studentId) }
     }
     
-    private func savePendingScores() {
+    private func savePendingChanges() {
         // Prevent keyboard lingering
         focusedStudentID = nil
         
-        let updates = pendingScores // make a stable capture for compiler
-        examResultsManager.batchUpdateScores(examId: examId, updates: updates) { result in
+        // Build unified updates of score + comment per student
+        var unified: [String: (score: Double?, comment: String?)] = [:]
+        let allStudentIds = Set(pendingScores.keys).union(pendingComments.keys)
+        for sid in allStudentIds {
+            let score = pendingScores[sid] ?? studentGrades.first(where: { $0.studentId == sid })?.committedScore
+            let comment = pendingComments[sid] ?? studentGrades.first(where: { $0.studentId == sid })?.committedComment
+            unified[sid] = (score: score, comment: comment)
+        }
+        examResultsManager.batchUpdateResults(examId: examId, updates: unified) { result in
             switch result {
             case .success:
                 // Clear pending and resync UI
                 pendingScores.removeAll()
+                pendingComments.removeAll()
                 showSuccessToast()
                 // Optionally refresh from backend to reflect server timestamps
                 if let schoolId = examManager.selectedExamSchoolId, let subjectId = examManager.selectedExamSubjectId {
@@ -322,7 +340,7 @@ struct StudentGradingListView: View {
     
     private func showSuccessToast() {
         withAnimation(.spring()) { showSaveToast = true }
-        UIAccessibility.post(notification: .announcement, argument: "Scores saved")
+        UIAccessibility.post(notification: .announcement, argument: "Changes saved")
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             withAnimation(.easeInOut) { showSaveToast = false }
         }

@@ -15,14 +15,18 @@ class StudentGrade: Identifiable, ObservableObject {
     @Published var committedScore: Double?
     // The score being edited locally (used for TextField binding)
     @Published var draftScore: Double?
-    @Published var comment: String = ""
+    // The comment currently stored in backend
+    @Published var committedComment: String
+    // The local draft comment
+    @Published var draftComment: String
 
     init(studentId: String, name: String, score: Double? = nil, comment: String = "") {
         self.studentId = studentId
         self.name = name
         self.committedScore = score
         self.draftScore = score
-        self.comment = comment
+        self.committedComment = comment
+        self.draftComment = comment
     }
 }
 
@@ -77,7 +81,7 @@ struct StudentCardView: View {
     }
     
     private var commentIconColor: Color {
-        student.comment.isEmpty ? .gray : .textPrimary
+        student.draftComment.isEmpty ? .gray : .textPrimary
     }
     
     var body: some View {
@@ -134,9 +138,9 @@ struct StudentCardView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     Divider()
                     // Display the comment as text
-                    Text(student.comment.isEmpty ? "No comment added." : student.comment)
+                    Text(student.draftComment.isEmpty ? "No comment added." : student.draftComment)
                         .font(.callout)
-                        .foregroundColor(student.comment.isEmpty ? .gray : .textPrimary)
+                        .foregroundColor(student.draftComment.isEmpty ? .gray : .textPrimary)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
