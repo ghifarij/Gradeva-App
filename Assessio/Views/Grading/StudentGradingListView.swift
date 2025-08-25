@@ -120,7 +120,7 @@ struct StudentGradingListView: View {
                         Text("Back")
                             .font(.body)
                     }
-                    .foregroundColor(.appPrimary)
+                    .foregroundColor(.black)
                 }
                 .accessibilityLabel("Go back")
                 .accessibilityHint("Double tap to return to previous screen")

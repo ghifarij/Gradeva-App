@@ -32,21 +32,25 @@ struct PendingGradesView: View {
                 VStack {
                     if pendingReview > 0 {
                         VStack {
-                            Text("\(pendingReview) awaiting")
+                            Text("\(pendingReview) Awaiting")
                                 .font(.title3)
                                 .foregroundStyle(.white)
+                                .fontWeight(.medium)
                             Text("your review")
                                 .font(.title3)
                                 .foregroundStyle(.white)
+                                .fontWeight(.medium)
                         }
                         
                         Button(action: goToReview) {
                             Label("Grade here", systemImage: "clipboard")
                                 .foregroundStyle(Color.appPrimary)
+                                .fontWeight(.medium)
                         }
-                        .padding()
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 30)
                         .background(.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                        .clipShape(RoundedRectangle(cornerRadius: 50))
                         .accessibilityRemoveTraits(.isButton)
                         .accessibilityHidden(true)
                     } else {

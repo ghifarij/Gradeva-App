@@ -21,6 +21,7 @@ struct GradingCard: View {
             VStack {
                 Text(subject.name)
                     .padding()
+                    .padding(.vertical)
                     .font(.title3.weight(.semibold))
                     .foregroundColor(Color.textPrimary)
                     .multilineTextAlignment(.center)

@@ -49,7 +49,8 @@ struct ExamCard: View {
                             .foregroundColor(.white)
                             .font(.headline)
                     }
-                    .padding()
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
                 }
                 .background(Color.appPrimary)
                 .clipShape(

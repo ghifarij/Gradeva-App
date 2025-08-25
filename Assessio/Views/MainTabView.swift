@@ -18,7 +18,7 @@ struct MainTabView: View {
                 }
             GradingView()
                 .tabItem {
-                    Label("Grading", systemImage: "pencil")
+                    Label("Grading", systemImage: "pencil.and.list.clipboard")
                         .accessibilityLabel("Grading tab")
                         .accessibilityHint("Grade student exams and assignments")
                 }
@@ -30,6 +30,7 @@ struct MainTabView: View {
 //                        .accessibilityHint("View performance statistics and reports")
 //                }
         }
+        .tint(Color.appPrimary)
         .navigationDestination(for: NavPath.self) { path in
             switch path {
             case .grading(let subjectId):

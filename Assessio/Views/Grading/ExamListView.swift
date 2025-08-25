@@ -55,7 +55,7 @@ struct ExamListView: View {
                 }) {
                     Image(systemName: "plus")
                         .font(.headline)
-                        .foregroundColor(.primary)
+                        .foregroundColor(.black)
                 }
                 .accessibilityLabel("Create new assessment")
                 .accessibilityHint("Double tap to create a new assessment")
