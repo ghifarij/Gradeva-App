@@ -20,7 +20,7 @@ struct NameStepView: View {
             VStack(spacing: 16) {
                 Image(systemName: "person.circle.fill")
                     .font(.system(size: 60))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.appPrimary)
                     .accessibilityHidden(true)
                 
                 VStack(spacing: 8) {
@@ -46,7 +46,7 @@ struct NameStepView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(isNameFieldFocused ? Color.accentColor : Color.clear, lineWidth: 2)
+                        .stroke(isNameFieldFocused ? Color.appPrimary : Color.clear, lineWidth: 2)
                 )
                 .focused($isNameFieldFocused)
                 .textInputAutocapitalization(.words)

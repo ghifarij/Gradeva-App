@@ -82,7 +82,7 @@ struct NotRegisteredView: View {
             HStack(spacing: 8) {
                 ForEach(0..<3, id: \.self) { index in
                     Circle()
-                        .fill(index <= currentStep ? Color.accentColor : Color.gray.opacity(0.3))
+                        .fill(index <= currentStep ? Color.appPrimary : Color.gray.opacity(0.3))
                         .frame(width: 8, height: 8)
                         .scaleEffect(index == currentStep ? 1.2 : 1.0)
                 }
@@ -125,11 +125,12 @@ struct NotRegisteredView: View {
                                 .accessibilityHidden(true)
                             Text("Back")
                         }
+                        .foregroundStyle(.appPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.accentColor, lineWidth: 1)
+                                .stroke(Color.appPrimary, lineWidth: 1)
                         )
                     }
                     .opacity(currentStep == 0 ? 0 : 1)
@@ -153,7 +154,7 @@ struct NotRegisteredView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical)
-                        .background(buttonEnabled ? Color.accentColor : Color.gray.opacity(0.3))
+                        .background(buttonEnabled ? Color.appPrimary : Color.gray.opacity(0.3))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .transition(.opacity)

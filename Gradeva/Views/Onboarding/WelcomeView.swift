@@ -13,6 +13,11 @@ struct WelcomeView: View {
     @State private var currentStep = 0
     @State private var name: String = ""
     @State private var selectedSubjects = Set<String>()
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    
+    private var isTextLarge: Bool {
+        dynamicTypeSize > .xxLarge
+    }
     
     private var canContinueFromName: Bool {
         !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
@@ -71,7 +76,7 @@ struct WelcomeView: View {
             HStack(spacing: 8) {
                 ForEach(0..<3, id: \.self) { index in
                     Circle()
-                        .fill(index <= currentStep ? Color.accentColor : Color.gray.opacity(0.3))
+                        .fill(index <= currentStep ? Color.appPrimary : Color.gray.opacity(0.3))
                         .frame(width: 8, height: 8)
                         .scaleEffect(index == currentStep ? 1.2 : 1.0)
                 }
@@ -91,13 +96,27 @@ struct WelcomeView: View {
                     }
                     .transition(.opacity)
                 case 1:
-                    NameStepView(name: $name)
-                        .transition(.opacity)
-                        .padding(.horizontal, 24)
+                    if isTextLarge {
+                        ScrollView {
+                            NameStepView(name: $name)
+                                .transition(.opacity)
+                                .padding(.horizontal, 24)
+                        }
+                    } else {
+                        NameStepView(name: $name)
+                            .transition(.opacity)
+                            .padding(.horizontal, 24)
+                    }
                 case 2:
-                    SubjectsStepView(selectedSubjects: $selectedSubjects)
-                        .transition(.opacity)
-                    // padding set internally
+                    if isTextLarge {
+                        ScrollView {
+                            SubjectsStepView(selectedSubjects: $selectedSubjects)
+                                .transition(.opacity)
+                        }
+                    } else {
+                        SubjectsStepView(selectedSubjects: $selectedSubjects)
+                            .transition(.opacity)
+                    }
                 default:
                     EmptyView()
                 }
@@ -114,11 +133,12 @@ struct WelcomeView: View {
                                 .accessibilityHidden(true)
                             Text("Back")
                         }
+                        .foregroundStyle(.appPrimary)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical)
                         .overlay(
                             RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.accentColor, lineWidth: 1)
+                                .stroke(Color.appPrimary, lineWidth: 1)
                         )
                     }
                     .opacity(currentStep == 0 ? 0 : 1)
@@ -142,7 +162,7 @@ struct WelcomeView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(.vertical)
-                        .background(buttonEnabled ? Color.accentColor : Color.gray.opacity(0.3))
+                        .background(buttonEnabled ? Color.appPrimary : Color.gray.opacity(0.3))
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
                         .transition(.opacity)

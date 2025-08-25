@@ -17,7 +17,7 @@ struct SubjectsStepView: View {
             VStack(spacing: 16) {
                 Image(systemName: "books.vertical.fill")
                     .font(.system(size: 60))
-                    .foregroundStyle(Color.accentColor)
+                    .foregroundStyle(Color.appPrimary)
                 
                 VStack(spacing: 8) {
                     Text("Choose your subjects")
@@ -33,19 +33,17 @@ struct SubjectsStepView: View {
             .padding(.top, 20)
             .padding(.horizontal, 24)
             
-            // Subject Selection - ScrollView only here
-            ScrollView {
-                LazyVStack(spacing: 12) {
-                    ForEach(subjectsManager.subjects, id: \.id) { subject in
-                        SubjectSelection(
-                            subject: subject,
-                            selectedSubjects: $selectedSubjects
-                        )
-                    }
+            VStack(spacing: 12) {
+                ForEach(subjectsManager.subjects, id: \.id) { subject in
+                    SubjectSelection(
+                        subject: subject,
+                        selectedSubjects: $selectedSubjects
+                    )
                 }
-                .padding(.horizontal, 24)
-                .padding(.vertical, 10)
             }
+            .padding(.horizontal, 24)
+            .padding(.vertical, 10)
+            
             .padding(.bottom)
         }
     }
