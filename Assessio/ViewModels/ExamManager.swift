@@ -129,8 +129,17 @@ class ExamManager: ObservableObject {
             return
         }
         
-        selectedExam?.maxScore = maxScore
-        selectedExam?.passingScore = passingScore
+        // Immediately update local selectedExam and publish so UI reacts in real-time
+        if let current = selectedExam {
+            let previous = current
+            let updated = Exam(id: current.id, name: current.name, maxScore: maxScore, passingScore: passingScore)
+            updated.createdAt = current.createdAt
+            updated.updatedAt = current.updatedAt
+            updated.pendingReview = current.pendingReview
+            updated.totalStudentsPassed = current.totalStudentsPassed
+            updated.totalStudentsFailed = current.totalStudentsFailed
+            self.selectedExam = updated
+        }
         
         updateExamScores(schoolId: schoolId, subjectId: subjectId, examId: examId, maxScore: maxScore, passingScore: passingScore) { [weak self] result in
             guard let self else { completion(result); return }
@@ -140,6 +149,11 @@ class ExamManager: ObservableObject {
                 self.loadExam(schoolId: schoolId, subjectId: subjectId, examId: examId)
                 completion(.success(()))
             case .failure(let error):
+                // Rollback local change on failure
+                if let prev = self.selectedExam { // try to restore from network if available
+                    // No-op; loadExam below will refresh anyway, but we roll back to previous if needed
+                }
+                self.loadExam(schoolId: schoolId, subjectId: subjectId, examId: examId)
                 completion(.failure(error))
             }
         }
