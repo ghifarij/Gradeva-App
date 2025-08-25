@@ -19,21 +19,20 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		2FB429692E535DF400D16F92 /* Exceptions for "Gradeva" folder in "Gradeva" target */ = {
+		2FB429692E535DF400D16F92 /* Exceptions for "Assessio" folder in "Assessio" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = FE19B8B12E4596FB006F28DE /* Gradeva */;
+			target = FE19B8B12E4596FB006F28DE /* Assessio */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		FE19B8B42E4596FB006F28DE /* Assessio */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				2FB429692E535DF400D16F92 /* Exceptions for "Gradeva" folder in "Gradeva" target */,
+				2FB429692E535DF400D16F92 /* Exceptions for "Assessio" folder in "Assessio" target */,
 			);
 			path = Assessio;
 			sourceTree = "<group>";

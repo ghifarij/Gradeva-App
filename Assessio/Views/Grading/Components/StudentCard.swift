@@ -11,13 +11,17 @@ class StudentGrade: Identifiable, ObservableObject {
     let id = UUID()
     let studentId: String
     @Published var name: String
-    @Published var score: Double?
+    // The score currently stored in backend (used for filtering/status)
+    @Published var committedScore: Double?
+    // The score being edited locally (used for TextField binding)
+    @Published var draftScore: Double?
     @Published var comment: String = ""
 
     init(studentId: String, name: String, score: Double? = nil, comment: String = "") {
         self.studentId = studentId
         self.name = name
-        self.score = score
+        self.committedScore = score
+        self.draftScore = score
         self.comment = comment
     }
 }
@@ -33,7 +37,7 @@ struct StudentCardView: View {
     private var scoreText: Binding<String> {
         Binding(
             get: {
-                if let score = student.score {
+                if let score = student.draftScore {
                     if floor(score) == score { return String(Int(score)) }
                     return String(score)
                 }
@@ -58,16 +62,17 @@ struct StudentCardView: View {
                     sanitized = filtered
                 }
                 if sanitized.isEmpty {
-                    student.score = nil
+                    student.draftScore = nil
                 } else if let value = Double(sanitized) {
-                    student.score = value
+                    student.draftScore = value
                 }
             }
         )
     }
     
     private var indicatorColor: Color {
-        guard let score = student.score, let passing = passingGrade else { return .gray }
+        // Indicator reflects committed status, not the draft
+        guard let score = student.committedScore, let passing = passingGrade else { return .gray }
         return score >= passing ? .green : .red
     }
     
@@ -91,7 +96,7 @@ struct StudentCardView: View {
                 Spacer()
                 
                 ZStack {
-                    if student.score == nil {
+                    if student.draftScore == nil {
                         Text("--")
                             .foregroundStyle(.textPrimary.opacity(0.4))
                     }
@@ -141,7 +146,7 @@ struct StudentCardView: View {
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
-        .onChange(of: student.score) { newValue in
+        .onChange(of: student.draftScore) { newValue in
             onScoreChange(newValue)
         }
     }

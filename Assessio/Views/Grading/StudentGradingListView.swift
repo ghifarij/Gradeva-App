@@ -48,17 +48,17 @@ struct StudentGradingListView: View {
         if let passing = passingGrade {
             switch selectedStatus {
             case .passed:
-                students = students.filter { $0.score != nil && ($0.score ?? 0) >= passing }
+                students = students.filter { $0.committedScore != nil && ($0.committedScore ?? 0) >= passing }
             case .failed:
-                students = students.filter { $0.score != nil && ($0.score ?? 0) < passing }
+                students = students.filter { $0.committedScore != nil && ($0.committedScore ?? 0) < passing }
             case .notGraded:
-                students = students.filter { $0.score == nil }
+                students = students.filter { $0.committedScore == nil }
             case .all:
                 break
             }
         } else {
             if selectedStatus == .notGraded {
-                students = students.filter { $0.score == nil }
+                students = students.filter { $0.committedScore == nil }
             }
         }
         
@@ -279,7 +279,14 @@ struct StudentGradingListView: View {
             let grade = StudentGrade(studentId: sid, name: s.name, score: result?.score, comment: result?.comment ?? "")
             newGrades.append(grade)
         }
+        // Replace local list
         self.studentGrades = newGrades
+        // Reapply any draft/pending scores so UI reflects unsaved edits
+        for grade in self.studentGrades {
+            if let pending = pendingScores[grade.studentId] {
+                grade.draftScore = pending
+            }
+        }
     }
     
     private func existingScore(for studentId: String) -> Double? {
