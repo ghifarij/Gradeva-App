@@ -14,6 +14,8 @@ struct StudentGradingListView: View {
     @ObservedObject private var navManager = NavManager.shared
     @State private var isShowingEditScores = false
     @FocusState private var focusedStudentID: UUID?
+    @GestureState private var dragOffset = CGSize.zero
+    @Environment(\.presentationMode) var presentationMode
     
     init(examId: String) {
         self.examId = examId
@@ -90,6 +92,17 @@ struct StudentGradingListView: View {
             }
             .presentationDragIndicator(.visible)
         }
+        .gesture(
+            DragGesture()
+                .updating(
+                    $dragOffset,
+                    body: { (value, state, transaction) in
+                        if(value.startLocation.x < 20 && value.translation.width > 100) {
+                            self.presentationMode.wrappedValue.dismiss()
+                        }
+                    }
+                )
+        )
         .accessibilityLabel("Students grading screen")
         .accessibilityAddTraits(.isHeader)
         .accessibilityElement(children: .contain)
