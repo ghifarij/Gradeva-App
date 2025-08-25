@@ -23,7 +23,7 @@ struct ExamListView: View {
 
             LazyVStack(spacing: 20) {
                 ForEach(examManager.exams, id: \.id) { exam in
-                    ExamCard(exam: exam)
+                    ExamCard(exam: exam, subjectId: subjectId) 
                 }
             }
             .padding()

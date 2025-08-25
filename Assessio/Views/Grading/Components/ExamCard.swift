@@ -10,6 +10,7 @@ import SwiftUI
 
 struct ExamCard: View {
     let exam: Exam
+    let subjectId: String
     
     @ObservedObject var auth = AuthManager.shared
     @ObservedObject var navManager = NavManager.shared
@@ -86,5 +87,5 @@ struct ExamCard: View {
 }
 
 #Preview {
-    ExamCard(exam: Exam(name: "Theory"), onTap: {})
+    ExamCard(exam: Exam(name: "Theory"), subjectId: "123")
 }
