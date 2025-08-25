@@ -50,7 +50,7 @@ struct CommentOverlayView: View {
                 .padding(.bottom, 30)
                 
                 // Buttons
-                HStack(spacing: 16) {
+                DynamicHStack(spacing: 16) {
                     Button("Cancel") {
                         onCancel()
                     }

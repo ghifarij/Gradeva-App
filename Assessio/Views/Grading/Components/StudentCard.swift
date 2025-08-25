@@ -7,29 +7,6 @@
 
 import SwiftUI
 
-class StudentGrade: Identifiable, ObservableObject {
-    let id = UUID()
-    let studentId: String
-    @Published var name: String
-    // The score currently stored in backend (used for filtering/status)
-    @Published var committedScore: Double?
-    // The score being edited locally (used for TextField binding)
-    @Published var draftScore: Double?
-    // The comment currently stored in backend
-    @Published var committedComment: String
-    // The local draft comment
-    @Published var draftComment: String
-
-    init(studentId: String, name: String, score: Double? = nil, comment: String = "") {
-        self.studentId = studentId
-        self.name = name
-        self.committedScore = score
-        self.draftScore = score
-        self.committedComment = comment
-        self.draftComment = comment
-    }
-}
-
 struct StudentCardView: View {
     @ObservedObject var student: StudentGrade
     let passingGrade: Double?
@@ -37,6 +14,11 @@ struct StudentCardView: View {
     let onCommentTap: () -> Void
     let focusedStudent: FocusState<UUID?>.Binding
     @State private var isCommentExpanded = false
+    @Environment(\.dynamicTypeSize) var dynamicTypeSize
+    
+    private var isTextLarge: Bool {
+        dynamicTypeSize > .xxLarge
+    }
     
     private var scoreText: Binding<String> {
         Binding(
@@ -84,55 +66,84 @@ struct StudentCardView: View {
         student.draftComment.isEmpty ? .gray : .textPrimary
     }
     
+    private func toggleExpanded() {
+        withAnimation(.spring()) {
+            isCommentExpanded.toggle()
+        }
+    }
+    
     var body: some View {
         VStack(spacing: 0) {
-            HStack(spacing: 16) {
+            DynamicHStack {
                 Capsule()
                     .fill(indicatorColor)
-                    .frame(width: 6, height: 40)
+                    .if(!isTextLarge) {
+                        $0.frame(width: 6, height: 40)
+                    }
+                    .if(isTextLarge) {
+                        $0.frame(maxWidth: .infinity)
+                        .frame(height: 10)
+                    }
                     .accessibilityHidden(true)
                 
                 Text(student.name)
                     .font(.headline)
                     .fontWeight(.semibold)
                     .foregroundStyle(.textPrimary)
-                
-                Spacer()
-                
-                ZStack {
-                    if student.draftScore == nil {
-                        Text("--")
-                            .foregroundStyle(.textPrimary.opacity(0.4))
+                    .accessibilityLabel(student.name)
+                    .accessibilityHint("Double tap to open comments")
+                    .accessibilityAction {
+                        toggleExpanded()
                     }
-                    TextField("", text: scoreText)
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.textPrimary)
-                        .focused(focusedStudent, equals: student.id)
-                }
-                .frame(width: 60, height: 40)
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(Color.gray.opacity(0.5), lineWidth: 1)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                )
                 
-                Button(action: {
-                    onCommentTap()
-                }) {
-                    Image(systemName: "message")
-                        .font(.title2)
-                        .foregroundColor(commentIconColor)
+                if !isTextLarge {
+                    Spacer()
+                }
+                
+                HStack {
+                    ZStack {
+                        if student.draftScore == nil {
+                            Text("--")
+                                .foregroundStyle(.textPrimary.opacity(0.4))
+                        }
+                        TextField("", text: scoreText)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.textPrimary)
+                            .focused(focusedStudent, equals: student.id)
+                            .accessibilityLabel("Student's score")
+                            .accessibilityHint("Double tap to input student's score")
+                    }
+                    .if(!isTextLarge) {
+                        $0.frame(width: 60, height: 40)
+                    }
+                    .if(isTextLarge) {
+                        $0.frame(height: 80)
+                    }
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.gray.opacity(0.5), lineWidth: 1)
+                            .background(Color.white)
+                            .cornerRadius(10)
+                    )
+                    
+                    Button(action: onCommentTap) {
+                        Image(systemName: "message")
+                            .font(.title2)
+                            .foregroundColor(commentIconColor)
+                    }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel("Input comment")
+                    .accessibilityHint("Double tap to open comment input")
                 }
             }
             .padding()
             .contentShape(Rectangle())
             .onTapGesture {
-                withAnimation(.spring()) {
-                    isCommentExpanded.toggle()
-                }
+                toggleExpanded()
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(student.name)
             
             if isCommentExpanded {
                 VStack(alignment: .leading, spacing: 0) {
@@ -145,14 +156,18 @@ struct StudentCardView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .transition(.opacity.combined(with: .move(edge: .top)))
+                .accessibilityElement(children: .contain)
+                .accessibilityLabel("Comment about \(student.name)")
+                .accessibilityAddTraits(.isStaticText)
             }
         }
+        .frame(maxWidth: .infinity)
         .background(Color.white)
         .cornerRadius(12)
         .shadow(color: .black.opacity(0.05), radius: 5, y: 2)
-        .onChange(of: student.draftScore) { newValue in
-            onScoreChange(newValue)
-        }
+        .onChange(of: student.draftScore, {
+            onScoreChange(student.draftScore)
+        })
     }
 }
 

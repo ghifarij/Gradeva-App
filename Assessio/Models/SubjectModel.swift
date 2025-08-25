@@ -16,7 +16,7 @@ class Subject: Codable {
     var pendingReview: Int?
     var totalStudentsPassed: Int?
     var totalStudentsFailed: Int?
-    var targetExamid: String?
+    var targetExamId: String?
     
     init(id: String? = nil, name: String) {
         self.id = id
