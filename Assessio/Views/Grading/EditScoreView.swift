@@ -73,7 +73,7 @@ struct EditScoreView: View {
                 .accessibilityValue(passingScoreText.isEmpty ? "Empty" : passingScoreText)
                 .accessibilityHint("Enter the minimum score required to pass")
 
-                HStack(spacing: 16) {
+                DynamicHStack(spacing: 16) {
                     Button("Cancel") { dismiss() }
                         .padding()
                         .frame(maxWidth: .infinity)
