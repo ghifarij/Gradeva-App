@@ -43,22 +43,13 @@ class ExamResult: Codable {
     }
 }
 
-class ExamResultUpdateData: Codable {
+struct ExamResultUpdateData: Codable {
     let studentId: String
     let score: Double?
     let comment: String?
-    let updatedAt: FieldValue
-    
-    init(studentId: String, score: Double?, comment: String?, updatedAt: FieldValue) {
-        self.studentId = studentId
-        self.score = score
-        self.comment = comment
-        self.updatedAt = updatedAt
-    }
 }
 
 struct ExamScoreUpdateData: Codable {
     let maxScore: Double
     let passingScore: Double
-    let updatedAt: FieldValue
 }

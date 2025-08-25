@@ -132,10 +132,10 @@ class ExamServices {
             do {
                 let updateData = ExamScoreUpdateData(
                     maxScore: maxScore,
-                    passingScore: passingScore,
-                    updatedAt: FieldValue.serverTimestamp()
+                    passingScore: passingScore
                 )
-                let encodedData = try Firestore.Encoder().encode(updateData)
+                var encodedData = try Firestore.Encoder().encode(updateData)
+                encodedData["updatedAt"] = FieldValue.serverTimestamp()
                 try await examRef.updateData(encodedData)
                 completion(.success(()))
             } catch {

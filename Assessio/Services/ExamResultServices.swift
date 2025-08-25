@@ -89,11 +89,11 @@ class ExamResultServices {
                     let updateData = ExamResultUpdateData(
                         studentId: studentId,
                         score: payload.score,
-                        comment: hasComment ? trimmedComment! : nil,
-                        updatedAt: FieldValue.serverTimestamp()
+                        comment: hasComment ? trimmedComment! : nil
                     )
 
                     var encodedData = try Firestore.Encoder().encode(updateData)
+                    encodedData["updatedAt"] = FieldValue.serverTimestamp()
                     
                     // Handle field deletions for nil values
                     if payload.score == nil {
